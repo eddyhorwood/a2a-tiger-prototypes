@@ -1,0 +1,65 @@
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    // Treat user as "logged in" if SignInWithXeroController set these session keys
+    var isLoggedIn = !string.IsNullOrEmpty(HttpContextAccessor?.HttpContext?.Session?.GetString("UserEmail"));
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - XeroDotnetSampleApp</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+
+<body>
+@* Only populate the header when the user is logged in *@
+@if (isLoggedIn)
+{
+    <header>
+        @await Component.InvokeAsync("NavBar")
+    </header>
+
+    <div class="row no-gutters">
+        <div class="col-3 no-gutters">
+            @* Hide the sidebar until logged in, too.
+            If you want the sidebar visible while logged out, remove the if-block. *@
+            @if (isLoggedIn)
+            {
+                @await Component.InvokeAsync("SideBar", new { maxPriority = 2, isDone = false })
+            }
+        </div>
+
+        <div class="col-9 no-gutters">
+            <div class="render-body">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container-fluid p-3">
+        @RenderBody()
+    </div>
+}
+</header>
+
+
+<footer>
+    <div class="footer">
+        &copy; @DateTime.Now.Year - XeroDotnetSampleApp
+    </div>
+</footer>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+
+@RenderSection("Scripts", required: false)
+</body>
+</html>
