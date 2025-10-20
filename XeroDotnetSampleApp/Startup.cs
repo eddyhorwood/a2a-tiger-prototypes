@@ -7,6 +7,8 @@ using Xero.NetStandard.OAuth2.Config;
 using Microsoft.EntityFrameworkCore;
 
 using XeroDotnetSampleApp.Services;
+using XeroDotnetSampleApp.Clients;
+using XeroDotnetSampleApp.Config;
 
 namespace XeroDotnetSampleApp
 {
@@ -28,6 +30,7 @@ namespace XeroDotnetSampleApp
             services.Configure<XeroAppStoreSubscriptionSettings>(Configuration.GetSection("XeroAppStoreSubscriptionSettings"));
             services.Configure<WebhookSettings>(Configuration.GetSection("WebhookSettings"));
             services.Configure<DatabaseConfiguration>(Configuration.GetSection("DatabaseConfiguration"));
+            services.Configure<AkahuSettings>(Configuration.GetSection("AkahuSettings"));
 
             services.AddHttpClient();
             
@@ -51,6 +54,7 @@ namespace XeroDotnetSampleApp
             // Add services as scoped services
             services.AddScoped<AppStoreService>();
             services.AddScoped<DatabaseService>();
+            services.AddScoped<IAkahuClient, AkahuClient>();
 
             services.AddControllersWithViews();
         }

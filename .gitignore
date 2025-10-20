@@ -27,3 +27,4 @@ XeroDotnetSampleApp/tenantid.json
 XeroDotnetSampleApp/xerotoken.json
 xero-dotnet-sample-app.sln
 .gitmodules
+.vs
