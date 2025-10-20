@@ -137,6 +137,13 @@ The version numbers may differ.
 <br>
 
 ## Running the App
+### With Docker
+```
+$ docker build -t xero-dotnet-sample-app .
+$ docker run -p 5000:8080 -e ASPNETCORE_ENVIRONMENT=Development xero-dotnet-sample-app
+```
+Access the application at http://localhost:5000
+
 ### Construct the Database
 Go <span style="color:red;">'cd'</span> to the directory where the .csproj resides, create the database by running <span style="color:red;">dotnet ef migrations add InitialCreate</span><br>
 This creates a <span style="color:red;">Migrations</span> folder with code to build the schema.<br>

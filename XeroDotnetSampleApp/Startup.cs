@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Xero.NetStandard.OAuth2.Config;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 using XeroDotnetSampleApp.Services;
 
@@ -53,6 +54,9 @@ namespace XeroDotnetSampleApp
             services.AddScoped<DatabaseService>();
 
             services.AddControllersWithViews();
+            
+            // Add health checks
+            services.AddHealthChecks();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -85,6 +89,9 @@ namespace XeroDotnetSampleApp
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+                    
+                // Add health check endpoint
+                endpoints.MapHealthChecks("/health");
             });
         }
     }
