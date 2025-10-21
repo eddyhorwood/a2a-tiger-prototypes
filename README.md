@@ -79,7 +79,7 @@ Add to your config file similar to above, for example by running <code style="co
 Clone this repo to your local drive or open with GitHub desktop client.
 
 __Configure your API Keys__<br>
-In /XeroDotnetSampleApp/appsettings.json, you should populate your configuration values as such: 
+In /A2APaymentsApp/appsettings.json, you should populate your configuration values as such: 
 
 ```
 "XeroConfiguration": {
@@ -156,7 +156,7 @@ More on this context and models below.<br>
 
 ### Build and Run the Project
 __With Command Line__<br>
-Change directory to XeroDotnetSampleApp directory on your terminal of choice where you can see XeroDotnetSampleApp.csproj, build the project by: 
+Change directory to A2APaymentsApp directory on your terminal of choice where you can see A2APaymentsApp.csproj, build the project by: 
 ```
 $ dotnet build
 
@@ -177,7 +177,7 @@ info: Microsoft.Hosting.Lifetime[0]
 info: Microsoft.Hosting.Lifetime[0]
       Hosting environment: Development
 info: Microsoft.Hosting.Lifetime[0]
-      Content root path: /Users/.../XeroDotnetSampleApp/XeroDotnetSampleApp
+      Content root path: /Users/.../A2APaymentsApp/A2APaymentsApp
 ```
 
 __With VS Code__<br>

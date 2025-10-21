@@ -6,9 +6,9 @@
         "type": "coreclr",
         "request": "launch",
         "preLaunchTask": "build",
-        "program": "${workspaceFolder}/XeroDotnetSampleApp/bin/Debug/net9.0/XeroDotnetSampleApp.dll",
+        "program": "${workspaceFolder}/A2APaymentsApp/bin/Debug/net9.0/A2APaymentsApp.dll",
         "args": [],
-        "cwd": "${workspaceFolder}/XeroDotnetSampleApp",
+        "cwd": "${workspaceFolder}/A2APaymentsApp",
         "stopAtEntry": false,
         "logging": {
           "console": true,

@@ -1,13 +1,13 @@
 # Once pulled, during development alternate below appsettings.json part
-# XeroDotnetSampleApp/appsettings.json
-# XeroDotnetSampleApp/appsettings.Development.json
+# A2APaymentsApp/appsettings.json
+# A2APaymentsApp/appsettings.Development.json
 
 # Build outputs
-XeroDotnetSampleApp/bin/*
-XeroDotnetSampleApp/obj/*
+A2APaymentsApp/bin/*
+A2APaymentsApp/obj/*
 
 # Database files
-XeroDotnetSampleApp/Migrations
+A2APaymentsApp/Migrations
 *.db
 *.db-shm
 *.db-wal
@@ -21,10 +21,12 @@ XeroDotnetSampleApp/Migrations
 # .vscode/
 
 # User-specific files
-XeroDotnetSampleApp/non_tenanted_xerotoken.json
-XeroDotnetSampleApp/state.json
-XeroDotnetSampleApp/tenantid.json
-XeroDotnetSampleApp/xerotoken.json
+A2APaymentsApp/non_tenanted_xerotoken.json
+A2APaymentsApp/state.json
+A2APaymentsApp/tenantid.json
+A2APaymentsApp/xerotoken.json
 xero-dotnet-sample-app.sln
 .gitmodules
 .vs
+
+.idea
