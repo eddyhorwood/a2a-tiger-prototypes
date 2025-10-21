@@ -1,0 +1,30 @@
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 50
+  targetMemoryUtilizationPercentage: 50
+replicaCount: 1
+maxUnavailable: 1
+image:
+  tag: latest
+  repository: >-
+    carlpaton060/a2apaymentsnz
+containerPort: 8080
+ingress:
+  enabled: true
+  path: /
+healthcheck:
+  path: /health
+  initialDelaySeconds: 3
+  periodSeconds: 10
+resources:
+  requests:
+    cpu: 250m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+kotahi:
+  catalogueUUID: en3070bca8692b1fb1
+name: A2AHackathon
