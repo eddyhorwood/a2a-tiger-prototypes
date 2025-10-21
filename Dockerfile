@@ -3,18 +3,18 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
 # Copy project file and restore dependencies
-COPY XeroDotnetSampleApp/*.csproj XeroDotnetSampleApp/
-RUN dotnet restore XeroDotnetSampleApp/XeroDotnetSampleApp.csproj
+COPY A2APaymentsApp/*.csproj A2APaymentsApp/
+RUN dotnet restore A2APaymentsApp/A2APaymentsApp.csproj
 
 # Copy the rest of the source code
 COPY . .
 
 # Build the application
-WORKDIR /src/XeroDotnetSampleApp
-RUN dotnet build XeroDotnetSampleApp.csproj -c Release -o /app/build
+WORKDIR /src/A2APaymentsApp
+RUN dotnet build A2APaymentsApp.csproj -c Release -o /app/build
 
 # Publish the application
-RUN dotnet publish XeroDotnetSampleApp.csproj -c Release -o /app/publish
+RUN dotnet publish A2APaymentsApp.csproj -c Release -o /app/publish
 
 # Use the official .NET 9.0 runtime image for the final stage
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
@@ -27,4 +27,4 @@ COPY --from=build /app/publish .
 EXPOSE 8080
 
 # Set the entry point
-ENTRYPOINT ["dotnet", "XeroDotnetSampleApp.dll"]
+ENTRYPOINT ["dotnet", "A2APaymentsApp.dll"]

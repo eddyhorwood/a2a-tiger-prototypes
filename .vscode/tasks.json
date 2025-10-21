@@ -7,7 +7,7 @@
 		"type": "process",
 		"args": [
 		  "build",
-		  "${workspaceFolder}/XeroDotnetSampleApp/XeroDotnetSampleApp.csproj"
+		  "${workspaceFolder}/A2APaymentsApp/A2APaymentsApp.csproj"
 		],
 		"problemMatcher": "$msCompile"
 	  }
