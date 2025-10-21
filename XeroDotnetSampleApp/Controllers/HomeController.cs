@@ -8,6 +8,7 @@ namespace XeroDotnetSampleApp.Controllers
 {
     public class HomeController : Controller
     {
+        // this UI will be used by Merchants
         public IActionResult Index([FromQuery] Guid? tenantId)
         {
             var tokenIO = LocalStorageTokenIO.Instance;
