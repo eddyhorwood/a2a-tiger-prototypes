@@ -137,6 +137,9 @@ The version numbers may differ.
 <br>
 
 ## Running the App
+### In AWS
+- [AWS Lightsail](./infra/README.md)
+
 ### With Docker
 ```
 $ docker build -t xero-dotnet-sample-app .
