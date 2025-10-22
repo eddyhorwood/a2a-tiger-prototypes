@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using A2APaymentsApp.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Xero.NetStandard.OAuth2.Config;
@@ -11,8 +12,12 @@ namespace A2APaymentsApp.Controllers.Payer
     /// </summary>
     public class PayerController : BaseXeroOAuth2Controller
     {
-        public PayerController(IOptions<XeroConfiguration> xeroConfig) : base(xeroConfig)
+        private readonly DatabaseService _databaseService;
+
+        public PayerController(IOptions<XeroConfiguration> xeroConfig, 
+            DatabaseService databaseService) : base(xeroConfig)
         {
+            _databaseService = databaseService;
         }
 
         /// <summary>
@@ -60,6 +65,15 @@ namespace A2APaymentsApp.Controllers.Payer
             // - Validate invoice exists
             // - Get merchant bank account details
             // - Prepare Akahu redirect
+
+            var orgData = await _databaseService.GetOrganisationByShortCode(ViewBag.ShortCode);
+            if (orgData == null)
+            {
+                ViewBag.Error = "Org doesn't exist";
+                return View();
+            }
+            
+            var bankAccountNumnber = orgData.BankAccountNumber;
 
             return View();
         }
