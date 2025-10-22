@@ -7,7 +7,6 @@ A2APaymentsApp/bin/*
 A2APaymentsApp/obj/*
 
 # Database files
-A2APaymentsApp/Migrations
 *.db
 *.db-shm
 *.db-wal
