@@ -1,0 +1,78 @@
+@model A2APaymentsApp.Models.MerchantOnboardingModel
+
+@{
+    ViewData["Title"] = "Welcome to Xero Dotnet Sample App";
+}
+
+<header class="text-center mb-3">
+    <h1 class="mb-1">A2A Bank Transfer Payment Service setup</h1>
+    <p class="text-muted">UI for merchants</p>
+</header>
+
+<br />
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success" role="alert">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (ViewBag.SubmittedData != null)
+{
+    <div class="alert alert-info" role="alert">
+        <h5>Submitted Data:</h5>
+        <p><strong>Bank Account:</strong> @ViewBag.SubmittedData.BankAccountId</p>
+        <p><strong>Branding Theme:</strong> @ViewBag.SubmittedData.BrandingThemeId</p>
+        <p><strong>Chart of Account Code:</strong> @ViewBag.SubmittedData.ChartOfAccountCode</p>
+    </div>
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Merchant Configuration</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Index" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        
+                        <div class="form-group mb-3">
+                            <label asp-for="BankAccountId" class="form-label"></label>
+                            <select asp-for="BankAccountId" class="form-select" asp-items="ViewBag.BankAccounts">
+                                <option value="">-- Select Bank Account --</option>
+                            </select>
+                            <span asp-validation-for="BankAccountId" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="BrandingThemeId" class="form-label"></label>
+                            <select asp-for="BrandingThemeId" class="form-select" asp-items="ViewBag.BrandingThemes">
+                                <option value="">-- Select Branding Theme --</option>
+                            </select>
+                            <span asp-validation-for="BrandingThemeId" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="ChartOfAccountCode" class="form-label"></label>
+                            <select asp-for="ChartOfAccountCode" class="form-select" asp-items="ViewBag.ChartOfAccountCodes">
+                                <option value="">-- Select Chart of Account Code --</option>
+                            </select>
+                            <span asp-validation-for="ChartOfAccountCode" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group text-center">
+                            <button type="submit" class="btn btn-primary btn-lg">Save Configuration</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
