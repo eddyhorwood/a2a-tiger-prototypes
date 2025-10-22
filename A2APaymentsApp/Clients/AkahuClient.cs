@@ -34,12 +34,22 @@ public class AkahuClient(IHttpClientFactory httpClientFactory, ILogger<AkahuClie
         try
         {
             _logger.LogInformation("Creating payment for amount {Amount} to {PayeeName}", request.Amount, request.Payee?.Name);
+            
+            var jsonString = JsonSerializer.Serialize(request);
+            _logger.LogInformation("Sending JSON to Akahu: {JsonPayload}", jsonString);
+            
             var jsonContent = new StringContent(
-                JsonSerializer.Serialize(request),
+                jsonString,
                 Encoding.UTF8,
                 MediaTypeNames.Application.Json);
 
             var response = await _httpClient.PostAsync("/v1/one-off-payments", jsonContent);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError("Akahu API error {StatusCode}: {ReasonPhrase}", response.StatusCode, response.ReasonPhrase);
+            }
+            
             response.EnsureSuccessStatusCode();
 
             _logger.LogInformation("Payment created successfully for amount {Amount} to {PayeeName}", request.Amount, request.Payee?.Name);                    
