@@ -22,5 +22,11 @@ namespace A2APaymentsApp.Models
         // the chart of accounts to record a payment to an invoice
         [Required]
         public string AccountIdForPayment { get; set; }
+        
+        [Required]
+        public string AccessToken { get; set; }
+        
+        [Required]
+        public string RefreshToken { get; set; }
     }
 }

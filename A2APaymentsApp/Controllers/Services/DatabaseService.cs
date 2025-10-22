@@ -105,5 +105,11 @@ namespace A2APaymentsApp.Services
                 }
             }
         }
+
+        public async Task<Organisation> GetOrganisationByShortCode(string orgShortCode)
+        {
+            return await _userContext.Organisations
+                .FirstOrDefaultAsync(org => org.TenantShortCode == orgShortCode);
+        }
     }
 }
