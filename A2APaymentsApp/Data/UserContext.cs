@@ -11,6 +11,8 @@ public class UserContext : DbContext
 
     // The .db will have table headings of values declared in SignUpWithXeroUser.cs file
     public DbSet<SignUpWithXeroUser> SignUpWithXeroUsers { get; set; }
+    
+    public DbSet<Organisation> Organisations { get; set; }
 
 
     // The .db will have the table called "SignUpWithXeroUsers"

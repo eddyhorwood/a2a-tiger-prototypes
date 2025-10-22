@@ -1,6 +1,7 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using A2APaymentsApp.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Xero.NetStandard.OAuth2.Config;
@@ -15,9 +16,13 @@ namespace A2APaymentsApp.Controllers.Payer
     {
         private readonly IAkahuClient _akahuClient;
 
-        public PayerController(IOptions<XeroConfiguration> xeroConfig, IAkahuClient akahuClient) : base(xeroConfig)
+        private readonly DatabaseService _databaseService;
+
+        public PayerController(IOptions<XeroConfiguration> xeroConfig, IAkahuClient akahuClient, 
+            DatabaseService databaseService) : base(xeroConfig)
         {
             _akahuClient = akahuClient;
+            _databaseService = databaseService;
         }
 
         /// <summary>
@@ -61,25 +66,12 @@ namespace A2APaymentsApp.Controllers.Payer
             ViewBag.Amount = amount.Value;
             ViewBag.ShortCode = shortCode;
 
-            CreatePaymentRequest request = new CreatePaymentRequest
-            {
-                Amount = amount.Value,
-                RedirectUri = Url.Action("Callback", "Payer", null, Request.Scheme),
-                Payee = new PayeeDetails
-                {
-                    Name = "Test Merchant Ltd",
-                    AccountNumber = "01-0001-0012345-00",
-                    Particulars = "Invoice",
-                    Code = invoiceNo,
-                    Reference = shortCode
-                }
-            };
+            // TODO: Implement payment logic
+            // - Validate invoice exists
+            // - Get merchant bank account details
+            // - Prepare Akahu redirect
 
-            // make a call to Akahu to create payment
-            var paymentResponse = await _akahuClient.CreatePayment(request);
-
-            // Redirect to Akahu's authorization URL to complete payment
-            return Redirect(paymentResponse.AuthorisationUrl);
+            return View();
         }
 
         /// <summary>
