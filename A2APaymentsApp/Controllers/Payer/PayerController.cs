@@ -102,11 +102,47 @@ namespace A2APaymentsApp.Controllers.Payer
             ViewBag.PaymentId = paymentId;
             ViewBag.Status = status;
 
-            // TODO: Implement callback logic
-            // - Poll Akahu API for payment status
-            // - Create payment record in Xero if successful
-            // - Redirect back to invoice or confirmation page
+            // Poll Akahu API for payment status until terminal state
+            const int maxPolls = 24; // Poll for up to 2 minutes (24 * 5 seconds)
+            int pollCount = 0;
+            
+            PollPaymentResponse paymentStatus;
+            
+            do
+            {
+                paymentStatus = await _akahuClient.PollPaymentStatus(paymentId);
+                pollCount++;
+                
+                // Check if payment is in terminal state
+                if (paymentStatus.Status == "SENT" || 
+                    paymentStatus.Status == "FAILED" || 
+                    paymentStatus.Status == "CANCELLED")
+                {
+                    break;
+                }
+                
+                // Wait 5 seconds before next poll (if not terminal)
+                if (pollCount < maxPolls)
+                {
+                    await Task.Delay(5000);
+                }
+                
+            } while (pollCount < maxPolls);
+            
+            // Check if payment is successful (SENT status)
+            if (paymentStatus.Status == "SENT")
+            {
+                // TODO: Create payment record in Xero if successful
+                
+                // Redirect for successful payments
+                // TODO: Redirect to a online invoice
+                return Redirect("https://xero.com");
+            }
 
+            // For non-successful payments or timeout, show the callback view with status
+            ViewBag.PaymentStatus = paymentStatus.Status;
+            ViewBag.StatusReason = paymentStatus.StatusReason?.Message;
+            ViewBag.PollTimeout = pollCount >= maxPolls;
             return View();
         }
     }
