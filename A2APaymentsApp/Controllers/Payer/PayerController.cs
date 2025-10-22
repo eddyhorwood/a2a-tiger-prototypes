@@ -66,10 +66,38 @@ namespace A2APaymentsApp.Controllers.Payer
             ViewBag.Amount = amount.Value;
             ViewBag.ShortCode = shortCode;
 
+            CreatePaymentRequest request = new CreatePaymentRequest
+            {
+                Amount = amount.Value,
+                RedirectUri = Url.Action("Callback", "Payer", null, Request.Scheme),
+                Payee = new PayeeDetails
+                {
+                    Name = "Test Merchant Ltd",
+                    AccountNumber = "01-0001-0012345-00",
+                    Particulars = "Invoice",
+                    Code = invoiceNo,
+                    Reference = shortCode
+                }
+            };
+
+            // make a call to Akahu to create payment
+            var paymentResponse = await _akahuClient.CreatePayment(request);
+
+            // Redirect to Akahu's authorization URL to complete payment
+            return Redirect(paymentResponse.AuthorisationUrl);
             // TODO: Implement payment logic
             // - Validate invoice exists
             // - Get merchant bank account details
             // - Prepare Akahu redirect
+
+            var orgData = await _databaseService.GetOrganisationByShortCode(ViewBag.ShortCode);
+            if (orgData == null)
+            {
+                ViewBag.Error = "Org doesn't exist";
+                return View();
+            }
+            
+            var bankAccountNumnber = orgData.BankAccountNumber;
 
             return View();
         }
