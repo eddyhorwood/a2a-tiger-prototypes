@@ -25,20 +25,10 @@ namespace A2APaymentsApp.Controllers
 
         public async Task<IActionResult> Index()
         {
-            try
-            {
-
-                var paymentGateway = await Api.GetPaymentServicesAsync(XeroToken.AccessToken, TenantId);
-
-            }
-            catch (System.Exception ex)
-            {
-                ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
-            }
-
 
             var model = new MerchantOnboardingModel();
             await PopulateDropdownData();
+            await PopulatePaymentServices();
             return View(model);
         }
 
@@ -81,6 +71,41 @@ namespace A2APaymentsApp.Controllers
 
             await PopulateDropdownData();
             return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SelectPaymentService(PaymentServiceSelectionModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                await PopulateDropdownData();
+                await PopulatePaymentServices();
+                return View("Index", new MerchantOnboardingModel());
+            }
+
+            // For now just acknowledge selection; persistence could be added later.
+            TempData["SuccessMessage"] = "Payment service selected.";
+
+            return RedirectToAction("Index");
+        }
+
+        private async Task PopulatePaymentServices()
+        {
+            var paymentServices = await Api.GetPaymentServicesAsync(XeroToken.AccessToken, TenantId);
+            if (paymentServices?._PaymentServices != null)
+            {
+                ViewBag.PaymentServices = paymentServices._PaymentServices
+                    .Select(ps => new SelectListItem
+                    {
+                        Value = ps.PaymentServiceID.ToString(),
+                        Text = ps.PaymentServiceName
+                    })
+                    .ToList();
+            }
+            else
+            {
+                ViewBag.PaymentServices = new List<SelectListItem>();
+            }
         }
 
         private async Task PopulateDropdownData()

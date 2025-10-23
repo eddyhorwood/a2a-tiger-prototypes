@@ -4,6 +4,7 @@ namespace A2APaymentsApp.Models
 {
     public class MerchantOnboardingModel
     {
+        
         [Required]
         [Display(Name = "Bank Account")]
         public string BankAccountId { get; set; }

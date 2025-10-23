@@ -91,7 +91,7 @@ namespace A2APaymentsApp
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=PublicLandingPage}/{action=Index}/{id?}");
                     
                 // Add health check endpoint
                 endpoints.MapHealthChecks("/health");
