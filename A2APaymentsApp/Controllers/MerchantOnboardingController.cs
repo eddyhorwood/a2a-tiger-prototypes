@@ -27,9 +27,22 @@ namespace A2APaymentsApp.Controllers
         {
 
             var model = new MerchantOnboardingModel();
+            await PopulateOrganisationDetails();
             await PopulateDropdownData();
             await PopulatePaymentServices();
             return View(model);
+        }
+
+        private async Task PopulateOrganisationDetails()
+        {
+            var xeroOrg = await Api.GetOrganisationsAsync(XeroToken.AccessToken, TenantId);
+            if (xeroOrg?._Organisations != null && xeroOrg._Organisations.Count > 0)
+            {
+                ViewBag.OrganisationName = xeroOrg._Organisations[0].Name;
+                ViewBag.OrganisationLegalName = xeroOrg._Organisations[0].LegalName;
+                ViewBag.OrganisationCountryCode = xeroOrg._Organisations[0].CountryCode;
+
+            }
         }
 
         [HttpPost]
