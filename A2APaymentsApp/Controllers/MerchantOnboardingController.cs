@@ -149,7 +149,7 @@ namespace A2APaymentsApp.Controllers
                     {
                         Value = account.AccountID.ToString(),
                         Text = $"{account.Name} ({account.BankAccountNumber}) - Code: {account.Code}",
-                        Selected = !string.IsNullOrEmpty(currentAccountId) && string.Equals(account.Code, currentAccountId)
+                        Selected = !string.IsNullOrEmpty(currentAccountId) && string.Equals(account.AccountID.ToString(), currentAccountId)
                     })
                     .ToList();
             }
