@@ -7,35 +7,105 @@ using Xero.NetStandard.OAuth2.Api;
 using Microsoft.Extensions.Options;
 using Xero.NetStandard.OAuth2.Config;
 using System.Threading.Tasks;
+using A2APaymentsApp.Services;
 
 namespace A2APaymentsApp.Controllers
 {
     public class MerchantOnboardingController : ApiAccessorController<AccountingApi>
     {
-        public MerchantOnboardingController(IOptions<XeroConfiguration> xeroConfig) : base(xeroConfig) {}
+
+        private readonly DatabaseService _databaseService;
+
+        public MerchantOnboardingController(
+            IOptions<XeroConfiguration> xeroConfig,
+            DatabaseService databaseService) : base(xeroConfig) 
+        {
+            _databaseService = databaseService;
+        }
 
         public async Task<IActionResult> Index()
         {
+
             var model = new MerchantOnboardingModel();
             await PopulateDropdownData();
+            await PopulatePaymentServices();
             return View(model);
         }
 
         [HttpPost]
         public async Task<IActionResult> Index(MerchantOnboardingModel model)
         {
+            var existingOrg = await _databaseService.GetOrganisationByTenantId(TenantId);
+            if (existingOrg != null)
+            {
+                existingOrg.BankAccountNumber = model.BankAccountId;
+                existingOrg.AccountIdForPayment = model.ChartOfAccountCode;
+                existingOrg.AccessToken = XeroToken.AccessToken;
+                existingOrg.RefreshToken = XeroToken.RefreshToken;
+
+                await _databaseService.UpdateOrganisation(existingOrg);
+
+            }
+            else
+            {
+                var xeroOrg = await Api.GetOrganisationsAsync(XeroToken.AccessToken, TenantId);
+
+                var newOrg = new Organisation
+                {
+                    TenantId = TenantId,
+                    TenantShortCode = xeroOrg._Organisations[0].ShortCode, // assume first organisation
+                    BankAccountNumber = model.BankAccountId,
+                    AccountIdForPayment = model.ChartOfAccountCode,
+                    AccessToken = XeroToken.AccessToken,
+                    RefreshToken = XeroToken.RefreshToken
+                };
+
+                await _databaseService.AddOrganisation(newOrg);
+            }
+
             if (ModelState.IsValid)
             {
-                // TODO: Persist the values in the next iteration
-                // For now, just display a success message
-                TempData["SuccessMessage"] = "Merchant onboarding data received successfully!";
-                ViewBag.SubmittedData = model;
-                await PopulateDropdownData();
+
                 return View(model);
             }
 
             await PopulateDropdownData();
             return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SelectPaymentService(PaymentServiceSelectionModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                await PopulateDropdownData();
+                await PopulatePaymentServices();
+                return View("Index", new MerchantOnboardingModel());
+            }
+
+            // For now just acknowledge selection; persistence could be added later.
+            TempData["SuccessMessage"] = "Payment service selected.";
+
+            return RedirectToAction("Index");
+        }
+
+        private async Task PopulatePaymentServices()
+        {
+            var paymentServices = await Api.GetPaymentServicesAsync(XeroToken.AccessToken, TenantId);
+            if (paymentServices?._PaymentServices != null)
+            {
+                ViewBag.PaymentServices = paymentServices._PaymentServices
+                    .Select(ps => new SelectListItem
+                    {
+                        Value = ps.PaymentServiceID.ToString(),
+                        Text = ps.PaymentServiceName
+                    })
+                    .ToList();
+            }
+            else
+            {
+                ViewBag.PaymentServices = new List<SelectListItem>();
+            }
         }
 
         private async Task PopulateDropdownData()
@@ -56,7 +126,8 @@ namespace A2APaymentsApp.Controllers
 
                 // Filter chart of accounts (everything except bank accounts)
                 ViewBag.ChartOfAccountCodes = accounts._Accounts
-                    .Where(account => account.Type != Xero.NetStandard.OAuth2.Model.Accounting.AccountType.BANK)
+                    .Where(account => account.Type == Xero.NetStandard.OAuth2.Model.Accounting.AccountType.BANK 
+                    || (account != null && account.EnablePaymentsToAccount != null && account.EnablePaymentsToAccount == true) )
                     .Select(account => new SelectListItem
                     {
                         Value = account.Code,

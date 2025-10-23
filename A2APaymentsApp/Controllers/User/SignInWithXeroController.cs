@@ -176,7 +176,7 @@ namespace A2APaymentsApp.Controllers
 
 
             // land the user on a dashboard/home page
-            return RedirectToAction("Index", "OrganisationInfo");
+            return RedirectToAction("Index", "MerchantOnboarding");
         }
 
 

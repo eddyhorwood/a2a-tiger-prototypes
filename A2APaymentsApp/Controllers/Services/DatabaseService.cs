@@ -111,5 +111,29 @@ namespace A2APaymentsApp.Services
             return await _userContext.Organisations
                 .FirstOrDefaultAsync(org => org.TenantShortCode == orgShortCode);
         }
+
+        public async Task<Organisation> GetOrganisationByTenantId(string tenantId)
+        {
+            return await _userContext.Organisations
+                .FirstOrDefaultAsync(org => org.TenantId == tenantId);
+        }
+
+        public async Task<Organisation> AddOrganisation(Organisation organisation)
+        {
+            _userContext.Organisations.Add(organisation);
+            await _userContext.SaveChangesAsync();
+            SaveAndUpdateDB();
+
+            return organisation;
+        }
+
+        public async Task<Organisation> UpdateOrganisation(Organisation organisation)
+        {
+            _userContext.Organisations.Update(organisation);
+            await _userContext.SaveChangesAsync();
+            SaveAndUpdateDB();
+
+            return organisation;
+        }
     }
 }
