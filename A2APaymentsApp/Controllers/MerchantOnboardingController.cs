@@ -23,66 +23,74 @@ namespace A2APaymentsApp.Controllers
             _databaseService = databaseService;
         }
 
+        private string EffectiveTenantId => !string.IsNullOrEmpty(Request.Query["tenantId"]) ? Request.Query["tenantId"].ToString() : TenantId;
+
+        // New unified initializer
+        private async Task InitializeViewData(string tenantId)
+        {
+            ViewBag.TenantId = tenantId;
+            await PopulateOrganisationDetails(tenantId);
+            await PopulateDropdownData(tenantId); // now only bank/account dropdowns
+            await PopulatePaymentServices(tenantId);
+            await PopulateBrandingThemes(tenantId); // branding themes info (not a dropdown)
+        }
+
         public async Task<IActionResult> Index()
         {
-
+            var effectiveTid = EffectiveTenantId;
             var model = new MerchantOnboardingModel();
-            await PopulateOrganisationDetails();
-            await PopulateDropdownData();
-            await PopulatePaymentServices();
+            var existingOrg = await _databaseService.GetOrganisationByTenantId(effectiveTid);
+            if (existingOrg != null)
+            {
+                model.BankAccountId = existingOrg.BankAccountNumber;
+                model.ChartOfAccountCode = existingOrg.AccountIdForPayment;
+            }
+            await InitializeViewData(effectiveTid);
             return View(model);
         }
 
-        private async Task PopulateOrganisationDetails()
+        private async Task PopulateOrganisationDetails(string tenantId)
         {
-            var xeroOrg = await Api.GetOrganisationsAsync(XeroToken.AccessToken, TenantId);
+            var xeroOrg = await Api.GetOrganisationsAsync(XeroToken.AccessToken, tenantId);
             if (xeroOrg?._Organisations != null && xeroOrg._Organisations.Count > 0)
             {
                 ViewBag.OrganisationName = xeroOrg._Organisations[0].Name;
                 ViewBag.OrganisationLegalName = xeroOrg._Organisations[0].LegalName;
                 ViewBag.OrganisationCountryCode = xeroOrg._Organisations[0].CountryCode;
-
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> Index(MerchantOnboardingModel model)
+        public async Task<IActionResult> Index(MerchantOnboardingModel model, string tenantId)
         {
-            var existingOrg = await _databaseService.GetOrganisationByTenantId(TenantId);
+            var effectiveTid = !string.IsNullOrEmpty(tenantId) ? tenantId : EffectiveTenantId;
+            var existingOrg = await _databaseService.GetOrganisationByTenantId(effectiveTid);
             if (existingOrg != null)
             {
                 existingOrg.BankAccountNumber = model.BankAccountId;
                 existingOrg.AccountIdForPayment = model.ChartOfAccountCode;
                 existingOrg.AccessToken = XeroToken.AccessToken;
                 existingOrg.RefreshToken = XeroToken.RefreshToken;
-
                 await _databaseService.UpdateOrganisation(existingOrg);
-
             }
             else
             {
-                var xeroOrg = await Api.GetOrganisationsAsync(XeroToken.AccessToken, TenantId);
-
+                var xeroOrg = await Api.GetOrganisationsAsync(XeroToken.AccessToken, effectiveTid);
                 var newOrg = new Organisation
                 {
-                    TenantId = TenantId,
-                    TenantShortCode = xeroOrg._Organisations[0].ShortCode, // assume first organisation
+                    TenantId = effectiveTid,
+                    TenantShortCode = xeroOrg._Organisations[0].ShortCode,
                     BankAccountNumber = model.BankAccountId,
                     AccountIdForPayment = model.ChartOfAccountCode,
                     AccessToken = XeroToken.AccessToken,
                     RefreshToken = XeroToken.RefreshToken
                 };
-
                 await _databaseService.AddOrganisation(newOrg);
             }
-
-            if (ModelState.IsValid)
-            {
-
-                return View(model);
-            }
-
-            await PopulateDropdownData();
+            // Always reinitialize view data so dropdowns/org info reflect updated selections
+            await InitializeViewData(effectiveTid);
+            // Success message after saving details
+            TempData["SuccessMessage"] = "Configuration saved.";
             return View(model);
         }
 
@@ -91,20 +99,16 @@ namespace A2APaymentsApp.Controllers
         {
             if (!ModelState.IsValid)
             {
-                await PopulateDropdownData();
-                await PopulatePaymentServices();
+                await InitializeViewData(EffectiveTenantId);
                 return View("Index", new MerchantOnboardingModel());
             }
-
-            // For now just acknowledge selection; persistence could be added later.
             TempData["SuccessMessage"] = "Payment service selected.";
-
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { tenantId = EffectiveTenantId });
         }
 
-        private async Task PopulatePaymentServices()
+        private async Task PopulatePaymentServices(string tenantId)
         {
-            var paymentServices = await Api.GetPaymentServicesAsync(XeroToken.AccessToken, TenantId);
+            var paymentServices = await Api.GetPaymentServicesAsync(XeroToken.AccessToken, tenantId);
             if (paymentServices?._PaymentServices != null)
             {
                 ViewBag.PaymentServices = paymentServices._PaymentServices
@@ -121,56 +125,81 @@ namespace A2APaymentsApp.Controllers
             }
         }
 
-        private async Task PopulateDropdownData()
+        private async Task PopulateDropdownData(string tenantId)
         {
-            var accounts = await Api.GetAccountsAsync(XeroToken.AccessToken, TenantId);
-
+            var existingOrg = await _databaseService.GetOrganisationByTenantId(tenantId);
+            var currentBankAccountId = existingOrg?.BankAccountNumber ?? string.Empty;
+            var currentAccountId = existingOrg?.AccountIdForPayment ?? string.Empty;
+            var accounts = await Api.GetAccountsAsync(XeroToken.AccessToken, tenantId);
             if (accounts?._Accounts != null)
             {
-                // Filter bank accounts (Type == AccountType.BANK)
                 ViewBag.BankAccounts = accounts._Accounts
                     .Where(account => account.Type == Xero.NetStandard.OAuth2.Model.Accounting.AccountType.BANK)
                     .Select(account => new SelectListItem
                     {
-                        Value = account.BankAccountNumber.ToString(),
-                        Text = $"{account.Name} ({account.BankAccountNumber})"
+                        Value = account.BankAccountNumber?.ToString(),
+                        Text = $"{account.Name} ({account.BankAccountNumber})",
+                        Selected = !string.IsNullOrEmpty(currentBankAccountId) && string.Equals(account.BankAccountNumber?.ToString(), currentBankAccountId)
                     })
                     .ToList();
-
-                // Filter chart of accounts (everything except bank accounts)
                 ViewBag.ChartOfAccountCodes = accounts._Accounts
-                    .Where(account => account.Type == Xero.NetStandard.OAuth2.Model.Accounting.AccountType.BANK 
-                    || (account != null && account.EnablePaymentsToAccount != null && account.EnablePaymentsToAccount == true) )
+                    .Where(account => account.Type == Xero.NetStandard.OAuth2.Model.Accounting.AccountType.BANK
+                        || (account.EnablePaymentsToAccount != null && account.EnablePaymentsToAccount == true))
                     .Select(account => new SelectListItem
                     {
-                        Value = account.Code,
-                        Text = $"{account.Code} - {account.Name}"
+                        Value = account.AccountID.ToString(),
+                        Text = $"{account.Name} ({account.BankAccountNumber}) - Code: {account.Code}",
+                        Selected = !string.IsNullOrEmpty(currentAccountId) && string.Equals(account.Code, currentAccountId)
                     })
                     .ToList();
             }
             else
             {
-                // Fallback to empty lists if API call fails
                 ViewBag.BankAccounts = new List<SelectListItem>();
                 ViewBag.ChartOfAccountCodes = new List<SelectListItem>();
             }
-            
-            var brandingThemes = await Api.GetBrandingThemesAsync(XeroToken.AccessToken, TenantId);
+        }
 
+        private async Task PopulateBrandingThemes(string tenantId)
+        {
+            var brandingThemes = await Api.GetBrandingThemesAsync(XeroToken.AccessToken, tenantId);
             if (brandingThemes?._BrandingThemes != null)
             {
-                ViewBag.BrandingThemes = brandingThemes._BrandingThemes
-                    .Select(theme => new SelectListItem
+                var list = new List<BrandingThemePaymentServiceInfo>();
+                foreach (var theme in brandingThemes._BrandingThemes)
+                {
+                    var info = new BrandingThemePaymentServiceInfo
                     {
-                        Value = theme.BrandingThemeID.ToString(),
-                        Text = theme.Name
-                    })
-                    .ToList();
+                        BrandingThemeId = theme.BrandingThemeID?.ToString() ?? string.Empty,
+                        BrandingThemeName = theme.Name
+                    };
+                    // Only attempt to fetch payment services if the BrandingThemeID is present
+                    if (theme.BrandingThemeID != null)
+                    {
+                        try
+                        {
+                            var btPaymentServices = await Api.GetBrandingThemePaymentServicesAsync(XeroToken.AccessToken, tenantId, theme.BrandingThemeID.Value);
+                            if (btPaymentServices?._PaymentServices != null)
+                            {
+                                info.PaymentServices.AddRange(btPaymentServices._PaymentServices.Select(ps => new SimplePaymentServiceInfo
+                                {
+                                    PaymentServiceId = ps.PaymentServiceID?.ToString() ?? string.Empty,
+                                    PaymentServiceName = ps.PaymentServiceName
+                                }));
+                            }
+                        }
+                        catch
+                        {
+                            // swallow errors for individual theme payment services to avoid blocking page
+                        }
+                    }
+                    list.Add(info);
+                }
+                ViewBag.BrandingThemePaymentServices = list;
             }
             else
             {
-                // Fallback to empty list if API call fails
-                ViewBag.BrandingThemes = new List<SelectListItem>();
+                ViewBag.BrandingThemePaymentServices = new List<BrandingThemePaymentServiceInfo>();
             }
         }
     }

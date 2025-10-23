@@ -79,13 +79,13 @@
                     }
                 </div>
             </div>
-            <!-- Merchant Configuration (unchanged form) -->
+            <!-- Bank and Account information (renamed Merchant Configuration) -->
             <div class="card mb-4">
                 <div class="card-header">
-                    <h3 class="card-title">Merchant Configuration</h3>
+                    <h3 class="card-title">Bank and Account information</h3>
                 </div>
                 <div class="card-body">
-                    <form asp-action="Index" method="post">
+                    <form asp-action="Index" asp-route-tenantId="@ViewBag.TenantId" method="post">
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                         <div class="form-group mb-3">
                             <label asp-for="BankAccountId" class="form-label"></label>
@@ -93,13 +93,6 @@
                                 <option value="">-- Select Bank Account --</option>
                             </select>
                             <span asp-validation-for="BankAccountId" class="text-danger"></span>
-                        </div>
-                        <div class="form-group mb-3">
-                            <label asp-for="BrandingThemeId" class="form-label"></label>
-                            <select asp-for="BrandingThemeId" class="form-select" asp-items="ViewBag.BrandingThemes">
-                                <option value="">-- Select Branding Theme --</option>
-                            </select>
-                            <span asp-validation-for="BrandingThemeId" class="text-danger"></span>
                         </div>
                         <div class="form-group mb-3">
                             <label asp-for="ChartOfAccountCode" class="form-label"></label>
@@ -112,6 +105,54 @@
                             <button type="submit" class="btn btn-primary btn-lg">Save Configuration</button>
                         </div>
                     </form>
+                </div>
+            </div>
+            <!-- Branding Themes info card (updated to include payment services) -->
+            <div class="card mb-4">
+                <div class="card-header py-2">
+                    <h3 class="card-title h5 mb-0">Branding Themes & Payment Services</h3>
+                </div>
+                <div class="card-body p-0">
+                    @if (ViewBag.BrandingThemePaymentServices != null && ((IEnumerable<A2APaymentsApp.Models.BrandingThemePaymentServiceInfo>)ViewBag.BrandingThemePaymentServices).Any())
+                    {
+                        <table class="table table-sm mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Theme Name</th>
+                                    <th>Theme ID</th>
+                                    <th style="width:50%">Payment Services (Name / ID)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var bt in (IEnumerable<A2APaymentsApp.Models.BrandingThemePaymentServiceInfo>)ViewBag.BrandingThemePaymentServices)
+                                {
+                                    <tr>
+                                        <td>@bt.BrandingThemeName</td>
+                                        <td class="text-muted small">@bt.BrandingThemeId</td>
+                                        <td>
+                                            @if (bt.PaymentServices != null && bt.PaymentServices.Any())
+                                            {
+                                                <ul class="list-unstyled mb-0 small">
+                                                    @foreach (var ps in bt.PaymentServices)
+                                                    {
+                                                        <li>@ps.PaymentServiceName <span class="text-muted">(@ps.PaymentServiceId)</span></li>
+                                                    }
+                                                </ul>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted small">None</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <div class="p-2"><p class="text-muted small mb-0">No branding themes available.</p></div>
+                    }
                 </div>
             </div>
             <!-- Removed original payment services card from bottom -->
