@@ -31,6 +31,55 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
+            <!-- Organisation Details (compact) -->
+            <div class="card mb-3">
+                <div class="card-header py-2">
+                    <h3 class="card-title h5 mb-0">Organisation Details</h3>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-sm mb-0">
+                        <tbody>
+                            <tr>
+                                <th class="w-25">Name</th>
+                                <td>@ViewBag.OrganisationName</td>
+                            </tr>
+                            <tr>
+                                <th>Legal Name</th>
+                                <td>@ViewBag.OrganisationLegalName</td>
+                            </tr>
+                            <tr>
+                                <th>Country Code</th>
+                                <td>@ViewBag.OrganisationCountryCode</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- Payment Services (moved here, compact) -->
+            <div class="card mb-4">
+                <div class="card-header py-2">
+                    <h3 class="card-title h5 mb-0">Available Payment Services</h3>
+                </div>
+                <div class="card-body p-0">
+                    @if (ViewBag.PaymentServices != null && ((IEnumerable<SelectListItem>)ViewBag.PaymentServices).Any())
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var ps in (IEnumerable<SelectListItem>)ViewBag.PaymentServices)
+                            {
+                                <li class="list-group-item py-2 d-flex justify-content-between align-items-center">
+                                    <span class="small">@ps.Text</span>
+                                    <span class="badge bg-secondary">@ps.Value</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <div class="p-2"><p class="text-muted small mb-0">No payment services available.</p></div>
+                    }
+                </div>
+            </div>
+            <!-- Merchant Configuration (unchanged form) -->
             <div class="card mb-4">
                 <div class="card-header">
                     <h3 class="card-title">Merchant Configuration</h3>
@@ -38,7 +87,6 @@
                 <div class="card-body">
                     <form asp-action="Index" method="post">
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                        
                         <div class="form-group mb-3">
                             <label asp-for="BankAccountId" class="form-label"></label>
                             <select asp-for="BankAccountId" class="form-select" asp-items="ViewBag.BankAccounts">
@@ -46,7 +94,6 @@
                             </select>
                             <span asp-validation-for="BankAccountId" class="text-danger"></span>
                         </div>
-
                         <div class="form-group mb-3">
                             <label asp-for="BrandingThemeId" class="form-label"></label>
                             <select asp-for="BrandingThemeId" class="form-select" asp-items="ViewBag.BrandingThemes">
@@ -54,7 +101,6 @@
                             </select>
                             <span asp-validation-for="BrandingThemeId" class="text-danger"></span>
                         </div>
-
                         <div class="form-group mb-3">
                             <label asp-for="ChartOfAccountCode" class="form-label"></label>
                             <select asp-for="ChartOfAccountCode" class="form-select" asp-items="ViewBag.ChartOfAccountCodes">
@@ -62,38 +108,13 @@
                             </select>
                             <span asp-validation-for="ChartOfAccountCode" class="text-danger"></span>
                         </div>
-
                         <div class="form-group text-center">
                             <button type="submit" class="btn btn-primary btn-lg">Save Configuration</button>
                         </div>
                     </form>
                 </div>
             </div>
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Select Payment Service</h3>
-                </div>
-                <div class="card-body">
-                    <form asp-action="SelectPaymentService" method="post">
-                        <div class="form-group mb-3">
-                            <label for="PaymentServiceId" class="form-label">Payment Service</label>
-                            <select name="PaymentServiceId" id="PaymentServiceId" class="form-select">
-                                <option value="">-- Select Payment Service --</option>
-                                @if (ViewBag.PaymentServices != null)
-                                {
-                                    foreach (var ps in (IEnumerable<SelectListItem>)ViewBag.PaymentServices)
-                                    {
-                                        <option value="@ps.Value">@ps.Text</option>
-                                    }
-                                }
-                            </select>
-                        </div>
-                        <div class="form-group text-center">
-                            <button type="submit" class="btn btn-secondary">Save Payment Service</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+            <!-- Removed original payment services card from bottom -->
         </div>
     </div>
 </div>
