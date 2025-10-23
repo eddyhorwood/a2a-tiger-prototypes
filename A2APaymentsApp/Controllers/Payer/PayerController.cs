@@ -1,26 +1,36 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using A2APaymentsApp.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Xero.NetStandard.OAuth2.Config;
 using A2APaymentsApp.Clients;
+using Xero.NetStandard.OAuth2.Api;
+using Xero.NetStandard.OAuth2.Model.Accounting;
+using Organisation = A2APaymentsApp.Models.Organisation;
 
 namespace A2APaymentsApp.Controllers.Payer
 {
     /// <summary>
     /// Controller for handling payer-related operations in A2A payments
     /// </summary>
-    public class PayerController : BaseXeroOAuth2Controller
+    public class PayerController : Controller
     {
+        private readonly IOptions<XeroConfiguration> _xeroConfig;
         private readonly IAkahuClient _akahuClient;
 
         private readonly DatabaseService _databaseService;
 
         public PayerController(IOptions<XeroConfiguration> xeroConfig, IAkahuClient akahuClient, 
-            DatabaseService databaseService) : base(xeroConfig)
+            DatabaseService databaseService)
         {
+            _xeroConfig = xeroConfig;
             _akahuClient = akahuClient;
             _databaseService = databaseService;
         }
@@ -60,23 +70,27 @@ namespace A2APaymentsApp.Controllers.Payer
                 return View();
             }
 
-            // Set payment details in ViewBag
-            ViewBag.InvoiceNo = invoiceNo;
-            ViewBag.Currency = currency;
-            ViewBag.Amount = amount.Value;
-            ViewBag.ShortCode = shortCode;
+            var orgData = await _databaseService.GetOrganisationByShortCode(shortCode);
+            if (orgData == null)
+            {
+                ViewBag.Error = "Org doesn't exist";
+                return View();
+            }
+            
+            // TODO Validate invoice exists
 
-            CreatePaymentRequest request = new CreatePaymentRequest
+            var request = new CreatePaymentRequest
             {
                 Amount = amount.Value,
-                RedirectUri = Url.Action("Callback", "Payer", null, Request.Scheme),
+                // TODO add query string in Url.Action
+                RedirectUri = Url.Action("Callback", "Payer", new { organisationShortCode = orgData.TenantShortCode, invoiceNumber = invoiceNo }, Request.Scheme),
                 Payee = new PayeeDetails
                 {
-                    Name = "Test Merchant Ltd",
-                    AccountNumber = "01-0001-0012345-00",
+                    Name = "Paywaka Org", // TODO we should also store organisation name in db and use it here ??
+                    AccountNumber = FormatNzBankAccountNumber(orgData.BankAccountNumber),
                     Particulars = "Invoice",
-                    Code = invoiceNo,
-                    Reference = shortCode
+                    Code = invoiceNo, 
+                    Reference = invoiceNo // TODO use payer name perhaps ?? we can get it from Get Invoice Xero API ??
                 }
             };
 
@@ -85,21 +99,6 @@ namespace A2APaymentsApp.Controllers.Payer
 
             // Redirect to Akahu's authorization URL to complete payment
             return Redirect(paymentResponse.AuthorisationUrl);
-            // TODO: Implement payment logic
-            // - Validate invoice exists
-            // - Get merchant bank account details
-            // - Prepare Akahu redirect
-
-            var orgData = await _databaseService.GetOrganisationByShortCode(ViewBag.ShortCode);
-            if (orgData == null)
-            {
-                ViewBag.Error = "Org doesn't exist";
-                return View();
-            }
-            
-            var bankAccountNumnber = orgData.BankAccountNumber;
-
-            return View();
         }
 
         /// <summary>
@@ -107,23 +106,26 @@ namespace A2APaymentsApp.Controllers.Payer
         /// Handle callback from payment provider (e.g., Akahu)
         /// </summary>
         /// <param name="paymentId">Payment ID from provider</param>
+        /// <param name="invoiceNumber"></param>
         /// <param name="status">Payment status</param>
+        /// <param name="organisationShortCode"></param>
         /// <returns>Returns payment result view</returns>
         public async Task<IActionResult> Callback(
             [FromQuery] string paymentId,
+            [FromQuery]string organisationShortCode,
+            [FromQuery]string invoiceNumber,
             [FromQuery] string status)
         {
-            if (string.IsNullOrEmpty(paymentId))
+            if (string.IsNullOrEmpty(paymentId) 
+                || string.IsNullOrEmpty(organisationShortCode) 
+                || string.IsNullOrEmpty(invoiceNumber))
             {
                 ViewBag.Error = "Invalid payment callback";
                 return View();
             }
-
-            ViewBag.PaymentId = paymentId;
-            ViewBag.Status = status;
-
+            
             // Poll Akahu API for payment status until terminal state
-            const int maxPolls = 24; // Poll for up to 2 minutes (24 * 5 seconds)
+            const int maxPolls = 24; // Poll for up to 24 seconds (24 * 1 second)
             int pollCount = 0;
             
             PollPaymentResponse paymentStatus;
@@ -141,10 +143,10 @@ namespace A2APaymentsApp.Controllers.Payer
                     break;
                 }
                 
-                // Wait 5 seconds before next poll (if not terminal)
+                // Wait 1 second before next poll (if not terminal)
                 if (pollCount < maxPolls)
                 {
-                    await Task.Delay(5000);
+                    await Task.Delay(1000);
                 }
                 
             } while (pollCount < maxPolls);
@@ -152,18 +154,149 @@ namespace A2APaymentsApp.Controllers.Payer
             // Check if payment is successful (SENT status)
             if (paymentStatus.Status == "SENT")
             {
-                // TODO: Create payment record in Xero if successful
-                
-                // Redirect for successful payments
-                // TODO: Redirect to a online invoice
-                return Redirect("https://xero.com");
-            }
+               var orgData = await _databaseService.GetOrganisationByShortCode(organisationShortCode);
+               var accessToken = await RefreshAccessTokenAsync(orgData);
 
+                var accountingApi = new AccountingApi();
+                var invoicesResponse = await accountingApi.GetInvoicesAsync(accessToken, orgData.TenantId, invoiceNumbers: new List<string> { invoiceNumber });
+                var invoice = invoicesResponse._Invoices.First();
+                if (!invoice.InvoiceID.HasValue)
+                {
+                    ViewBag.Error = "Innvoice not found";
+                    return View();
+                }
+
+                var invoiceId = invoice.InvoiceID.Value;
+                var onlineInvoiceResponse = await accountingApi
+                    .GetOnlineInvoiceAsync(accessToken, orgData.TenantId, invoiceId);
+                var onlineInvoiceUrl = onlineInvoiceResponse._OnlineInvoices.First().OnlineInvoiceUrl;
+
+                try
+                {
+                    await RecordPaymentToInvoice(accountingApi, orgData, invoiceId, paymentStatus.Amount, accessToken);
+                }
+                catch (Exception e)
+                {
+                    // TODO remove try catch 
+                }
+                
+            
+                return Redirect(onlineInvoiceUrl);
+            }
+            
+            
             // For non-successful payments or timeout, show the callback view with status
             ViewBag.PaymentStatus = paymentStatus.Status;
             ViewBag.StatusReason = paymentStatus.StatusReason?.Message;
             ViewBag.PollTimeout = pollCount >= maxPolls;
             return View();
+        }
+
+        private async Task RecordPaymentToInvoice(AccountingApi accountingApi, Organisation orgData, Guid invoiceId, decimal amount, string accessToken)
+        {
+            var payment = new Payment
+            {
+                Invoice = new Invoice
+                {
+                    InvoiceID = invoiceId
+                },
+                Account = new Account
+                {
+                    AccountID = Guid.Parse(orgData.AccountIdForPayment)
+                },
+                Amount = amount,
+                Date = DateTime.Today.Date
+            };
+            var payments = new Payments() { _Payments = new List<Payment> { payment } };
+
+            await accountingApi.CreatePaymentsAsync(accessToken, orgData.TenantId, payments);
+        }
+        
+        private async Task<string> GetOnlineInvoiceUrl(Organisation orgData, Guid invoiceId, string accessToken)
+        {
+            var accountingApi = new AccountingApi();
+            var onlineInvoiceResponse = await accountingApi
+                .GetOnlineInvoiceAsync(accessToken, orgData.TenantId, invoiceId);
+
+            return onlineInvoiceResponse._OnlineInvoices.First().OnlineInvoiceUrl;
+        }
+
+        /// <summary>
+        /// Formats a bank account number into New Zealand format (XX-XXXX-XXXXXXX-XX or XX-XXXX-XXXXXXX-XXX)
+        /// </summary>
+        /// <param name="accountNumber">Bank account number without dashes</param>
+        /// <returns>Formatted bank account number with dashes</returns>
+        private string FormatNzBankAccountNumber(string accountNumber)
+        {
+            if (string.IsNullOrEmpty(accountNumber))
+                return accountNumber;
+
+            // Remove any existing dashes or spaces
+            string cleanNumber = accountNumber.Replace("-", "").Replace(" ", "");
+
+            // NZ bank account format: XX-XXXX-XXXXXXX-XX (15 digits) or XX-XXXX-XXXXXXX-XXX (16 digits)
+            if (cleanNumber.Length == 15)
+            {
+                return $"{cleanNumber.Substring(0, 2)}-{cleanNumber.Substring(2, 4)}-{cleanNumber.Substring(6, 7)}-{cleanNumber.Substring(13, 2)}";
+            }
+            else if (cleanNumber.Length == 16)
+            {
+                return $"{cleanNumber.Substring(0, 2)}-{cleanNumber.Substring(2, 4)}-{cleanNumber.Substring(6, 7)}-{cleanNumber.Substring(13, 3)}";
+            }
+            else
+            {
+                // Return original if length doesn't match expected NZ format
+                return accountNumber;
+            }
+        }
+
+        /// <summary>
+        /// Retrieves a fresh access token for the organization using stored refresh token
+        /// </summary>
+        /// <param name="organisation"></param>
+        /// <returns>Access token string</returns>
+        private async Task<string> RefreshAccessTokenAsync(Organisation organisation)
+        {
+            // TODO only refresh if access token is expired
+            
+            var clientId = _xeroConfig.Value.ClientId;
+            var clientSecret = _xeroConfig.Value.ClientSecret;
+            var authString = $"{clientId}:{clientSecret}";
+            var authBytes = Encoding.UTF8.GetBytes(authString);
+            var base64AuthString = Convert.ToBase64String(authBytes);
+
+            var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                "Basic",
+                base64AuthString
+            );
+            
+            var formContent = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("grant_type", "refresh_token"),
+                new KeyValuePair<string, string>("client_id", clientId),
+                new KeyValuePair<string, string>("refresh_token", organisation.RefreshToken)
+            });
+            
+            var response = await 
+                httpClient.PostAsync("https://identity.xero.com/connect/token", formContent);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var jsonDoc = JsonDocument.Parse(content);
+                
+                var newAccessToken = jsonDoc.RootElement.GetProperty("access_token").GetString();
+                var newRefreshToken = jsonDoc.RootElement.GetProperty("refresh_token").GetString();
+
+                // save new refresh token to db
+                await _databaseService.UpdateRefreshToken(organisation, 
+                    newAccessToken, newRefreshToken);
+                
+                return newAccessToken;
+            }
+
+            throw new Exception("Failed to refresh access token.");
         }
     }
 }
