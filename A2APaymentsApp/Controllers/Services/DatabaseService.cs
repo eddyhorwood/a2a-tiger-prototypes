@@ -135,5 +135,20 @@ namespace A2APaymentsApp.Services
 
             return organisation;
         }
+
+        public async Task UpdateRefreshToken(Organisation organisation, string accessToken, string refreshToken)
+        {
+            if (organisation == null)
+            {
+                throw new ArgumentException("Invalid organisation data.");
+            }
+
+            organisation.AccessToken = accessToken;
+            organisation.RefreshToken = refreshToken;
+
+            _userContext.Organisations.Update(organisation);
+            await _userContext.SaveChangesAsync();
+            SaveAndUpdateDB();
+        }
     }
 }
