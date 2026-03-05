@@ -21,8 +21,17 @@ All documentation is in the [`docs/`](docs/) folder:
 - **[PROTOTYPE_PRD_V2.md](docs/PROTOTYPE_PRD_V2.md)** - Product requirements
 - **[FLOW_VARIANTS.md](docs/FLOW_VARIANTS.md)** - Balanced vs Aggressive flow comparison
 - **[MULTI_ENTRY_IMPLEMENTATION.md](docs/MULTI_ENTRY_IMPLEMENTATION.md)** - Entry points (invoice, settings)
+- **[PAYMENT_ONBOARDING_ENTRY_POINTS.md](docs/PAYMENT_ONBOARDING_ENTRY_POINTS.md)** - Current Xero payment onboarding entry points
 - **[XERO_DESIGN_GUIDELINES.md](docs/XERO_DESIGN_GUIDELINES.md)** - Design system reference
 - **[XUI_COMPONENT_STANDARDS.md](docs/XUI_COMPONENT_STANDARDS.md)** - XUI component usage
+
+## ⚖️ Compliance & Legal
+
+The [`compliance/`](compliance/) folder contains AML/CFT guardrails and legal requirements:
+
+- **[AML_CFT_LLM_CONTEXT.md](compliance/AML_CFT_LLM_CONTEXT.md)** - Canonical roles and guardrails for AI agents
+
+**Important:** If you're using AI assistance (Copilot, Claude, etc.) to work on A2A features, ensure your agent reads the compliance documentation first. This ensures all designs, copy, and flows maintain NZ legal compliance.
 
 ## 🎯 Test the Prototype
 
