@@ -79,6 +79,14 @@ This index helps LLMs quickly locate relevant documentation. Each entry specifie
 - **Key topics**: XUIButton, XUISelectBox, XUITextInput, XUIModal, prop patterns
 - **Note**: Includes corrections for common TypeScript errors with XUI props
 
+### reference/xero-payment-setup-flow.md
+- **Purpose**: Complete context on how Xero payment service setup works in production
+- **When to use**: Designing realistic onboarding flows, understanding state transitions, entry point patterns
+- **LLM use**: Flow design, state management, provider integration patterns, preconditions
+- **Key topics**: 5-phase setup flow, provider state machine, entry points, KYC/KYB, attach patterns
+- **Size**: Comprehensive reference with examples (Stripe, GoCardless, A2A patterns)
+- **Note**: Production Xero knowledge - use this to inform realistic prototype behavior
+
 ---
 
 ## Guides (Setup & Development)
