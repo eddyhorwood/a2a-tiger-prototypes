@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import XUIButton from '@xero/xui/react/button'
 import { usePrototypeConfig } from '../config/PrototypeConfigContext'
-import {
-  PrototypeConfig,
+import {  PrototypeConfig,
   StripeStatus,
+  OtherPaymentMethods,
   BankAccountSetup,
   A2AOnboardingStatus,
   FlowVariant,
@@ -133,6 +133,28 @@ function PrototypeSetup() {
                       onChange={() => updateConfig({ stripe: option })}
                     />
                     <span className="x-config-option__label">{CONFIG_LABELS.stripe[option]}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Other Payment Methods */}
+            <div className="x-config-group">
+              <label className="x-config-group__label">Other Payment Methods</label>
+              <p className="x-text-sm x-text-muted x-config-group__hint">
+                Direct debit and other payment providers already configured
+              </p>
+              <div className="x-config-group__options">
+                {(Object.keys(CONFIG_LABELS.otherPaymentMethods) as OtherPaymentMethods[]).map(option => (
+                  <label key={option} className="x-config-option">
+                    <input
+                      type="radio"
+                      name="otherPaymentMethods"
+                      value={option}
+                      checked={config.otherPaymentMethods === option}
+                      onChange={() => updateConfig({ otherPaymentMethods: option })}
+                    />
+                    <span className="x-config-option__label">{CONFIG_LABELS.otherPaymentMethods[option]}</span>
                   </label>
                 ))}
               </div>

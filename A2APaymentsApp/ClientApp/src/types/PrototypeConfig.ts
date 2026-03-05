@@ -34,11 +34,17 @@ export type RegionEligibility =
   | 'eligible'                // NZ org, meets all requirements
   | 'ineligible'              // Non-NZ or missing prerequisites
 
+export type OtherPaymentMethods =
+  | 'none'                    // No other payment methods configured
+  | 'direct_debit'            // Direct debit (e.g., GoCardless) configured
+  | 'multiple'                // Multiple other providers (complex OPMM)
+
 /**
  * Complete prototype configuration state
  */
 export interface PrototypeConfig {
   stripe: StripeStatus
+  otherPaymentMethods: OtherPaymentMethods
   bankAccounts: BankAccountSetup
   a2aStatus: A2AOnboardingStatus
   flowVariant: FlowVariant
@@ -52,9 +58,10 @@ export interface PrototypeConfig {
 export const PRESET_SCENARIOS: Record<string, { name: string; description: string; config: PrototypeConfig }> = {
   fresh_start: {
     name: "Fresh Start",
-    description: "No Stripe, single bank account, first-time setup",
+    description: "No payment methods, single bank account, first-time setup",
     config: {
       stripe: 'none',
+      otherPaymentMethods: 'none',
       bankAccounts: 'single',
       a2aStatus: 'not_started',
       flowVariant: 'balanced',
@@ -65,13 +72,28 @@ export const PRESET_SCENARIOS: Record<string, { name: string; description: strin
   
   stripe_competitor: {
     name: "Stripe Competitor",
-    description: "Stripe active, multiple accounts, low online win-rate (target cohort)",
+    description: "Stripe active, A2A as alternative payment method",
     config: {
       stripe: 'active',
+      otherPaymentMethods: 'none',
       bankAccounts: 'multiple',
       a2aStatus: 'not_started',
       flowVariant: 'balanced',
       businessType: 'b2c_low',
+      regionEligibility: 'eligible'
+    }
+  },
+  
+  complex_opmm: {
+    name: "Complex OPMM",
+    description: "Stripe + Direct Debit + A2A (multi-provider scenario)",
+    config: {
+      stripe: 'active',
+      otherPaymentMethods: 'direct_debit',
+      bankAccounts: 'multiple',
+      a2aStatus: 'not_started',
+      flowVariant: 'balanced',
+      businessType: 'b2c_high',
       regionEligibility: 'eligible'
     }
   },
@@ -81,6 +103,7 @@ export const PRESET_SCENARIOS: Record<string, { name: string; description: strin
     description: "Started setup but didn't finish - resume flow",
     config: {
       stripe: 'low_use',
+      otherPaymentMethods: 'none',
       bankAccounts: 'multiple',
       a2aStatus: 'partially_complete',
       flowVariant: 'balanced',
@@ -91,9 +114,10 @@ export const PRESET_SCENARIOS: Record<string, { name: string; description: strin
   
   power_user: {
     name: "Power User",
-    description: "Fully configured, testing management & edge cases",
+    description: "Multiple providers configured, testing management",
     config: {
       stripe: 'active',
+      otherPaymentMethods: 'multiple',
       bankAccounts: 'multiple',
       a2aStatus: 'complete_enabled',
       flowVariant: 'aggressive',
@@ -107,6 +131,7 @@ export const PRESET_SCENARIOS: Record<string, { name: string; description: strin
     description: "No bank accounts or non-NZ - blocked state",
     config: {
       stripe: 'none',
+      otherPaymentMethods: 'none',
       bankAccounts: 'none',
       a2aStatus: 'not_started',
       flowVariant: 'balanced',
@@ -120,6 +145,7 @@ export const PRESET_SCENARIOS: Record<string, { name: string; description: strin
     description: "Test single-step flow variant",
     config: {
       stripe: 'none',
+      otherPaymentMethods: 'none',
       bankAccounts: 'single',
       a2aStatus: 'not_started',
       flowVariant: 'aggressive',
@@ -142,6 +168,11 @@ export const CONFIG_LABELS = {
     none: 'No Stripe',
     active: 'Stripe Connected & Active',
     low_use: 'Stripe Connected (Low Use)'
+  },
+  otherPaymentMethods: {
+    none: 'No Other Methods',
+    direct_debit: 'Direct Debit Configured',
+    multiple: 'Multiple Providers Configured'
   },
   bankAccounts: {
     none: 'No Bank Accounts (Ineligible)',

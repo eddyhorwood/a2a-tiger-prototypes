@@ -97,6 +97,11 @@ export function useConfigState() {
     hasStripe: config.stripe !== 'none',
     isStripeActive: config.stripe === 'active',
     
+    // Other payment methods
+    hasOtherPaymentMethods: config.otherPaymentMethods !== 'none',
+    hasDirectDebit: config.otherPaymentMethods === 'direct_debit' || config.otherPaymentMethods === 'multiple',
+    hasMultipleProviders: config.otherPaymentMethods === 'multiple',
+    
     // Bank account state
     hasBankAccounts: config.bankAccounts !== 'none',
     hasMultipleBankAccounts: config.bankAccounts === 'multiple',
