@@ -91,6 +91,13 @@ This index helps LLMs quickly locate relevant documentation. Each entry specifie
 
 ## Guides (Setup & Development)
 
+### guides/prototype-configuration.md
+- **Purpose**: Configuration landing page system for testing different merchant scenarios
+- **When to use**: Setting up prototype test scenarios, understanding state management, extending configuration
+- **LLM use**: Using `usePrototypeConfig` and `useConfigState` hooks, adding new dimensions
+- **Key topics**: Configuration dimensions (Stripe, bank accounts, A2A status, flow variant), presets, localStorage persistence
+- **Note**: Critical for adapting mock data and UX based on configured merchant state
+
 ### guides/team-setup.md
 - **Purpose**: Complete setup guide for team members (human and AI agents)
 - **When to use**: Initial project setup, troubleshooting dev environment, common tasks

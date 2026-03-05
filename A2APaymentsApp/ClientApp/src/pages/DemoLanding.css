@@ -11,6 +11,36 @@
   margin: 0 auto;
 }
 
+/* Configuration Banner */
+.x-demo-config-banner {
+  background: var(--xui-color-blue-50);
+  border: 1px solid var(--xui-color-blue-200);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.x-demo-config-banner__content {
+  flex: 1;
+}
+
+.x-demo-config-banner__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--xui-color-text-primary);
+  margin-bottom: 4px;
+}
+
+.x-demo-config-banner__details {
+  font-size: 13px;
+  color: var(--xui-color-text-secondary);
+  font-family: ui-monospace, 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+}
+
 /* Header */
 .x-demo-header {
   text-align: center;

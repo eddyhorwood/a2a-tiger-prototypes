@@ -1,0 +1,207 @@
+/* Add Service Tab Styles */
+
+.x-add-service-tab {
+  display: flex;
+  flex-direction: column;
+  gap: var(--xui-spacing-40, 40px);
+}
+
+/* Empty State */
+.x-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--xui-spacing-64, 64px) var(--xui-spacing-24, 24px);
+  text-align: center;
+}
+
+.x-empty-icon {
+  color: var(--xui-color-text-tertiary, #6B7280);
+  margin-bottom: var(--xui-spacing-16, 16px);
+}
+
+.x-empty-state .x-heading-md {
+  margin-bottom: var(--xui-spacing-8, 8px);
+}
+
+/* Add Service Section */
+.x-add-service-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--xui-spacing-24, 24px);
+}
+
+.x-add-service-section .x-heading-md {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+/* Service Cards Grid */
+.x-service-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: var(--xui-spacing-20, 20px);
+}
+
+/* Service Card */
+.x-add-service-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--xui-spacing-16, 16px);
+  padding: var(--xui-spacing-24, 24px);
+  border: 1px solid var(--xui-color-border-default, #E5E7EB);
+  border-radius: var(--xui-border-radius-md, 8px);
+  background: var(--xui-color-surface-default, #FFFFFF);
+  transition: all 0.2s;
+}
+
+.x-add-service-card:hover {
+  border-color: var(--xui-color-border-strong, #D1D5DB);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Setup Started State */
+.x-add-service-card--started {
+  border-color: var(--xui-color-orange-200, #FED7AA);
+  background: var(--xui-color-orange-50, #FFF7ED);
+}
+
+.x-card-banner {
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  background: var(--xui-color-orange-500, #F97316);
+  color: #FFFFFF;
+  padding: var(--xui-spacing-8, 8px) var(--xui-spacing-16, 16px);
+  border-radius: var(--xui-border-radius-md, 8px) var(--xui-border-radius-md, 8px) 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+  text-align: center;
+}
+
+.x-add-service-card--started .x-card-header {
+  margin-top: var(--xui-spacing-32, 32px);
+}
+
+/* Card Header */
+.x-card-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--xui-spacing-4, 4px);
+}
+
+.x-card-header .x-heading-md {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+.x-provider-attribution {
+  margin: 0;
+  color: var(--xui-color-text-secondary, #6B7280);
+  line-height: 20px;
+}
+
+/* Card Description */
+.x-card-description {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--xui-color-text-secondary, #6B7280);
+  flex-grow: 1;
+}
+
+/* Card Actions */
+.x-card-actions {
+  display: flex;
+  gap: var(--xui-spacing-12, 12px);
+  padding-top: var(--xui-spacing-8, 8px);
+}
+
+.x-card-actions button {
+  flex: 1;
+}
+
+/* Footer */
+.x-add-service-footer {
+  text-align: center;
+  padding: var(--xui-spacing-20, 20px) 0;
+}
+
+.x-add-service-footer .x-text-md {
+  margin: 0;
+  color: var(--xui-color-text-secondary, #6B7280);
+  line-height: 20px;
+}
+
+/* History Section */
+.x-history-section {
+  border: 1px solid var(--xui-color-border-default, #E5E7EB);
+  border-radius: var(--xui-border-radius-md, 8px);
+  background: var(--xui-color-surface-default, #FFFFFF);
+  overflow: hidden;
+}
+
+.x-history-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--xui-spacing-16, 16px) var(--xui-spacing-20, 20px);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.x-history-summary::-webkit-details-marker {
+  display: none;
+}
+
+.x-history-title {
+  display: flex;
+  align-items: center;
+  gap: var(--xui-spacing-8, 8px);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 22px;
+  color: var(--xui-color-text-primary, #111827);
+}
+
+.x-chevron {
+  transition: transform 0.2s;
+  color: var(--xui-color-text-tertiary, #9CA3AF);
+}
+
+details[open] .x-chevron {
+  transform: rotate(180deg);
+}
+
+.x-history-content {
+  padding: 0 var(--xui-spacing-20, 20px) var(--xui-spacing-20, 20px) var(--xui-spacing-20, 20px);
+  border-top: 1px solid var(--xui-color-border-subtle, #F3F4F6);
+}
+
+.x-history-content .x-text-sm {
+  margin: var(--xui-spacing-16, 16px) 0 0 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .x-service-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .x-card-actions {
+    flex-direction: column;
+  }
+  
+  .x-card-actions button {
+    width: 100%;
+  }
+}

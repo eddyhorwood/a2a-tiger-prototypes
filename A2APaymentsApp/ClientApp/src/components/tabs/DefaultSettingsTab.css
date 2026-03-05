@@ -1,0 +1,33 @@
+/* Default Settings Tab Styles */
+
+.x-default-settings-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.x-placeholder-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--xui-spacing-64, 64px) var(--xui-spacing-24, 24px);
+  text-align: center;
+  max-width: 480px;
+}
+
+.x-placeholder-icon {
+  color: var(--xui-color-text-tertiary, #9CA3AF);
+  margin-bottom: var(--xui-spacing-16, 16px);
+}
+
+.x-placeholder-state .x-heading-md {
+  margin-bottom: var(--xui-spacing-8, 8px);
+}
+
+.x-placeholder-state .x-text-md {
+  margin: 0;
+  line-height: 22px;
+}

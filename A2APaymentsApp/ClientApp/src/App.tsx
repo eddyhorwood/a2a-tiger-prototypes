@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
+import PrototypeSetup from './pages/PrototypeSetup'
 import DemoLanding from './pages/DemoLanding'
 import OnlinePaymentsSettings from './pages/OnlinePaymentsSettings'
 import InvoiceDetail from './pages/InvoiceDetail'
@@ -9,8 +10,11 @@ import OnboardingWizardAggressive from './pages/OnboardingWizardAggressive'
 function App() {
   return (
     <Routes>
+      {/* Prototype configuration landing page */}
+      <Route path="/" element={<PrototypeSetup />} />
+      
       {/* Demo landing page - shows all entry points */}
-      <Route path="/" element={<DemoLanding />} />
+      <Route path="/demo" element={<DemoLanding />} />
       
       {/* Entry Point 1: Online Payments Settings */}
       <Route path="/settings/online-payments" element={<OnlinePaymentsSettings />} />

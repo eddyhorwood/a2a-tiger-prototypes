@@ -1,36 +1,25 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import XUIButton from '@xero/xui/react/button'
 import { SetupBanner } from '../components/SetupBanner'
+import { PaymentMethodsTab } from '../components/tabs/PaymentMethodsTab'
+import { DefaultSettingsTab } from '../components/tabs/DefaultSettingsTab'
+import { ConnectedServicesTab } from '../components/tabs/ConnectedServicesTab'
+import { AddServiceTab } from '../components/tabs/AddServiceTab'
 import { serializeEntryContext, type EntryContext } from '../types/EntryContext'
+import type { PaymentServiceConfig, ProviderStatus } from '../types/PaymentServiceTypes'
 import './OnlinePaymentsSettings.css'
 
-type ProviderStatus = 'NOT_CONFIGURED' | 'SETUP_STARTED' | 'SETUP_COMPLETE' | 'ERROR'
-
-interface PaymentServiceConfig {
-  id: string
-  name: string
-  provider: string
-  description: string
-  longDescription: string
-  status: ProviderStatus
-  methods: string[]
-  features: string[]
-  settlementAccount?: {
-    name: string
-    maskedNumber: string
-  }
-  feeAccount?: string
-  pricing: string
-  setupTime: string
-  region: string[]
-  icon: 'bank' | 'card' | 'debit'
-}
+type TabId = 'methods' | 'settings' | 'connected' | 'add'
 
 function OnlinePaymentsSettings() {
   const navigate = useNavigate()
+  const [activeTab, setActiveTab] = useState<TabId>('methods')
   
   // Mock state - in real app this would come from API/CP Provisioning
+  // Customize the initial state to demo different flows:
+  // - All NOT_CONFIGURED: pristine org without any setup
+  // - Some SETUP_STARTED: user has incomplete onboarding(s)
+  // - Some SETUP_COMPLETE: user has connected services
   const [services, setServices] = useState<PaymentServiceConfig[]>([
     {
       id: 'pay-by-bank',
@@ -38,7 +27,7 @@ function OnlinePaymentsSettings() {
       provider: 'Powered by Akahu',
       description: 'Accept instant bank-to-bank transfers',
       longDescription: 'Let your customers pay you directly from their bank account with instant settlement. No card fees, faster cash flow.',
-      status: 'NOT_CONFIGURED', // Change to SETUP_STARTED or SETUP_COMPLETE to demo those states
+      status: 'SETUP_COMPLETE', // Change to test different states
       methods: ['Bank transfer', 'Open Banking'],
       features: [
         'Instant bank-to-bank transfers',
@@ -51,12 +40,11 @@ function OnlinePaymentsSettings() {
       setupTime: '5 minutes',
       region: ['NZ'],
       icon: 'bank',
-      // When SETUP_COMPLETE:
-      // settlementAccount: {
-      //   name: 'Business Cheque Account',
-      //   maskedNumber: '03-XXXX-XXXXXX78-00'
-      // },
-      // feeAccount: 'Payment Processing Fees'
+      settlementAccount: {
+        name: 'Business Cheque Account',
+        maskedNumber: '03-XXXX-XXXXXX78-00'
+      },
+      feeAccount: 'Payment Processing Fees'
     },
     {
       id: 'stripe',
@@ -64,7 +52,7 @@ function OnlinePaymentsSettings() {
       provider: 'Powered by Stripe',
       description: 'Accept credit cards, debit cards, and wallets',
       longDescription: 'Accept Visa, Mastercard, American Express, Apple Pay, and Google Pay. Get paid in 2-3 business days.',
-      status: 'NOT_CONFIGURED',
+      status: 'SETUP_COMPLETE',
       methods: ['Credit card', 'Debit card', 'Apple Pay', 'Google Pay'],
       features: [
         'Accept Visa, Mastercard, Amex',
@@ -76,7 +64,12 @@ function OnlinePaymentsSettings() {
       pricing: '2.9% + 30¢ per transaction',
       setupTime: '10 minutes',
       region: ['NZ', 'AU', 'UK', 'US', 'CA'],
-      icon: 'card'
+      icon: 'card',
+      settlementAccount: {
+        name: 'Business Cheque Account',
+        maskedNumber: '03-XXXX-XXXXXX78-00'
+      },
+      feeAccount: 'Payment Processing Fees'
     },
     {
       id: 'gocardless',

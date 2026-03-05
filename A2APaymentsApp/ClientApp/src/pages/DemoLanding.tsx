@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import XUIButton from '@xero/xui/react/button'
+import { usePrototypeConfig } from '../config/PrototypeConfigContext'
+import { CONFIG_LABELS } from '../types/PrototypeConfig'
 import './DemoLanding.css'
 
 /**
@@ -11,10 +13,29 @@ import './DemoLanding.css'
  */
 function DemoLanding() {
   const navigate = useNavigate()
+  const { config } = usePrototypeConfig()
   
   return (
     <div className="x-demo-landing">
       <div className="x-demo-container">
+        {/* Configuration Status Banner */}
+        <div className="x-demo-config-banner">
+          <div className="x-demo-config-banner__content">
+            <div className="x-demo-config-banner__title">Current Configuration</div>
+            <div className="x-demo-config-banner__details">
+              {CONFIG_LABELS.stripe[config.stripe]} • {CONFIG_LABELS.bankAccounts[config.bankAccounts]} • 
+              {' '}{CONFIG_LABELS.a2aStatus[config.a2aStatus]} • {CONFIG_LABELS.flowVariant[config.flowVariant]}
+            </div>
+          </div>
+          <XUIButton
+            variant="borderless-standard"
+            size="small"
+            onClick={() => navigate('/')}
+          >
+            Change Configuration
+          </XUIButton>
+        </div>
+
         <div className="x-demo-header">
           <h1 className="x-heading-xxl">A2A Bank Payments Prototype</h1>
           <p className="x-text-lg x-text-muted">

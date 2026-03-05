@@ -1,0 +1,193 @@
+/* Connected Services Tab Styles */
+
+.x-connected-services-tab {
+  display: flex;
+  flex-direction: column;
+  gap: var(--xui-spacing-40, 40px);
+}
+
+/* Empty State */
+.x-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--xui-spacing-64, 64px) var(--xui-spacing-24, 24px);
+  text-align: center;
+}
+
+.x-empty-icon {
+  color: var(--xui-color-text-tertiary, #6B7280);
+  margin-bottom: var(--xui-spacing-16, 16px);
+}
+
+.x-empty-state .x-heading-md {
+  margin-bottom: var(--xui-spacing-8, 8px);
+}
+
+/* Services Section */
+.x-services-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--xui-spacing-20, 20px);
+}
+
+.x-services-section .x-heading-md {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+/* Services Table */
+.x-services-table-container {
+  border: 1px solid var(--xui-color-border-default, #E5E7EB);
+  border-radius: var(--xui-border-radius-md, 8px);
+  background: var(--xui-color-surface-default, #FFFFFF);
+  overflow: hidden;
+}
+
+.x-services-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.x-services-table thead th {
+  background: var(--xui-color-surface-subtle, #F9FAFB);
+  padding: var(--xui-spacing-12, 12px) var(--xui-spacing-16, 16px);
+  text-align: left;
+  font-weight: 600;
+  color: var(--xui-color-text-secondary, #6B7280);
+  font-size: 13px;
+  line-height: 18px;
+  border-bottom: 1px solid var(--xui-color-border-default, #E5E7EB);
+}
+
+.x-services-table tbody tr {
+  border-bottom: 1px solid var(--xui-color-border-subtle, #F3F4F6);
+}
+
+.x-services-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.x-services-table tbody tr:hover {
+  background: var(--xui-color-surface-subtle, #F9FAFB);
+}
+
+.x-services-table td {
+  padding: var(--xui-spacing-16, 16px);
+  vertical-align: middle;
+}
+
+.x-table-account {
+  font-weight: 500;
+  color: var(--xui-color-text-primary, #111827);
+}
+
+.x-table-service {
+  width: 200px;
+}
+
+.x-provider-logo {
+  display: inline-block;
+  font-weight: 600;
+  font-size: 16px;
+  padding: var(--xui-spacing-4, 4px) 0;
+}
+
+.x-provider-logo--stripe {
+  color: #635BFF;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-style: italic;
+}
+
+.x-provider-logo--akahu {
+  color: #0047AB;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.x-provider-logo--gocardless {
+  color: #00B388;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.x-table-themes {
+  color: var(--xui-color-text-secondary, #6B7280);
+}
+
+.x-theme-name {
+  display: inline-block;
+}
+
+.x-table-actions {
+  width: 100px;
+  text-align: right;
+}
+
+.x-table-footer {
+  padding: var(--xui-spacing-16, 16px) 0 0 0;
+}
+
+/* History Section */
+.x-history-section {
+  border: 1px solid var(--xui-color-border-default, #E5E7EB);
+  border-radius: var(--xui-border-radius-md, 8px);
+  background: var(--xui-color-surface-default, #FFFFFF);
+  overflow: hidden;
+}
+
+.x-history-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--xui-spacing-16, 16px) var(--xui-spacing-20, 20px);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.x-history-summary::-webkit-details-marker {
+  display: none;
+}
+
+.x-history-title {
+  display: flex;
+  align-items: center;
+  gap: var(--xui-spacing-8, 8px);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 22px;
+  color: var(--xui-color-text-primary, #111827);
+}
+
+.x-chevron {
+  transition: transform 0.2s;
+  color: var(--xui-color-text-tertiary, #9CA3AF);
+}
+
+details[open] .x-chevron {
+  transform: rotate(180deg);
+}
+
+.x-history-content {
+  padding: 0 var(--xui-spacing-20, 20px) var(--xui-spacing-20, 20px) var(--xui-spacing-20, 20px);
+  border-top: 1px solid var(--xui-color-border-subtle, #F3F4F6);
+}
+
+.x-history-content .x-text-sm {
+  margin: var(--xui-spacing-16, 16px) 0 0 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .x-services-table-container {
+    overflow-x: auto;
+  }
+  
+  .x-services-table {
+    min-width: 600px;
+  }
+}

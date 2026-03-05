@@ -2,13 +2,16 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
+import { PrototypeConfigProvider } from './config/PrototypeConfigContext'
 import '@xero/xui/sass/xui.scss'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
-      <App />
+      <PrototypeConfigProvider>
+        <App />
+      </PrototypeConfigProvider>
     </BrowserRouter>
   </React.StrictMode>,
 )

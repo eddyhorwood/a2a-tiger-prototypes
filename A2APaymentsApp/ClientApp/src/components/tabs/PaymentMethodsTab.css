@@ -1,0 +1,252 @@
+/* Payment Methods Tab Styles */
+
+.x-payment-methods-tab {
+  display: flex;
+  flex-direction: column;
+  gap: var(--xui-spacing-24, 24px);
+}
+
+/* Empty State */
+.x-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--xui-spacing-64, 64px) var(--xui-spacing-24, 24px);
+  text-align: center;
+}
+
+.x-empty-icon {
+  color: var(--xui-color-text-tertiary, #6B7280);
+  margin-bottom: var(--xui-spacing-16, 16px);
+}
+
+.x-empty-state .x-heading-md {
+  margin-bottom: var(--xui-spacing-8, 8px);
+}
+
+/* Method Category */
+.x-method-category {
+  border: 1px solid var(--xui-color-border-default, #E5E7EB);
+  border-radius: var(--xui-border-radius-md, 8px);
+  background: var(--xui-color-surface-default, #FFFFFF);
+  overflow: hidden;
+}
+
+.x-category-header {
+  padding: var(--xui-spacing-20, 20px) var(--xui-spacing-24, 24px);
+  border-bottom: 1px solid var(--xui-color-border-subtle, #F3F4F6);
+}
+
+.x-category-title {
+  display: flex;
+  align-items: center;
+  gap: var(--xui-spacing-8, 8px);
+  margin-bottom: var(--xui-spacing-4, 4px);
+}
+
+.x-category-icon {
+  color: var(--xui-color-text-secondary, #6B7280);
+}
+
+.x-category-header .x-heading-md {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+.x-category-header .x-text-sm {
+  margin: 0;
+  line-height: 20px;
+}
+
+/* Methods List */
+.x-methods-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.x-method-item {
+  display: grid;
+  grid-template-columns: 24px 40px 1fr auto;
+  align-items: center;
+  gap: var(--xui-spacing-12, 12px);
+  padding: var(--xui-spacing-16, 16px) var(--xui-spacing-24, 24px);
+  border-bottom: 1px solid var(--xui-color-border-subtle, #F3F4F6);
+  min-height: 72px;
+}
+
+.x-method-item:last-child {
+  border-bottom: none;
+}
+
+.x-method-item:hover {
+  background: var(--xui-color-surface-subtle, #F9FAFB);
+}
+
+/* Expand Button */
+.x-method-expand {
+  background: none;
+  border: none;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--xui-color-text-tertiary, #9CA3AF);
+  cursor: pointer;
+  border-radius: var(--xui-border-radius-sm, 4px);
+  transition: all 0.2s;
+}
+
+.x-method-expand:hover {
+  background: var(--xui-color-surface-subtle, #F3F4F6);
+  color: var(--xui-color-text-secondary, #6B7280);
+}
+
+.x-method-expand:focus {
+  outline: 2px solid var(--xui-color-border-brand, #0078C8);
+  outline-offset: 2px;
+}
+
+/* Method Icon */
+.x-method-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--xui-border-radius-md, 8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.x-method-icon--stripe {
+  background: #635BFF;
+  color: #FFFFFF;
+}
+
+.x-method-icon--applepay {
+  background: #000000;
+  color: #FFFFFF;
+}
+
+.x-method-icon--googlepay {
+  background: #4285F4;
+  color: #FFFFFF;
+}
+
+.x-method-icon--link {
+  background: #00D4AA;
+  color: #FFFFFF;
+}
+
+.x-method-icon--bank {
+  background: var(--xui-color-blue-500, #0078C8);
+  color: #FFFFFF;
+}
+
+.x-method-icon--debit {
+  background: var(--xui-color-purple-500, #7C3AED);
+  color: #FFFFFF;
+}
+
+/* Method Content */
+.x-method-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--xui-spacing-4, 4px);
+  min-width: 0;
+}
+
+.x-method-title {
+  display: flex;
+  align-items: baseline;
+  gap: var(--xui-spacing-8, 8px);
+  flex-wrap: wrap;
+}
+
+.x-method-title strong {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  color: var(--xui-color-text-primary, #111827);
+}
+
+.x-method-provider {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--xui-color-text-secondary, #6B7280);
+}
+
+.x-method-subtitle {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--xui-color-text-tertiary, #9CA3AF);
+  margin: 0;
+}
+
+/* Method Status */
+.x-method-status {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 120px;
+}
+
+.x-method-auto {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--xui-spacing-4, 4px);
+}
+
+.x-method-auto .x-text-xs {
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+/* Status Badge */
+.x-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--xui-spacing-4, 4px);
+  padding: var(--xui-spacing-4, 4px) var(--xui-spacing-8, 8px);
+  border-radius: var(--xui-border-radius-sm, 4px);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.x-status-badge--on {
+  background: var(--xui-color-green-50, #ECFDF5);
+  color: var(--xui-color-green-700, #047857);
+}
+
+.x-status-badge--on svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+  stroke: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .x-method-item {
+    grid-template-columns: 24px 40px 1fr;
+    gap: var(--xui-spacing-8, 8px);
+  }
+  
+  .x-method-status {
+    grid-column: 2 / 4;
+    justify-content: flex-start;
+    margin-top: var(--xui-spacing-8, 8px);
+  }
+  
+  .x-method-auto {
+    align-items: flex-start;
+  }
+}
