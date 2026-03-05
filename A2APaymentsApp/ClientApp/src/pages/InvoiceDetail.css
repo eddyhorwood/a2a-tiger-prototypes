@@ -246,6 +246,8 @@
 
 .x-payment-option-content {
   /* Content wrapper */
+  display: flex;
+  flex-direction: column;
 }
 
 /* Bank logo badges */

@@ -1,0 +1,152 @@
+/* Setup Banner Component Styles */
+
+.x-setup-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 16px 20px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  margin-bottom: 20px;
+}
+
+.x-setup-banner__content {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  flex: 1;
+}
+
+.x-setup-banner__icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+}
+
+.x-setup-banner__text {
+  flex: 1;
+}
+
+.x-setup-banner__title {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  margin-bottom: 4px;
+}
+
+.x-setup-banner__description {
+  font-size: 14px;
+  line-height: 20px;
+  margin: 0;
+  opacity: 0.9;
+}
+
+.x-setup-banner__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.x-setup-banner__dismiss {
+  background: none;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 8px;
+  margin-left: 8px;
+  opacity: 0.6;
+  transition: opacity 120ms ease-out;
+}
+
+.x-setup-banner__dismiss:hover {
+  opacity: 1;
+}
+
+/* Variant: Info (Blue) */
+.x-setup-banner--info {
+  background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+  border-color: #BFDBFE;
+}
+
+.x-setup-banner--info .x-setup-banner__title {
+  color: #1E40AF;
+}
+
+.x-setup-banner--info .x-setup-banner__description {
+  color: #1E3A8A;
+}
+
+.x-setup-banner--info .x-setup-banner__icon {
+  color: #3B82F6;
+}
+
+.x-setup-banner--info .x-setup-banner__dismiss {
+  color: #1E40AF;
+}
+
+/* Variant: Promotional (Purple) */
+.x-setup-banner--promotional {
+  background: linear-gradient(135deg, #F3E8FF 0%, #E9D5FF 100%);
+  border-color: #D8B4FE;
+}
+
+.x-setup-banner--promotional .x-setup-banner__title {
+  color: #6B21A8;
+}
+
+.x-setup-banner--promotional .x-setup-banner__description {
+  color: #581C87;
+}
+
+.x-setup-banner--promotional .x-setup-banner__icon {
+  color: #9333EA;
+}
+
+.x-setup-banner--promotional .x-setup-banner__dismiss {
+  color: #6B21A8;
+}
+
+/* Variant: High-Contrast (Yellow/Orange) */
+.x-setup-banner--high-contrast {
+  background: linear-gradient(135deg, #FEF9C3 0%, #FEF08A 100%);
+  border-color: #FDE047;
+}
+
+.x-setup-banner--high-contrast .x-setup-banner__title {
+  color: #78350F;
+}
+
+.x-setup-banner--high-contrast .x-setup-banner__description {
+  color: #92400E;
+}
+
+.x-setup-banner--high-contrast .x-setup-banner__icon {
+  color: #F59E0B;
+}
+
+.x-setup-banner--high-contrast .x-setup-banner__dismiss {
+  color: #78350F;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .x-setup-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .x-setup-banner__actions {
+    width: 100%;
+    flex-direction: column;
+  }
+  
+  .x-setup-banner__actions button {
+    width: 100%;
+  }
+}
