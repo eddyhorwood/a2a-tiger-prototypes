@@ -23,8 +23,8 @@ The prototype uses **XUI components** and **Xero Design Guidelines** for an auth
 
 1. **Clone the repository** (if you haven't already):
    ```bash
-   git clone https://github.com/xero-internal/A2APaymentsNZ.git
-   cd A2APaymentsNZ
+   git clone https://github.com/eddyhorwood/a2a-tiger-prototypes.git
+   cd a2a-tiger-prototypes
    ```
 
 2. **Navigate to the React app**:
