@@ -374,3 +374,88 @@
     padding: 8px 4px;
   }
 }
+
+/* === OPMM Modal Components === */
+/* Payment Option Card */
+.x-payment-option-card {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  padding: 32px;
+  margin: 0 auto;
+  max-width: 560px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+.x-payment-option-content {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Bank logo badges */
+.x-bank-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  background: #F3F4F6;
+  border: 1px solid #E5E7EB;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  letter-spacing: 0.3px;
+}
+
+/* Feature list with checkmarks */
+.x-feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.x-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #374151;
+}
+
+.x-feature-item:last-child {
+  margin-bottom: 0;
+}
+
+.x-checkmark {
+  flex-shrink: 0;
+  color: #10B981;
+  margin-top: 2px;
+}
+
+/* Demo config collapsible */
+.x-demo-config {
+  border-top: 1px solid #E5E7EB;
+  padding-top: 20px;
+}
+
+.x-demo-config summary {
+  user-select: none;
+}
+
+.x-demo-config summary::-webkit-details-marker {
+  display: none;
+}
+
+.x-demo-config summary::before {
+  content: "▸ ";
+  display: inline-block;
+  margin-right: 6px;
+  transition: transform 120ms ease-out;
+}
+
+.x-demo-config[open] summary::before {
+  transform: rotate(90deg);
+}
+

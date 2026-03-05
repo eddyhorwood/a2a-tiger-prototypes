@@ -34,21 +34,24 @@ Reusable banner component for contextual payment setup prompts.
 
 ### 2. InvoiceView Page (`/src/pages/InvoiceView.tsx`)
 
-New realistic invoice view/edit screen with contextual setup banner.
+Unified invoice view/edit screen with multiple payment setup entry points.
 
 **Features:**
 - Xero-style breadcrumbs navigation
 - Contextual setup banner (appears when no payment service configured)
+- "Set up online payments" button with OPMM modal
 - Realistic invoice layout matching production Xero
 - Contact display with avatar
 - Line items table
 - Totals calculation section
 - Notes textarea
-- Entry context tracking for banner click
+- Demo configuration controls (flow variant, compliance variant)
 
-**Route:** `/invoice-view/:invoiceId`
+**Two Entry Points:**
+1. **Banner**: Prominent banner at top of page → Entry ID: `invoice.banner`
+2. **OPMM Modal**: "Set up online payments" button → Modal → Entry ID: `invoice.modal`
 
-**Entry Point ID:** `banner` (tracks that user came from invoice banner)
+**Route:** `/invoice/:invoiceId`
 
 ### 3. Enhanced OnlinePaymentsSettings (`/src/pages/OnlinePaymentsSettings.tsx`)
 

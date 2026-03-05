@@ -114,6 +114,8 @@ export function useConfigState() {
     
     // Flow
     isAggressiveFlow: config.flowVariant === 'aggressive',
+    isBalancedFlow: config.flowVariant === 'balanced',
+    isConservativeFlow: config.flowVariant === 'conservative',
     
     // Business
     isTargetCohort: config.businessType === 'b2c_low', // Low Stripe win-rate = target for A2A

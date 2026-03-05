@@ -22,8 +22,9 @@ export type A2AOnboardingStatus =
   | 'complete_disabled'       // Setup complete but paused/disabled
 
 export type FlowVariant =
-  | 'balanced'                // Multi-step flow (more hand-holding)
-  | 'aggressive'              // Single-step flow (fast & minimal)
+  | 'aggressive'              // Ultra-fast flow (single page, < 10 sec)
+  | 'balanced'                // Fast flow (minimal steps, ~30 sec)
+  | 'conservative'            // Full flow (multi-step with guidance, 3-5 min)
 
 export type BusinessType =
   | 'b2c_high'                // B2C with high invoice volume
@@ -64,7 +65,7 @@ export const PRESET_SCENARIOS: Record<string, { name: string; description: strin
       otherPaymentMethods: 'none',
       bankAccounts: 'single',
       a2aStatus: 'not_started',
-      flowVariant: 'balanced',
+      flowVariant: 'conservative',
       businessType: 'b2c_high',
       regionEligibility: 'eligible'
     }
@@ -78,7 +79,7 @@ export const PRESET_SCENARIOS: Record<string, { name: string; description: strin
       otherPaymentMethods: 'none',
       bankAccounts: 'multiple',
       a2aStatus: 'not_started',
-      flowVariant: 'balanced',
+      flowVariant: 'conservative',
       businessType: 'b2c_low',
       regionEligibility: 'eligible'
     }
@@ -92,7 +93,7 @@ export const PRESET_SCENARIOS: Record<string, { name: string; description: strin
       otherPaymentMethods: 'direct_debit',
       bankAccounts: 'multiple',
       a2aStatus: 'not_started',
-      flowVariant: 'balanced',
+      flowVariant: 'conservative',
       businessType: 'b2c_high',
       regionEligibility: 'eligible'
     }
@@ -106,7 +107,7 @@ export const PRESET_SCENARIOS: Record<string, { name: string; description: strin
       otherPaymentMethods: 'none',
       bankAccounts: 'multiple',
       a2aStatus: 'partially_complete',
-      flowVariant: 'balanced',
+      flowVariant: 'conservative',
       businessType: 'b2c_high',
       regionEligibility: 'eligible'
     }
@@ -120,7 +121,7 @@ export const PRESET_SCENARIOS: Record<string, { name: string; description: strin
       otherPaymentMethods: 'multiple',
       bankAccounts: 'multiple',
       a2aStatus: 'complete_enabled',
-      flowVariant: 'aggressive',
+      flowVariant: 'balanced',
       businessType: 'b2c_high',
       regionEligibility: 'eligible'
     }
@@ -134,15 +135,15 @@ export const PRESET_SCENARIOS: Record<string, { name: string; description: strin
       otherPaymentMethods: 'none',
       bankAccounts: 'none',
       a2aStatus: 'not_started',
-      flowVariant: 'balanced',
+      flowVariant: 'conservative',
       businessType: 'b2c_low',
       regionEligibility: 'ineligible'
     }
   },
   
   fast_onboarding: {
-    name: "Fast Onboarding (Aggressive)",
-    description: "Test single-step flow variant",
+    name: "Fast Onboarding",
+    description: "Test ultra-fast aggressive flow",
     config: {
       stripe: 'none',
       otherPaymentMethods: 'none',
@@ -186,8 +187,9 @@ export const CONFIG_LABELS = {
     complete_disabled: 'Complete & Disabled'
   },
   flowVariant: {
-    balanced: 'Balanced (Multi-step)',
-    aggressive: 'Aggressive (Single-step)'
+    aggressive: 'Aggressive (< 10 sec)',
+    balanced: 'Balanced (~30 sec)',
+    conservative: 'Conservative (3-5 min)'
   },
   businessType: {
     b2c_high: 'B2C High Volume',

@@ -77,19 +77,20 @@ function DemoLanding() {
           {/* Entry Point 2: Invoice Banner */}
           <div className="x-demo-card">
             <div className="x-demo-card__badge x-demo-card__badge--new">Entry Point 2 (New)</div>
-            <h2 className="x-heading-lg">Invoice with Banner</h2>
+            <h2 className="x-heading-lg">Invoice Entry Points</h2>
             <p className="x-text-md x-demo-card__description">
-              View a realistic invoice editor with a contextual banner prompting merchants to set up 
-              online payments. This matches the real Xero pattern for in-context payment setup.
+              View a realistic invoice editor with TWO ways to trigger payment setup onboarding:
+              (1) Prominent banner at top of page, and (2) "Set up online payments" button that opens OPMM modal.
+              Both entry points tracked separately for testing conversion approaches.
             </p>
             
             <div className="x-demo-features">
               <h3 className="x-text-sm x-text-muted">Features demonstrated:</h3>
               <ul className="x-demo-features-list">
-                <li>High-contrast informational banner above invoice</li>
+                <li>High-contrast informational banner (entry: invoice.banner)</li>
+                <li>OPMM modal from "Set up online payments" button (entry: invoice.modal)</li>
                 <li>Realistic Xero invoice layout with breadcrumbs</li>
-                <li>Primary and secondary CTAs in banner</li>
-                <li>Dismissible banner pattern</li>
+                <li>Demo configuration controls for flow variant</li>
                 <li>Direct flow to onboarding from invoice context</li>
               </ul>
             </div>
@@ -97,26 +98,26 @@ function DemoLanding() {
             <div className="x-demo-card__actions">
               <XUIButton
                 variant="main"
-                onClick={() => navigate('/invoice-view/INV-002')}
+                onClick={() => navigate('/invoice/INV-001')}
               >
-                View Invoice Banner
+                View Invoice Page
               </XUIButton>
             </div>
           </div>
           
-          {/* Entry Point 3: Invoice with Modal (existing) */}
+          {/* Entry Point 3: Settings (moved from original) */}
           <div className="x-demo-card x-demo-card--secondary">
-            <div className="x-demo-card__badge x-demo-card__badge--existing">Entry Point 3 (Existing)</div>
-            <h2 className="x-heading-lg">Invoice with Payment Options Modal</h2>
+            <div className="x-demo-card__badge x-demo-card__badge--existing">Entry Point 3 (Primary)</div>
+            <h2 className="x-heading-lg">Online Payments Settings</h2>
             <p className="x-text-md x-demo-card__description">
-              Original prototype with inline payment options modal (OPMM pattern). 
-              Still functional for comparison with the new banner approach.
+              Primary settings entry point with Pay by bank tile, settlement account management, 
+              and state-based CTAs (first-time vs. manage modes).
             </p>
             
             <div className="x-demo-card__actions">
               <XUIButton
                 variant="standard"
-                onClick={() => navigate('/invoice/INV-001')}
+                onClick={() => navigate('/settings/online-payments')}
               >
                 View Modal Flow
               </XUIButton>

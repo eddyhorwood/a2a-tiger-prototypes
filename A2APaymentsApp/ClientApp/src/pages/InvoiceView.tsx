@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import XUIButton from '@xero/xui/react/button'
+import XUIModal, { XUIModalBody } from '@xero/xui/react/modal'
 import { SetupBanner } from '../components/SetupBanner'
-import { serializeEntryContext, type EntryContext } from '../types/EntryContext'
+import { serializeEntryContext, type EntryContext, type ComplianceVariant } from '../types/EntryContext'
+import OnboardingWizardAggressiveFast from './OnboardingWizardAggressiveFast'
 import './InvoiceView.css'
 
 interface Invoice {
@@ -32,21 +34,24 @@ interface Invoice {
 }
 
 /**
- * InvoiceView - Realistic Xero invoice view/edit screen
+ * InvoiceView - Unified invoice view/edit screen with multiple payment setup entry points
  * 
- * Entry point: Banner prompting payment setup
- * This mimics the real Xero invoice editor with contextual banners
+ * Entry points:
+ * 1. SetupBanner at top of page (source: 'invoice.banner')
+ * 2. "Set up online payments" button → OPMM modal (source: 'invoice.modal')
+ * 
+ * This mimics the real Xero invoice editor with contextual prompts
  * that encourage merchants to set up online payments.
- * 
- * Banner appears when:
- * - Invoice is draft or sent
- * - Merchant has no payment services configured
- * - Banner hasn't been dismissed recently
  */
 function InvoiceView() {
   const navigate = useNavigate()
   const [showBanner, setShowBanner] = useState(true)
+  const [showPaymentMethodModal, setShowPaymentMethodModal] = useState(false)
+  const [showAggressiveOnboarding, setShowAggressiveOnboarding] = useState(false)
   const [paymentServiceConfigured] = useState(false) // In real app, fetch from API
+  const [flowVariant, setFlowVariant] = useState<'aggressive' | 'balanced' | 'conservative'>('conservative')
+  const [complianceVariant, setComplianceVariant] = useState<ComplianceVariant>('modal')
+  const [currentEntryContext, setCurrentEntryContext] = useState<EntryContext | null>(null)
   
   // Mock invoice data - realistic Xero invoice
   const invoice: Invoice = {
@@ -86,10 +91,11 @@ function InvoiceView() {
   }
   
   const handleSetupPayments = () => {
-    // Entry point: Banner on invoice view/edit
+    // Entry point 1: Banner on invoice view/edit
     const context: EntryContext = {
-      source: 'banner',
+      source: 'invoice.banner',
       mode: 'first_time',
+      complianceVariant: complianceVariant,
       returnTo: `/invoice/${invoice.id}`,
       metadata: { 
         invoiceId: invoice.id,
@@ -97,8 +103,46 @@ function InvoiceView() {
         contactName: invoice.contact.name
       }
     }
-    const params = serializeEntryContext(context)
-    navigate(`/merchant-onboarding?${params.toString()}`)
+    
+    // Aggressive flow opens as modal, others navigate to wizard
+    if (flowVariant === 'aggressive') {
+      setCurrentEntryContext(context)
+      setShowAggressiveOnboarding(true)
+    } else {
+      const params = serializeEntryContext(context)
+      navigate(`/merchant-onboarding?${params.toString()}`)
+    }
+  }
+  
+  const handleOpenPaymentMethodModal = () => {
+    setShowPaymentMethodModal(true)
+  }
+  
+  const handleConnectPaymentService = () => {
+    // Close OPMM modal first
+    setShowPaymentMethodModal(false)
+    
+    // Entry point 2: OPMM Modal from "Set up online payments" button
+    const context: EntryContext = {
+      source: 'invoice.modal',
+      mode: 'first_time',
+      complianceVariant: complianceVariant,
+      returnTo: `/invoice/${invoice.id}`,
+      metadata: { 
+        invoiceId: invoice.id,
+        invoiceAmount: invoice.total,
+        contactName: invoice.contact.name
+      }
+    }
+    
+    // Aggressive flow opens as modal, others navigate to wizard
+    if (flowVariant === 'aggressive') {
+      setCurrentEntryContext(context)
+      setShowAggressiveOnboarding(true)
+    } else {
+      const params = serializeEntryContext(context)
+      navigate(`/merchant-onboarding?${params.toString()}`)
+    }
   }
   
   const handleLearnMore = () => {
@@ -124,6 +168,88 @@ function InvoiceView() {
       
       {/* Main content area */}
       <div className="x-invoice-view-container">
+        {/* Demo configuration controls - visible at top for both entry points */}
+        <details className="x-demo-config" style={{ marginBottom: '20px' }}>
+          <summary className="x-text-sm" style={{ cursor: 'pointer', fontWeight: 500, color: '#6B7280', marginBottom: '12px' }}>
+            Prototype settings
+          </summary>
+          <div style={{ padding: '16px', background: '#F9FAFB', borderRadius: '6px', border: '1px solid #E5E7EB' }}>
+            {/* Flow length dimension */}
+            <div style={{ marginBottom: '12px' }}>
+              <p className="x-text-sm" style={{ marginBottom: '6px', fontWeight: 500 }}>Flow length</p>
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                  <input
+                    type="radio"
+                    name="flow"
+                    value="aggressive"
+                    checked={flowVariant === 'aggressive'}
+                    onChange={(e) => setFlowVariant(e.target.value as 'aggressive' | 'balanced' | 'conservative')}
+                  />
+                  <span className="x-text-sm">Aggressive (< 10 sec)</span>
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                  <input
+                    type="radio"
+                    name="flow"
+                    value="balanced"
+                    checked={flowVariant === 'balanced'}
+                    onChange={(e) => setFlowVariant(e.target.value as 'aggressive' | 'balanced' | 'conservative')}
+                  />
+                  <span className="x-text-sm">Balanced (~30 sec)</span>
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                  <input
+                    type="radio"
+                    name="flow"
+                    value="conservative"
+                    checked={flowVariant === 'conservative'}
+                    onChange={(e) => setFlowVariant(e.target.value as 'aggressive' | 'balanced' | 'conservative')}
+                  />
+                  <span className="x-text-sm">Conservative (3-5 min)</span>
+                </label>
+              </div>
+            </div>
+            
+            {/* Compliance disclosure dimension */}
+            <div>
+              <p className="x-text-sm" style={{ marginBottom: '6px', fontWeight: 500 }}>Compliance disclosure</p>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                  <input
+                    type="radio"
+                    name="compliance"
+                    value="modal"
+                    checked={complianceVariant === 'modal'}
+                    onChange={(e) => setComplianceVariant(e.target.value as ComplianceVariant)}
+                  />
+                  <span className="x-text-sm">Modal</span>
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                  <input
+                    type="radio"
+                    name="compliance"
+                    value="banner"
+                    checked={complianceVariant === 'banner'}
+                    onChange={(e) => setComplianceVariant(e.target.value as ComplianceVariant)}
+                  />
+                  <span className="x-text-sm">Banner</span>
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                  <input
+                    type="radio"
+                    name="compliance"
+                    value="fullscreen"
+                    checked={complianceVariant === 'fullscreen'}
+                    onChange={(e) => setComplianceVariant(e.target.value as ComplianceVariant)}
+                  />
+                  <span className="x-text-sm">Fullscreen</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </details>
+        
         {/* Setup banner - contextual prompt to set up payments */}
         {!paymentServiceConfigured && showBanner && (
           <SetupBanner
@@ -224,6 +350,26 @@ function InvoiceView() {
             </div>
           </div>
           
+          {/* Online payments section */}
+          {!paymentServiceConfigured && (
+            <div className="x-invoice-section" style={{ borderTop: '1px solid var(--xui-color-border-subtle)', paddingTop: '16px' }}>
+              <div className="x-invoice-field">
+                <label className="x-field-label">Online payments</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <XUIButton
+                    variant="borderless-main"
+                    onClick={handleOpenPaymentMethodModal}
+                  >
+                    Set up online payments
+                  </XUIButton>
+                  <span className="x-text-sm" style={{ color: 'var(--xui-color-text-secondary)' }}>
+                    Add a 'Pay now' button to your invoices
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+          
           {/* Line items table */}
           <div className="x-invoice-section">
             <table className="x-invoice-items-table">
@@ -286,6 +432,118 @@ function InvoiceView() {
           />
         </div>
       </div>
+      
+      {/* OPMM Modal - Entry point to onboarding wizard */}
+      <XUIModal
+        id="payment-method-management-modal"
+        isOpen={showPaymentMethodModal}
+        size="large"
+        closeButtonLabel="Close modal"
+        onClose={() => setShowPaymentMethodModal(false)}
+      >
+        <XUIModalBody>
+          {/* Main heading and subheading */}
+          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+            <h2 className="x-heading-xl" style={{ marginBottom: '12px', fontSize: '28px', fontWeight: 600 }}>
+              Give your customers more ways to pay
+            </h2>
+            <p className="x-text-md" style={{ color: '#6B7280' }}>
+              Join businesses like you who are getting paid 2x faster with online payments
+            </p>
+          </div>
+
+          {/* Payment option card */}
+          <div className="x-payment-option-card">
+            <div className="x-payment-option-content">
+              <h3 className="x-heading-md" style={{ marginBottom: '4px', fontSize: '18px', fontWeight: 600 }}>
+                Account to account bank payments
+              </h3>
+              <p className="x-text-sm" style={{ color: '#6B7280', marginBottom: '16px' }}>
+                Powered by Akahu
+              </p>
+
+              {/* Bank logos */}
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', flexWrap: 'wrap' }}>
+                <div className="x-bank-logo">ANZ</div>
+                <div className="x-bank-logo">ASB</div>
+                <div className="x-bank-logo">BNZ</div>
+                <div className="x-bank-logo">Westpac</div>
+                <div className="x-bank-logo">Kiwibank</div>
+              </div>
+
+              {/* Feature list with checkmarks */}
+              <ul className="x-feature-list">
+                <li className="x-feature-item">
+                  <svg className="x-checkmark" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M7 10l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <circle cx="10" cy="10" r="9" stroke="currentColor" strokeWidth="1.5"/>
+                  </svg>
+                  <span>Instant bank-to-bank transfers from major NZ banks</span>
+                </li>
+                <li className="x-feature-item">
+                  <svg className="x-checkmark" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M7 10l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <circle cx="10" cy="10" r="9" stroke="currentColor" strokeWidth="1.5"/>
+                  </svg>
+                  <span>Lower fees than traditional card payments</span>
+                </li>
+                <li className="x-feature-item">
+                  <svg className="x-checkmark" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M7 10l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <circle cx="10" cy="10" r="9" stroke="currentColor" strokeWidth="1.5"/>
+                  </svg>
+                  <span>No setup fees or monthly costs</span>
+                </li>
+                <li className="x-feature-item">
+                  <svg className="x-checkmark" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M7 10l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <circle cx="10" cy="10" r="9" stroke="currentColor" strokeWidth="1.5"/>
+                  </svg>
+                  <span>Automatic reconciliation in Xero</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* CTA button */}
+          <div style={{ marginTop: '32px', textAlign: 'center' }}>
+            <XUIButton
+              variant="main"
+              onClick={handleConnectPaymentService}
+              style={{ width: '100%', maxWidth: '400px', height: '48px', fontSize: '16px', fontWeight: 600 }}
+            >
+              Get set up with Akahu
+            </XUIButton>
+            
+            {/* Explore all options link */}
+            <a 
+              href="#" 
+              className="x-text-sm"
+              onClick={(e) => {
+                e.preventDefault()
+                navigate('/settings/online-payments')
+              }}
+              style={{ 
+                display: 'inline-block',
+                marginTop: '16px', 
+                color: '#3B82F6',
+                textDecoration: 'none',
+                fontWeight: 500
+              }}
+            >
+              Explore all online payment options →
+            </a>
+          </div>
+        </XUIModalBody>
+      </XUIModal>
+      
+      {/* Aggressive Onboarding Modal */}
+      {showAggressiveOnboarding && currentEntryContext && (
+        <OnboardingWizardAggressiveFast
+          entryContext={currentEntryContext}
+          onClose={() => setShowAggressiveOnboarding(false)}
+        />
+      )}
     </div>
   )
 }

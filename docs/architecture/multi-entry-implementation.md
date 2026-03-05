@@ -2,7 +2,7 @@
 
 ## Overview
 
-Successfully implemented **7 different entry points** into the Pay by bank merchant onboarding flow, all routing to a single canonical wizard with context preservation.
+Successfully implemented **6 different entry points** into the Pay by bank merchant onboarding flow, all routing to a single canonical wizard with context preservation.
 
 ## Architecture
 
@@ -32,41 +32,38 @@ No forked flows or duplicated logic. Entry context is passed via URL params and 
 - "Enable" / "Change settlement account" / "Disable" actions
 - Entry identifiers: `settings` (first-time), `manage` (edit)
 
-### 2. [Invoice – Inline Enable Prompt](A2APaymentsApp/ClientApp/src/pages/InvoiceDetail.tsx)
-**In-context discovery** - Invoice detail → Payment options section
+### 2. [Invoice – Unified View](A2APaymentsApp/ClientApp/src/pages/InvoiceView.tsx)
+**Contextual discovery** - Invoice view/edit page with TWO entry points:
+
+**2a. SetupBanner** - Prominent banner at top of invoice
 - Shown when A2A not enabled for org
 - High-visibility callout promoting direct bank transfers
-- CTA: "Set up Pay by bank"
-- Entry identifier: `invoice.inline`
+- Primary CTA: "Set up online payments"
+- Entry identifier: `invoice.banner`
 
-### 3. [Invoice – Payment Method Modal](A2APaymentsApp/ClientApp/src/pages/InvoiceDetail.tsx)
-**Payment method selector** - Invoice detail → "Add payment method" modal
-- Modal (OPMM pattern) with all available payment services
-- Pay by bank as selectable option if not enabled
+**2b. OPMM Modal** - "Set up online payments" button in invoice form
+- Opens modal (OPMM pattern) with payment service details
+- Bank logos, feature list, demo configuration
+- Primary CTA: "Get set up with Akahu"
 - Entry identifier: `invoice.modal`
 
-### 4. [Online Payments Banner](A2APaymentsApp/ClientApp/src/pages/OnlinePaymentsSettings.tsx)
-**High-contrast promo** - Top of Online Payments settings
-- Awareness-focused messaging
-- Scrolls to and focuses Pay by bank tile on click
-- Dismissible after CTA interaction
-- Entry identifier: `banner`
+Both entry points on the same invoice page provide flexibility for user discovery and testing different conversion approaches.
 
-### 5. [One Onboarding](A2APaymentsApp/ClientApp/src/pages/OneOnboarding.tsx)
+### 3. [One Onboarding](A2APaymentsApp/ClientApp/src/pages/OneOnboarding.tsx)
 **Guided setup checklist** - Post-signup onboarding flow
 - "Accept direct bank payments" task with description
 - Progress bar showing completion %
 - Entry identifier: `one_onboarding`
 - Metadata: `taskId` for completion tracking
 
-### 6. [Campaign / Deep Link Handler](A2APaymentsApp/ClientApp/src/pages/CampaignEntry.tsx)
+### 4. [Campaign / Deep Link Handler](A2APaymentsApp/ClientApp/src/pages/CampaignEntry.tsx)
 **External entry** - Marketing emails, Xero Central CTAs, campaign landing pages
 - Loading screen with org switching logic (mocked)
 - UTM parameter capture for campaign attribution
 - Entry identifier: `campaign`
 - Metadata: `campaignId`, `utmSource`, `utmMedium`, `utmContent`
 
-### 7. Manage Flow
+### 5. Manage Flow
 **Edit existing setup** - Settings → Pay by bank tile (enabled state) → "Change settlement account"
 - Pre-selects current settlement account
 - Shows guardrail reminders
