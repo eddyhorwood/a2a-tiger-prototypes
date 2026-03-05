@@ -14,22 +14,33 @@ Then open http://localhost:5173
 
 ## 📖 Documentation
 
-All documentation is in the [`docs/`](docs/) folder:
+**For AI/LLM agents:** Start with [docs/INDEX.md](docs/INDEX.md) - a complete manifest of all documentation with guidance on when to use each document.
 
-- **[TEAM_SETUP.md](docs/TEAM_SETUP.md)** - Start here! Complete setup guide for your team
-- **[PROJECT_SUMMARY.md](docs/PROJECT_SUMMARY.md)** - Project overview and architecture
-- **[PROTOTYPE_PRD_V2.md](docs/PROTOTYPE_PRD_V2.md)** - Product requirements
-- **[FLOW_VARIANTS.md](docs/FLOW_VARIANTS.md)** - Balanced vs Aggressive flow comparison
-- **[MULTI_ENTRY_IMPLEMENTATION.md](docs/MULTI_ENTRY_IMPLEMENTATION.md)** - Entry points (invoice, settings)
-- **[PAYMENT_ONBOARDING_ENTRY_POINTS.md](docs/PAYMENT_ONBOARDING_ENTRY_POINTS.md)** - Current Xero payment onboarding entry points
-- **[XERO_DESIGN_GUIDELINES.md](docs/XERO_DESIGN_GUIDELINES.md)** - Design system reference
-- **[XUI_COMPONENT_STANDARDS.md](docs/XUI_COMPONENT_STANDARDS.md)** - XUI component usage
+**For humans:** Start with [docs/guides/team-setup.md](docs/guides/team-setup.md) for setup and development instructions.
+
+### Quick Links
+
+#### Specifications
+- [Product Requirements](docs/specifications/prototype-prd.md) - Feature scope and user stories
+- [Flow Variants](docs/specifications/flow-variants.md) - Balanced vs Aggressive comparison
+- [Payment Execution Pattern](docs/specifications/payment-execution-pattern.md) - Payment lifecycle
+
+#### Architecture
+- [Project Summary](docs/architecture/project-summary.md) - Overview and file structure
+- [Multi-Entry Implementation](docs/architecture/multi-entry-implementation.md) - Entry point system
+- [Branding Themes 3-Slot Problem](docs/architecture/branding-themes-3-slot-problem.md) - Xero context
+
+#### Reference
+- [Payment Onboarding Entry Points](docs/reference/payment-onboarding-entry-points.md) - Current Xero flows
+- [Xero Design Guidelines](docs/reference/xero-design-guidelines.md) - Design system
+- [XUI Component Standards](docs/reference/xui-component-standards.md) - Component usage
 
 ## ⚖️ Compliance & Legal
 
 The [`compliance/`](compliance/) folder contains AML/CFT guardrails and legal requirements:
 
 - **[AML_CFT_LLM_CONTEXT.md](compliance/AML_CFT_LLM_CONTEXT.md)** - Canonical roles and guardrails for AI agents
+- **[README.md](compliance/README.md)** - Compliance documentation guide
 
 **Important:** If you're using AI assistance (Copilot, Claude, etc.) to work on A2A features, ensure your agent reads the compliance documentation first. This ensures all designs, copy, and flows maintain NZ legal compliance.
 
@@ -45,7 +56,7 @@ The [`compliance/`](compliance/) folder contains AML/CFT guardrails and legal re
 - **Balanced** (multi-step): Business details → Bank account → Compliance → Done
 - **Aggressive** (single-step): Bank account → Done (with inline editing)
 
-See [FLOW_VARIANTS.md](docs/FLOW_VARIANTS.md) for detailed comparison.
+See [docs/specifications/flow-variants.md](docs/specifications/flow-variants.md) for detailed comparison.
 
 ## 🏗️ Project Structure
 
@@ -71,7 +82,7 @@ A2APaymentsApp/ClientApp/
 
 ## 🤝 Contributing
 
-This is a prototype for exploration and iteration. See [TEAM_SETUP.md](docs/TEAM_SETUP.md) for:
+This is a prototype for exploration and iteration. See [docs/guides/team-setup.md](docs/guides/team-setup.md) for:
 - Working with AI agents (Copilot/Claude)
 - Common tasks and troubleshooting
 - How to make changes
@@ -80,4 +91,4 @@ This is a prototype for exploration and iteration. See [TEAM_SETUP.md](docs/TEAM
 
 This project was originally a .NET MVC OAuth sample app. The React prototype lives in `A2APaymentsApp/ClientApp/`. The .NET backend is not required to run the prototype.
 
-See [ORIGINAL_DOTNET_README.md](docs/ORIGINAL_DOTNET_README.md) for the original .NET setup instructions.
+See [docs/archive/original-dotnet-readme.md](docs/archive/original-dotnet-readme.md) for the original .NET setup instructions.
