@@ -1,6 +1,5 @@
-import React from 'react'
 import XUIButton from '@xero/xui/react/button'
-import type { PaymentServiceConfig } from '../../types/PaymentServiceTypes'
+import type { PaymentServiceConfig} from '../../types/PaymentServiceTypes'
 import './AddServiceTab.css'
 
 interface AddServiceTabProps {

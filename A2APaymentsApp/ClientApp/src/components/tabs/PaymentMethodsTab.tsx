@@ -1,4 +1,3 @@
-import React, { useState } from 'react'
 import type { PaymentServiceConfig } from '../../types/PaymentServiceTypes'
 import './PaymentMethodsTab.css'
 

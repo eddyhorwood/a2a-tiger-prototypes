@@ -1,4 +1,3 @@
-import React from 'react'
 import './DefaultSettingsTab.css'
 
 export function DefaultSettingsTab() {

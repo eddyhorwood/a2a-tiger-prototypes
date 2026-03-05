@@ -1,56 +1,133 @@
-/* Payment Services Landing Page - Enhanced Realistic Xero Design */
+/* Online Payments Settings Page Styles */
 
-/* === Page Layout === */
 .x-payment-services-page {
-  background-color: #F3F4F6; /* --bg-page */
-  min-height: 100vh;
-  padding: 20px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--xui-spacing-32, 32px) var(--xui-spacing-24, 24px);
 }
 
-/* === Breadcrumbs === */
+/* Breadcrumbs */
 .x-breadcrumbs {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 20px;
-  font-size: 14px;
+  gap: var(--xui-spacing-8, 8px);
+  font-size: 13px;
+  line-height: 18px;
+  margin-bottom: var(--xui-spacing-20, 20px);
+  color: var(--xui-color-text-secondary, #6B7280);
 }
 
 .x-breadcrumbs a {
-  color: var(--text-link);
+  color: var(--xui-color-text-link, #0078C8);
   text-decoration: none;
-  transition: color 120ms ease-out;
 }
 
 .x-breadcrumbs a:hover {
-  color: var(--text-link-hover);
+  text-decoration: underline;
 }
 
 .x-breadcrumbs__separator {
-  color: var(--text-muted);
+  color: var(--xui-color-text-tertiary, #9CA3AF);
 }
 
 .x-breadcrumbs__current {
-  color: var(--text-body);
+  color: var(--xui-color-text-primary, #111827);
   font-weight: 500;
 }
 
-/* === Page Header === */
+/* Page Header */
 .x-page-header {
-  max-width: 1200px;
-  margin: 0 auto 32px;
+  margin-bottom: var(--xui-spacing-32, 32px);
 }
 
-.x-page-header__title h1 {
-  margin-bottom: 8px;
-}
-
-.x-page-header__title p {
+.x-heading-xl {
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 40px;
+  color: var(--xui-color-text-primary, #111827);
   margin: 0;
 }
 
+/* Tab Navigation */
+.x-tabs {
+  display: flex;
+  flex-direction: column;
+}
+
+.x-tabs-nav {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--xui-color-border-default, #E5E7EB);
+  margin-bottom: var(--xui-spacing-32, 32px);
+}
+
+.x-tab {
+  position: relative;
+  background: none;
+  border: none;
+  padding: var(--xui-spacing-12, 12px) var(--xui-spacing-20, 20px);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  color: var(--xui-color-text-secondary, #6B7280);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.x-tab:hover {
+  color: var(--xui-color-text-primary, #111827);
+  background: var(--xui-color-surface-subtle, #F9FAFB);
+}
+
+.x-tab:focus {
+  outline: 2px solid var(--xui-color-border-brand, #0078C8);
+  outline-offset: -2px;
+  z-index: 1;
+}
+
+.x-tab--active {
+  color: var(--xui-color-brand-primary, #0078C8);
+  font-weight: 600;
+}
+
+.x-tab--active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--xui-color-brand-primary, #0078C8);
+}
+
+/* Tab Content */
+.x-tabs-content {
+  min-height: 400px;
+}
+
+/* Text Utilities */
+.x-text-md {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.x-text-sm {
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.x-text-xs {
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.x-text-muted {
+  color: var(--xui-color-text-secondary, #6B7280);
+}
+
 .x-text-link {
-  color: var(--text-link);
+  color: var(--xui-color-text-link, #0078C8);
   text-decoration: none;
 }
 
@@ -58,282 +135,38 @@
   text-decoration: underline;
 }
 
-/* === Payment Services Section === */
-.x-payment-services-section {
-  max-width: 1200px;
-  margin: 0 auto 40px;
+.x-heading-md {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 22px;
+  color: var(--xui-color-text-primary, #111827);
 }
 
-/* === Services Grid === */
-.x-services-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 20px;
-}
-
-/* === Service Card === */
-.x-service-card {
-  background: #FFFFFF;
-  border: 1px solid #E5E7EB;
-  border-radius: 8px;
-  padding: 24px;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
-  transition: box-shadow 180ms ease-out, border-color 180ms ease-out;
-}
-
-.x-service-card:hover {
-  box-shadow: 0 4px 6px rgba(15, 23, 42, 0.12);
-  border-color: #D1D5DB;
-}
-
-.x-service-card--connected {
-  border-color: #10B981;
-  border-width: 2px;
-}
-
-/* Card Header */
-.x-service-card__header {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 16px;
-}
-
-.x-service-card__icon {
-  flex-shrink: 0;
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
-  border: 1px solid #BFDBFE;
-  border-radius: 8px;
-  color: #3B82F6;
-}
-
-.x-service-card--connected .x-service-card__icon {
-  background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
-  border-color: #A7F3D0;
-  color: #10B981;
-}
-
-.x-service-card__title {
-  flex: 1;
-}
-
-/* Card Description */
-.x-service-card__description {
+.x-heading-sm {
   font-size: 14px;
+  font-weight: 600;
   line-height: 20px;
-  color: var(--text-body);
-  margin-bottom: 16px;
+  color: var(--xui-color-text-primary, #111827);
 }
 
-/* Payment Method Badges */
-.x-service-card__methods {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
-.x-method-badge {
-  padding: 4px 12px;
-  background: #F3F4F6;
-  border: 1px solid #E5E7EB;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
-  color: #4B5563;
-}
-
-/* Expandable Details */
-.x-service-card__details {
-  margin-bottom: 16px;
-  border-top: 1px solid #F3F4F6;
-  padding-top: 16px;
-}
-
-.x-details-summary {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  list-style: none;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-body);
-  padding: 8px 0;
-  transition: color 120ms ease-out;
-}
-
-.x-details-summary::-webkit-details-marker {
-  display: none;
-}
-
-.x-details-summary:hover {
-  color: var(--text-link);
-}
-
-.x-details-summary svg {
-  transition: transform 200ms ease-out;
-}
-
-.x-service-card__details[open] .x-details-summary svg {
-  transform: rotate(180deg);
-}
-
-/* Features List */
-.x-features-list {
-  list-style: none;
-  padding: 12px 0 8px;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.x-feature-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  font-size: 14px;
-  line-height: 20px;
-  color: var(--text-body);
-}
-
-.x-checkmark {
-  flex-shrink: 0;
-  margin-top: 2px;
-  color: #10B981;
-}
-
-/* Service Meta */
-.x-service-meta {
-  display: flex;
-  gap: 24px;
-  padding-top: 12px;
-  border-top: 1px solid #F3F4F6;
-}
-
-.x-meta-item {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.x-meta-label {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-muted);
-}
-
-.x-meta-value {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-body);
-}
-
-/* Settlement Account Display */
-.x-service-card__account {
-  padding: 16px;
-  background: #F9FAFB;
-  border: 1px solid #E5E7EB;
-  border-radius: 6px;
-  margin-bottom: 16px;
-}
-
-.x-account-info {
-  /* Individual account info sections */
-  display: flex;
-  flex-direction: column;
-}
-
-/* Card Actions */
-.x-service-card__actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding-top: 16px;
-  border-top: 1px solid #F3F4F6;
-}
-
-/* Status Badges */
-.x-status-badge {
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.x-status-badge--success {
-  background: #ECFDF3;
-  color: #166534;
-}
-
-.x-status-badge--warning {
-  background: #FEF3C7;
-  color: #92400E;
-}
-
-.x-status-badge--error {
-  background: #FEF2F2;
-  color: #B91C1C;
-}
-
-/* === Help Section === */
-.x-help-section {
-  max-width: 1200px;
-  margin: 40px auto 0;
-  padding: 20px 24px;
-  background: #F9FAFB;
-  border: 1px solid #E5E7EB;
-  border-radius: 8px;
-}
-
-.x-help-section h3 {
-  margin-bottom: 8px;
-}
-
-.x-help-section p {
-  margin: 0;
-}
-
-/* === Responsive === */
-@media (max-width: 1024px) {
-  .x-payment-services-page {
-    padding: 16px 24px;
-  }
-}
-
+/* Responsive */
 @media (max-width: 768px) {
   .x-payment-services-page {
-    padding: 16px;
+    padding: var(--xui-spacing-20, 20px) var(--xui-spacing-16, 16px);
   }
   
-  .x-service-card {
-    padding: 16px;
+  .x-tabs-nav {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
   
-  .x-service-card__header {
-    flex-direction: column;
-    align-items: flex-start;
+  .x-tabs-nav::-webkit-scrollbar {
+    display: none;
   }
   
-  .x-service-card__actions {
-    flex-direction: column;
-    width: 100%;
-  }
-  
-  .x-service-card__actions button {
-    width: 100%;
-  }
-  
-  .x-service-meta {
-    flex-direction: column;
-    gap: 12px;
+  .x-heading-xl {
+    font-size: 24px;
+    line-height: 32px;
   }
 }

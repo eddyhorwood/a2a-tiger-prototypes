@@ -25,11 +25,11 @@ import './PrototypeSetup.css'
 function PrototypeSetup() {
   const navigate = useNavigate()
   const { config, updateConfig, loadPreset } = usePrototypeConfig()
-  const [showPresets, setShowPresets] = useState(false)
+  const [showPresets, setShowPresets] = useState(true)
+  const [showCustomConfig, setShowCustomConfig] = useState(false)
 
   const handlePresetClick = (presetConfig: PrototypeConfig) => {
     loadPreset(presetConfig)
-    setShowPresets(false)
   }
 
   const handleStartPrototype = () => {
@@ -100,11 +100,21 @@ function PrototypeSetup() {
 
         {/* Manual Configuration */}
         <div className="x-prototype-setup__config-section">
-          <h2 className="x-heading-lg">Custom Configuration</h2>
+          <div className="x-prototype-setup__presets-header">
+            <h2 className="x-heading-lg">Custom Configuration</h2>
+            <XUIButton
+              variant="standard"
+              size="small"
+              onClick={() => setShowCustomConfig(!showCustomConfig)}
+            >
+              {showCustomConfig ? 'Hide Custom Config' : 'Show Custom Config'}
+            </XUIButton>
+          </div>
           <p className="x-text-md x-text-muted" style={{ marginBottom: '24px' }}>
             Fine-tune the prototype state to test specific scenarios
           </p>
 
+          {showCustomConfig && (
           <div className="x-prototype-setup__config-grid">
             {/* Stripe Status */}
             <div className="x-config-group">
@@ -238,6 +248,7 @@ function PrototypeSetup() {
               </div>
             </div>
           </div>
+          )}
         </div>
 
         {/* Actions */}
