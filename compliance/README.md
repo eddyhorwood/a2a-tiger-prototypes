@@ -19,6 +19,8 @@ Canonical documentation of AML/CFT (Anti-Money Laundering / Countering Financing
 
 **Important:** This document is designed for AI/LLM consumption and should be treated as hard constraints when generating any A2A-related designs, flows, or copy.
 
+**Single Source of Truth:** Section 4.1 contains the canonical list of prohibited and preferred language for payment flows. When you update this section, the changes automatically propagate to all AI agents via [../.github/copilot-instructions.md](../.github/copilot-instructions.md) which references this file.
+
 ---
 
 ## For Contributors
