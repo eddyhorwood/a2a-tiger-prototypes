@@ -1,4 +1,4 @@
-import type { PaymentServiceConfig } from '../../types/PaymentServiceTypes'
+import type { PaymentServiceConfig } from '../../types/PaymentServiceTypes.ts'
 import './PaymentMethodsTab.css'
 
 interface PaymentMethodsTabProps {

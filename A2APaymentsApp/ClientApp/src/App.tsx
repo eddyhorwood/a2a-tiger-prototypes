@@ -4,7 +4,7 @@ import DemoLanding from './pages/DemoLanding'
 import OnlinePaymentsSettings from './pages/OnlinePaymentsSettings'
 import InvoiceDetail from './pages/InvoiceDetail'
 import InvoiceView from './pages/InvoiceView'
-import OnboardingWizardBalanced from './pages/OnboardingWizardBalanced'
+import OnboardingRouter from './pages/OnboardingRouter'
 import OnboardingWizardAggressive from './pages/OnboardingWizardAggressive'
 
 function App() {
@@ -25,10 +25,10 @@ function App() {
       {/* Entry Point 3: Invoice view (with contextual banner) - NEW realistic entry */}
       <Route path="/invoice-view/:invoiceId" element={<InvoiceView />} />
       
-      {/* Onboarding wizard - balanced flow (default) */}
-      <Route path="/merchant-onboarding" element={<OnboardingWizardBalanced />} />
+      {/* Onboarding wizard - smart router that respects config flowVariant */}
+      <Route path="/merchant-onboarding" element={<OnboardingRouter />} />
       
-      {/* Onboarding wizard - aggressive flow (fast track) */}
+      {/* Onboarding wizard - aggressive flow (direct route for testing) */}
       <Route path="/merchant-onboarding-aggressive" element={<OnboardingWizardAggressive />} />
       
       {/* Catch all */}
