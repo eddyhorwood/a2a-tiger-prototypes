@@ -1,0 +1,4 @@
+bucket = "payment-execution-service-tf-state-uat"
+region = "us-west-2" 
+dynamodb_table = "payment-execution-service-tf-state-lock-uat"
+kms_key_id = "arn:aws:kms:us-west-2:333186395126:key/mrk-b883401ceb07443e846ee9999581032b" 

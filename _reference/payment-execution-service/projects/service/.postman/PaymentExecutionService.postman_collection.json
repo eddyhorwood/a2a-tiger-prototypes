@@ -1,0 +1,682 @@
+{
+	"info": {
+		"_postman_id": "b51d7d98-64aa-4a88-83c0-7d0f5689d2a3",
+		"name": "PaymentExecutionService",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23563436"
+	},
+	"item": [
+		{
+			"name": "ping",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Ping is successful\", () => {",
+							"    pm.expect(pm.response).to.have.status(200)",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Xero-Correlation-Id",
+						"value": "16a77425-2ad5-4805-9856-6bd2f6c09204",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{payment-execution-service-url}}/ping",
+					"host": [
+						"{{payment-execution-service-url}}"
+					],
+					"path": [
+						"ping"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ready",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Ready is successful\", () => {",
+							"    pm.expect(pm.response).to.have.status(200)",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-Secret",
+						"value": "TERCES",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{payment-execution-service-url}}/ready",
+					"host": [
+						"{{payment-execution-service-url}}"
+					],
+					"path": [
+						"ready"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "healthcheck",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Service is healthy\", () => {",
+							"    pm.expect(pm.response).to.have.status(200)",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-Secret",
+						"value": "TERCES",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{payment-execution-service-url}}/healthcheck",
+					"host": [
+						"{{payment-execution-service-url}}"
+					],
+					"path": [
+						"healthcheck"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetPRIdentityToken",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"An access token is returned\", () => {",
+							"    pm.expect(pm.response).to.have.status(200)",
+							"    pm.expect(pm.response.json()).to.have.property('access_token')",
+							"    pm.expect(pm.response.json().access_token).to.be.a('string')",
+							"    pm.environment.set('PR-TOKEN', pm.response.json().access_token)",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "{{pr-identity-client-id}}",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "{{identity-client-secret}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "{{pr-identity-scopes}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{identity-url}}/connect/token",
+					"host": [
+						"{{identity-url}}"
+					],
+					"path": [
+						"connect",
+						"token"
+					]
+				},
+				"description": "Get Identity Token for Payment Request Service"
+			},
+			"response": []
+		},
+		{
+			"name": "secure-ping",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Secure-Ping is successful\", () => {",
+							"    pm.expect(pm.response).to.have.status(200)",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{PE-TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-Secret",
+						"value": "TERCES",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{payment-execution-service-url}}/secure-ping",
+					"host": [
+						"{{payment-execution-service-url}}"
+					],
+					"path": [
+						"secure-ping"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create-PR",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"PaymentRequest is created\", () => {",
+							"    pm.expect(pm.response).to.have.status(201)",
+							"    pm.expect(pm.response.json()).to.have.property('paymentRequestId')",
+							"    pm.expect(pm.response.json().paymentRequestId).to.be.a('string')",
+							"    pm.environment.set(\"PaymentRequestId\", pm.response.json().paymentRequestId)",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{PR-TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Xero-Correlation-Id",
+						"value": "{{$guid}}"
+					},
+					{
+						"key": "Xero-Tenant-Id",
+						"value": "11111111-2222-3333-4444-555555555555"
+					},
+					{
+						"key": "Xero-Client-Name",
+						"value": "Test-Script-Client"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"PaymentDate\": \"2025-01-01T00:00:00\",\r\n  \"ContactId\":\"c986f6a0-5c76-4776-a272-2f904828a6ab\", \r\n  \"BillingContactDetails\":{\"Email\":\"valid@email.com\"},\r\n  \"Amount\":100,\r\n  \"Currency\":\"AUD\",\r\n  \"PaymentDescription\":\"description goes here!\",\r\n  \"SelectedPaymentMethod\":{\r\n    \"PaymentGatewayId\":\"bf0d43e4-01b5-48d0-a88f-b5e3371f3676\",\r\n    \"PaymentMethodName\":\"card\",\r\n    \"SurchargeAmount\":10\r\n  },\r\n  \"LineItems\":[\r\n    {\r\n      \"Reference\" : \"Some-reference\",\r\n        \"Description\" : \"Line item 1\",\r\n        \"UnitCost\" : 100,\r\n        \"Quantity\" : 1,\r\n        \"TaxAmount\" : 10\r\n            }\r\n  ],\r\n  \"SourceContext\":{\r\n    \"Identifier\":\"5a3af7fd-054e-4e1d-96f3-09e3b932b77a\",\r\n    \"Type\":\"statementpayments\",\r\n    \"RepeatingTemplateId\": \"bb37f482-294d-11f0-8c30-9326663c6184\"\r\n  },\r\n  \"Executor\":\"paymentexecution\",\r\n  \"Receivables\":[\r\n    {\r\n      \"Identifier\":\"{{$randomUUID}}\",\r\n      \"Type\":\"invoice\"\r\n    }\r\n  ],\r\n  \"MerchantReference\":\"available upon request\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{payment-request-service-url}}/v1/payment-requests/create",
+					"protocol": "https",
+					"host": [
+						"{{payment-request-service-url}}"
+					],
+					"path": [
+						"v1",
+						"payment-requests",
+						"create"
+					]
+				},
+				"description": "Generated from cURL: curl -X POST 'https://payment-execution.global.xero-test.com/requests/v1/payment-requests/create' \\\r\n--header 'Xero-Correlation-Id: 5DECDFE3-6681-4CCB-8D6C-09D3B1537160' \\\r\n--header 'Xero-Tenant-Id: 11111111-2222-3333-4444-555555555555' \\\r\n--header 'Xero-Client-Name: Test-Script-Client' \\\r\n--header 'Authorization: Bearer <access_token>' \\\r\n--header 'Content-Type: application/json' \\\r\n--data-raw '{\r\n  \"PaymentDate\": \"2025-01-01T00:00:00\",\r\n  \"ContactId\":\"c986f6a0-5c76-4776-a272-2f904828a6ab\", \r\n  \"BillingContactDetails\":{\"Email\":\"valid@email.com\"},\r\n  \"Amount\":100,\r\n  \"Currency\":\"AUD\",\r\n  \"PaymentDescription\":\"description goes here!\",\r\n  \"SelectedPaymentMethod\":{\r\n    \"PaymentGatewayId\":\"bf0d43e4-01b5-48d0-a88f-b5e3371f3676\",\r\n    \"PaymentMethodName\":\"card\",\r\n    \"SurchargeAmount\":10\r\n  },\r\n  \"LineItems\":[\r\n    {\r\n      \"Reference\" : \"Some-reference\",\r\n        \"Description\" : \"Line item 1\",\r\n        \"UnitCost\" : 100,\r\n        \"Quantity\" : 1,\r\n        \"TaxAmount\" : 10\r\n            }\r\n  ],\r\n  \"SourceContext\":{\r\n    \"Identifier\":\"5a3af7fd-054e-4e1d-96f3-09e3b932b77a\",\r\n    \"Type\":\"statementpayments\",\r\n    \"RepeatingTemplateId\": \"bb37f482-294d-11f0-8c30-9326663c6184\"\r\n  },\r\n  \"Executor\":\"paymentexecution\",\r\n  \"Receivables\":[\r\n    {\r\n      \"Identifier\":\"c4d8901d-b49b-4801-abcd-08c0a697e4f2\",\r\n      \"Type\":\"invoice\"\r\n    }\r\n  ],\r\n  \"MerchantReference\":\"available upon request\"\r\n}'"
+			},
+			"response": []
+		},
+		{
+			"name": "Prepare-PR",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"PaymentRequest is awaiting execution\", () => {",
+							"    pm.expect(pm.response).to.have.status(204)",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{PR-TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Xero-Correlation-Id",
+						"value": "{{$guid}}"
+					},
+					{
+						"key": "Xero-Tenant-Id",
+						"value": "11111111-2222-3333-4444-555555555555"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{payment-request-service-url}}/v1/payment-requests/{{PaymentRequestId}}/prepare",
+					"protocol": "https",
+					"host": [
+						"{{payment-request-service-url}}"
+					],
+					"path": [
+						"v1",
+						"payment-requests",
+						"{{PaymentRequestId}}",
+						"prepare"
+					]
+				},
+				"description": "Generated from cURL: curl -X POST https://payment-execution.global.xero-test.com/requests/v1/payment-requests/<payment-request-id>/prepare \\\n-H \"Xero-Correlation-Id: BC051E97-380E-4250-AA12-45C35D774F7A\" \\\n-H \"Xero-Tenant-Id: 11111111-2222-3333-4444-555555555555\" \\\n-H \"Authorization: Bearer <access_token>\" \\\n-H \"Content-Type: application/json\""
+			},
+			"response": []
+		},
+		{
+			"name": "GetPEIdentityToken",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"An access token is returned\", () => {",
+							"    pm.expect(pm.response).to.have.status(200)",
+							"    pm.expect(pm.response.json()).to.have.property('access_token')",
+							"    pm.expect(pm.response.json().access_token).to.be.a('string')",
+							"    pm.environment.set('PE-TOKEN', pm.response.json().access_token)",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "{{pe-identity-client-id}}",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "{{identity-client-secret}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "{{pe-identity-scopes}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{identity-url}}/connect/token",
+					"host": [
+						"{{identity-url}}"
+					],
+					"path": [
+						"connect",
+						"token"
+					]
+				},
+				"description": "Get Identity Token for Payment Execution Service"
+			},
+			"response": []
+		},
+		{
+			"name": "Submit",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"PaymentRequest is submitted\", () => {",
+							"    pm.expect(pm.response).to.have.status(200)",
+							"    pm.expect(pm.response.json()).to.have.property('paymentIntentId')",
+							"    pm.expect(pm.response.json().paymentIntentId).to.be.a('string')",
+							"    pm.expect(pm.response.json()).to.have.property('clientSecret')",
+							"    pm.expect(pm.response.json().clientSecret).to.be.a('string')",
+							"    pm.environment.set('paymentIntentId', pm.response.json().paymentIntentId)",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{PE-TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer <access_token>"
+					},
+					{
+						"key": "Xero-Correlation-Id",
+						"value": "{{$guid}}"
+					},
+					{
+						"key": "Provider-Account-Id",
+						"value": "{{stripe-account-id}}"
+					},
+					{
+						"key": "Xero-Tenant-Id",
+						"value": "11111111-2222-3333-4444-555555555555"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"PaymentRequestId\":\"{{PaymentRequestId}}\",\n    \"PaymentMethodsMadeAvailable\": [\"card\"],\n    \"PaymentMethodId\": null\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{payment-execution-service-url}}/v1/payments/stripe/submit",
+					"host": [
+						"{{payment-execution-service-url}}"
+					],
+					"path": [
+						"v1",
+						"payments",
+						"stripe",
+						"submit"
+					]
+				},
+				"description": "Generated from cURL: curl -X POST \"https://payment-execution.global.xero-test.com/execution/v1/payments/stripe/submit\" \\\n    -H \"Authorization: Bearer <access_token>\" \\\n    -H \"Xero-Correlation-Id: 537595b0-2bc9-11f0-a2de-2bff8b698b08\" \\\n    -H \"Provider-Account-Id: <stripe_account>\" \\\n    -H \"Xero-Tenant-Id: 11111111-2222-3333-4444-555555555555\" \\\n    -H \"Content-Type: application/json\" \\\n    -d '{\n    \"PaymentRequestId\": <payment-request-id>,\n    \"PaymentMethodsMadeAvailable\": [\"card\"],\n    \"PaymentMethodId\": null\n    }'"
+			},
+			"response": []
+		},
+		{
+			"name": "Complete",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"PaymentRequest completed\", () => {",
+							"    pm.expect(pm.response).to.have.status(202)",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{PE-TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					},
+					{
+						"key": "Xero-Tenant-Id",
+						"value": "11111111-2222-3333-4444-555555555555"
+					},
+					{
+						"key": "Xero-Correlation-Id",
+						"value": "{{$guid}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"fee\": 2147483647,\n  \"feeCurrency\": \"string\",\n  \"paymentProviderPaymentTransactionId\": \"{{paymentIntentId}}\",\n  \"paymentProviderPaymentReferenceId\": \"ch_asdfbgfdsdf\",\n  \"providerType\": \"Stripe\",\n  \"status\": \"Succeeded\",\n  \"failureDetails\": \"string\",\n  \"eventCreatedDateTime\": \"{{$isoTimestamp}}\",\n  \"paymentProviderLastUpdatedAt\": \"{{$isoTimestamp}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{payment-execution-service-url}}/v1/payments/payment-requests/{{PaymentRequestId}}/provider-executions/{{ProviderServiceId}}/complete",
+					"host": [
+						"{{payment-execution-service-url}}"
+					],
+					"path": [
+						"v1",
+						"payments",
+						"payment-requests",
+						"{{PaymentRequestId}}",
+						"provider-executions",
+						"{{ProviderServiceId}}",
+						"complete"
+					]
+				},
+				"description": "Generated from cURL: curl -X 'POST' \\\n  'http://localhost:5000/v1/payments/payment-requests/276655C3-93ED-4D59-8AAE-AA741490378A/provider-executions/276655C3-93ED-4D59-8AAE-AA741490378A/complete' \\\n  -H 'accept: */*' \\\n  -H 'Xero-Tenant-Id: 11111111-2222-3333-4444-555555555555' \\\n  -H 'Xero-Correlation-Id: 276655C3-93ED-4D59-8AAE-AA741490378A' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n  \"fee\": 2147483647,\n  \"feeCurrency\": \"string\",\n  \"paymentProviderPaymentTransactionId\": \"string\",\n  \"paymentProviderPaymentReferenceId\": \"string\",\n  \"providerType\": \"Stripe\",\n  \"status\": \"Succeeded\",\n  \"failureDetails\": \"string\",\n  \"eventCreatedDateTime\": \"2025-05-16T06:51:32.300Z\",\n  \"paymentProviderLastUpdatedAt\": \"2025-05-16T06:51:32.300Z\"\n}'"
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "oauth2",
+		"oauth2": [
+			{
+				"key": "grant_type",
+				"value": "client_credentials",
+				"type": "string"
+			},
+			{
+				"key": "scope",
+				"value": "{{identity-scopes}}",
+				"type": "string"
+			},
+			{
+				"key": "clientSecret",
+				"value": "{{identity-client-secret}}",
+				"type": "string"
+			},
+			{
+				"key": "clientId",
+				"value": "{{identity-client-id}}",
+				"type": "string"
+			},
+			{
+				"key": "accessTokenUrl",
+				"value": "{{identity-url}}/connect/token",
+				"type": "string"
+			},
+			{
+				"key": "tokenName",
+				"value": "MyToken",
+				"type": "string"
+			},
+			{
+				"key": "challengeAlgorithm",
+				"value": "S256",
+				"type": "string"
+			},
+			{
+				"key": "addTokenTo",
+				"value": "header",
+				"type": "string"
+			},
+			{
+				"key": "client_authentication",
+				"value": "header",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "Token",
+			"value": ""
+		},
+		{
+			"key": "TOKEN",
+			"value": ""
+		},
+		{
+			"key": "PE-TOKEN",
+			"value": ""
+		}
+	]
+}

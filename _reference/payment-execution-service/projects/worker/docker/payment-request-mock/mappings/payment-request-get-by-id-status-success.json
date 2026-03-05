@@ -1,0 +1,15 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/v1/payment-requests/([0-9A-Fa-f]{8}-([0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12})",
+    "headers": {
+      "Xero-Correlation-Id": {
+        "matches": "^[a-zA-Z0-9_-]+$"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "payment-request-with-success-status.json"
+  }
+}

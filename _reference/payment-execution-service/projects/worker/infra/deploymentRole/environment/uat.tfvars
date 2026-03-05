@@ -1,0 +1,7 @@
+environment                  = "uat"
+region                       = "us-west-2"
+aws_account_id               = "471112828694"
+oidc_role_arn                = "arn:aws:iam::357642245240:role/gha-oidc-preprod-payment-execution-worker"
+artifactory_password_arn     = "arn:aws:ssm:ap-southeast-2:640077214053:parameter/cloud-tools/artifactory/users/collecting_payments_execution_deployer"
+artifactory_password_kms_arn = "arn:aws:kms:ap-southeast-2:333186395126:key/3ea6a505-6e72-4fdf-9d5f-155556390aee"
+infra_kms_key_arn            = "arn:aws:kms:us-west-2:333186395126:key/mrk-02d6309915624425bb2c221f1420e06d"

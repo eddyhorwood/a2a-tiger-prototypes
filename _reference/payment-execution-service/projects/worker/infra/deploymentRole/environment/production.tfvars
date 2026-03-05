@@ -1,0 +1,7 @@
+environment = "production"
+region = "us-east-1"
+aws_account_id = "211125634578"
+oidc_role_arn = "arn:aws:iam::357642245240:role/gha-oidc-prod-payment-execution-worker"
+artifactory_password_arn = "arn:aws:ssm:us-east-1:640077214053:parameter/cloud-tools/artifactory/users/collecting_payments_execution_deployer"
+artifactory_password_kms_arn = "arn:aws:kms:us-east-1:333186395126:key/7d1cfc09-57c1-4ccc-8344-5f31cf323fe8"
+infra_kms_key_arn = "arn:aws:kms:us-east-1:333186395126:key/mrk-99c14f3773964c1a87a5f03e1c08f00b"

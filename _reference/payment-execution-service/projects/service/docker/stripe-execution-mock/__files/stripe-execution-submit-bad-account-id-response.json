@@ -1,0 +1,6 @@
+{
+  "Status": 400,
+  "Title": "Stripe integration error",
+  "Detail": "Invalid-account-id is not a valid stripe account",
+  "ProviderErrorCode": "account-invalid"
+}

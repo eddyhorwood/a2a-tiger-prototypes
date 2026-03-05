@@ -1,0 +1,9 @@
+[
+  {
+    "resourceName": "xero_collecting-payments_payment-request-service",
+    "scopes": [
+      "xero_collecting-payments_payment-request-service.executionsucceed",
+      "xero_collecting-payments_payment-request-service.fail"
+    ]
+  }
+]

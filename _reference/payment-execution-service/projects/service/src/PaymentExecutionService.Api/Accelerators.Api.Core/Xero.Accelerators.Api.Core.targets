@@ -1,0 +1,17 @@
+<!--
+######################################################################################
+IMPORTANT: This file is part of API Service Accelerator core code.
+
+Editing, moving, renaming or deleting this file may impact your ability to upgrade
+this project to newer versions of the Accelerator template.
+
+See `docs/upgrade-support.md` for more information.
+######################################################################################
+-->
+
+<Project>
+    <Import
+        Project="$(MSBuildThisFileDirectory)\Conventions\Versioning\Xero.Accelerators.Api.Core.Conventions.Versioning.targets" />
+    <Import
+        Project="$(MSBuildThisFileDirectory)\OpenApi\Xero.Accelerators.Api.Core.OpenApi.targets" />
+</Project>

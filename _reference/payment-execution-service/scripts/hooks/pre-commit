@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+############################################################################################################
+# Mark script files as executable.
+############################################################################################################
+
+GIT_STAGED_FILES=$(git diff --cached --name-only)
+
+# Temporarily unset 'e' flag to ignore non-zero exit codes from 'grep' when no lines are matched.
+set +e
+STAGED_EXECUTABLE_FILES=$(echo "$GIT_STAGED_FILES" | grep -e '^scripts/.*\.sh' -e '^scripts/hooks/')
+set -e
+
+if [ -n "$STAGED_EXECUTABLE_FILES" ]; then
+    chmod +x $STAGED_EXECUTABLE_FILES
+    git update-index --chmod=+x $STAGED_EXECUTABLE_FILES
+fi
+
+
+SERVICE_PROJECT_PATH="projects/service"
+PROJECTS=("service" "worker")
+
+lint() {
+  if git diff --cached --name-only --quiet -- "projects/$1"
+  then
+    echo "Unchanged for $1 project"
+  else
+    echo "Changed files detected in $1 project, running hooks.."
+    make -C "projects/$1" lint-and-fix
+    return $?
+  fi
+}
+
+STAGED_CS_FILES=$(git diff --cached --name-only | grep -E "\.cs$" || true)
+if [ -n "$STAGED_CS_FILES" ]; then
+  echo ".net files changes detected, running dotnet format.."
+#  This file has been explicitly ignored due formatting induced static class modifer causes breaking change
+  dotnet format --exclude "./projects/lambdas/cancel/src/PaymentExecutionLambda.CancelLambda/Startup.cs"
+  echo "Staging formatted .net files.."
+  git add $STAGED_CS_FILES
+fi
+
+# Lint and fix using megalinter
+# for project in "${PROJECTS[@]}"; do
+#  lint "$project"
+# done
+  
+
+

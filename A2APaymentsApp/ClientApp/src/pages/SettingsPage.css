@@ -1,0 +1,84 @@
+/* Xero Design Language - Settings Page */
+/* Per Settings Page Pattern (§4.6) */
+
+.settings-page {
+  min-height: 100vh;
+  background-color: var(--bg-page);
+  padding: var(--space-8) 0;
+}
+
+.payment-service-tile {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm);
+}
+
+.tile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-4);
+}
+
+/* Status Pill Pattern (§4.6) */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+}
+
+.status-pill--active {
+  background: var(--status-success-bg);
+  color: var(--status-success-text);
+}
+
+.tile-description {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-muted);
+}
+
+.tile-details {
+  margin: 0;
+}
+
+.tile-details dt {
+  margin-bottom: var(--space-2);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+.tile-details dd {
+  margin: 0 0 var(--space-1) 0;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-heading);
+}
+
+.tile-details .account-number {
+  font-family: var(--font-mono);
+  margin-bottom: var(--space-4);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--text-muted);
+}
+
+.tile-actions {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}

@@ -1,0 +1,32 @@
+{
+  "priority": 1,
+  "request": {
+    "method": "POST",
+    "urlPath": "/v1/payments/cancel/00000000-0000-0000-0000-000000000001",
+    "headers": {
+      "Authorization": {
+        "matches": "Bearer .+"
+      },
+      "Content-Type": {
+        "contains": "application/json"
+      },
+      "Xero-Tenant-Id": {
+        "matches": "[0-9A-Fa-f]{8}-([0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}"
+      },
+      "Xero-Correlation-Id": {
+        "matches": "[0-9A-Fa-f]{8}-([0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}"
+      }
+    }
+  },
+  "response": {
+    "status": 500,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "error": "Internal server error",
+      "message": "Simulated error for testing partial batch failure"
+    }
+  }
+}
+

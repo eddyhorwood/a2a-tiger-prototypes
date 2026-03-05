@@ -1,0 +1,3 @@
+bucket = "cancel-execution-lambda-tf-state-test"
+region = "ap-southeast-2" 
+kms_key_id = "arn:aws:kms:ap-southeast-2:333186395126:key/mrk-d056f8a301b2467496ae8ca4cfe14298" 

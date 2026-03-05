@@ -1,0 +1,14 @@
+---
+Version: '2012-10-17'
+Statement:
+  - Effect: Allow
+    Principal:
+      AWS: ${oidc_role_arn}
+    Action:
+      - sts:AssumeRole
+      - sts:TagSession
+    Condition:
+      StringEqualsIfExists:
+        aws:RequestTag/GitHub: Actions
+        aws:RequestTag/Repository: xero-internal/payment-execution-service
+        aws:RequestTag/Branch: refs/heads/main

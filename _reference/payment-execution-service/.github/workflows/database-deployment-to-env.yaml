@@ -1,0 +1,112 @@
+name: Deploy Payment Execution DB to environment
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        description: "Environment to run deployment and migration on"
+        required: true
+      cortex_id:
+        type: string
+        description: "Cortex ID for the component"
+        required: true
+      aws_region:
+        type: string
+        description: "AWS region"
+        required: true
+    secrets:
+      DEPLOY_TRACK_API_TOKEN:
+        required: true
+
+permissions:
+  contents: read
+  id-token: write
+  pull-requests: read
+
+jobs:
+  begin-notify-deployment:
+    name: Begin Database Test DeployTrack
+    runs-on: [self-hosted, linux, x64, "runners-${{ inputs.aws_region }}"]
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Begin Database Test DeployTrack
+        uses: xero-internal/github-actions/DeployTrack@v1.0
+        with:
+          kotahi_id: ${{ inputs.cortex_id }}
+          environment: ${{ inputs.environment }}
+          status: in_progress
+          token: ${{ secrets.DEPLOY_TRACK_API_TOKEN }}
+          
+  terraform-validate:
+    name: Terraform validate
+    runs-on: [ self-hosted, linux, x64, runners-us-west-2, linux-al2023 ]
+    environment: ${{ inputs.environment }}
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: xero-internal/github-actions/terraform-validate@v1
+        with:
+          aws_region: ${{ inputs.aws_region }}
+          oidc_role: ${{ vars.OIDC_ROLE_ARN  }}
+          target_role: ${{ vars.DEPLOYMENT_ROLE_ARN}}
+          working_dir: ./projects/database/infra/terraform
+          terraform_backend: environment/${{ inputs.environment }}.backend
+          terraform_var_files: environment/${{ inputs.environment }}.tfvars
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+  
+  terraform-deploy:
+    name: Deploy ${{ inputs.environment }} database infrastructure
+    environment: ${{ inputs.environment }}
+    runs-on: [self-hosted, linux, x64, "runners-${{ inputs.aws_region }}"]
+    outputs:
+      server_endpoint: ${{ steps.terraform-deploy.outputs.server_endpoint }}
+    needs: [begin-notify-deployment]
+    steps:
+      - uses: actions/checkout@v4
+      - id: terraform-deploy
+        uses: ./.github/actions/deploy-database-infra
+        with:
+          environment: ${{ inputs.environment }}
+          aws_region: ${{ inputs.aws_region }}
+          oidc_role: ${{ vars.OIDC_ROLE_ARN }}
+          target_role: ${{ vars.DEPLOYMENT_ROLE_ARN }}
+          working_dir: ./projects/database/infra/terraform
+  
+  run-migration:
+    name: Migrate database in ${{ inputs.environment }}
+    environment: ${{ inputs.environment }}
+    needs: [terraform-deploy]
+    runs-on: [self-hosted, linux, x64, "runners-${{ inputs.aws_region }}"]
+    steps:
+      - uses: actions/checkout@v4
+      - id: migrate-database
+        uses: ./.github/actions/migrate-database
+        with:
+          aws_region: ${{ inputs.aws_region }}
+          oidc_role: ${{ vars.OIDC_ROLE_ARN }}
+          target_role: ${{ vars.DEPLOYMENT_ROLE_ARN }}
+          server_endpoint: ${{ needs.terraform-deploy.outputs.server_endpoint }}
+          schema_manager_secret: collecting-payments-execution/collecting-payments-execution-payment-execution-database/payment-execution-db/schema-manager-password
+          connection_string_secret: collecting-payments-execution/collecting-payments-execution-payment-execution-database/payment-execution-db/connection-string
+          retool_user_secret: collecting-payments-execution/collecting-payments-execution-payment-execution-database/payment-execution-db/connection-string-retool  
+  finalise-notify-deployment:
+    name: Finalise DeployTrack for ${{ inputs.environment }} database deployment
+    needs: [terraform-deploy, run-migration]
+    if: ${{ always() && contains(needs.begin-notify-deployment.result, 'success') }}
+    runs-on: [self-hosted, linux, x64, "runners-${{ inputs.aws_region }}"]
+    steps:
+      - name: Finish Database DeployTrack for ${{ inputs.environment }}
+        uses: xero-internal/github-actions/DeployTrack@v1.0
+        env:
+          conclusion: ${{ (contains(job.status,'failure') || contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')) && 'failed' || 'success' }}
+        with:
+          kotahi_id: ${{ inputs.cortex_id }}
+          status: ${{ env.conclusion }}
+          token: ${{ secrets.DEPLOY_TRACK_API_TOKEN }}
+          environment: ${{ inputs.environment }}

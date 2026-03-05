@@ -1,0 +1,131 @@
+/* Xero Design Language - Payment Service Selector */
+/* Per OPMM-style Settings Page (§9.1) */
+
+.payment-service-selector {
+  min-height: 100vh;
+  background-color: var(--bg-page-alt);
+  padding: var(--space-6) var(--space-8);
+}
+
+.selector-content {
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+.selector-title {
+  margin-bottom: var(--space-6);
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 600;
+  color: var(--text-heading);
+}
+
+.service-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+/* Payment Service Card Pattern (§4.2) */
+.service-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  transition: box-shadow 120ms ease-out,
+              border-color 120ms ease-out,
+              transform 80ms ease-out;
+  position: relative;
+}
+
+/* Colored top border applied via inline style */
+.service-card:hover:not(.service-card--disabled) {
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-strong);
+  cursor: pointer;
+}
+
+.service-card--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: var(--bg-page);
+}
+
+.service-card-header {
+  min-height: 60px;
+}
+
+.service-card-title {
+  margin-bottom: var(--space-2);
+  font-family: var(--font-display);
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--text-heading);
+}
+
+.service-card-provider {
+  color: var(--xero-color-blue);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.service-card-description {
+  flex: 1;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.service-card-footer {
+  margin-top: auto;
+}
+
+.service-card-button {
+  width: 100%;
+}
+
+.additional-options {
+  margin: var(--space-8) 0;
+  text-align: center;
+}
+
+.additional-options p {
+  font-size: 14px;
+  line-height: 20px;
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.history-notes {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-4);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .payment-service-selector {
+    padding: var(--space-6) var(--space-4);
+  }
+
+  .selector-title {
+    margin-bottom: var(--space-6);
+  }
+
+  .service-cards {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+}

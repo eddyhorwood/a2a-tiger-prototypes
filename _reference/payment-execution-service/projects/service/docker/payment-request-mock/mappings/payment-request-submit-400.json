@@ -1,0 +1,15 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPathPattern": "/v1/payment-requests/.*/submit",
+    "headers": {
+      "Xero-Tenant-Id": {
+        "matches": "11111111-2222-3333-4444-555555555555"
+      }
+    }
+  },
+  "response": {
+    "status": 400,
+    "bodyFileName": "payment-request-submit-400-response.json"
+  }
+}

@@ -1,0 +1,85 @@
+/* Import Xero Design Language tokens */
+@import './xero-tokens.css';
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
+body {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-body);
+  background-color: var(--bg-page);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--text-heading);
+  margin: 0;
+}
+
+h1 {
+  font-size: 32px;
+  line-height: 40px;
+}
+
+h2 {
+  font-size: 24px;
+  line-height: 32px;
+}
+
+h3 {
+  font-size: 20px;
+  line-height: 28px;
+}
+
+h4 {
+  font-size: 18px;
+  line-height: 24px;
+}
+
+p {
+  margin: 0 0 var(--space-4) 0;
+}
+
+a {
+  color: var(--text-link);
+  text-decoration: none;
+  transition: text-decoration 120ms ease-out;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a:focus-visible {
+  outline: 2px solid rgba(19, 181, 234, 0.7);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+button {
+  font-family: var(--font-ui);
+}
+
+/* Monospace elements */
+code, kbd, pre, samp {
+  font-family: var(--font-mono);
+}
+
+/* Selection color */
+::selection {
+  background-color: rgba(19, 181, 234, 0.2);
+  color: var(--text-body);
+}
+
+/* Focus visible for all interactive elements */
+*:focus-visible {
+  outline: 2px solid var(--border-focus-blue);
+  outline-offset: 2px;
+}

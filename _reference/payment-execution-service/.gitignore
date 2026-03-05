@@ -1,0 +1,50 @@
+# .NET
+**/bin
+**/obj
+
+# Test reports
+tests/results
+
+# Linting reports
+megalinter-reports/
+
+# JetBrains IDEs
+.idea
+*.DotSettings.user
+
+# Visual Studio
+**/.vs/
+
+**/.vscode/
+
+# Pacts
+**/pacts
+
+# Terraform
+infra/terraform/.terraform/*
+infra/deploymentRole/.terraform/*
+projects/database/infra/terraform/.terraform/*
+.terraform.lock.hcl
+**/.terraform/*
+**/*.tfstate*
+.terraform.lock.hcl
+
+# Miscellaneous
+.DS_Store
+*.orig
+
+# k6 load tests
+node_modules
+tests/PaymentExecutionService.LoadTests/dist
+
+
+# Test reports
+**/tests/results
+**/TestResults/
+
+# Pact testing .env files
+**/.env
+
+# Lambda Annotations generated files
+**/serverless.template
+# Force CI refresh

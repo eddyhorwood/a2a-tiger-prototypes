@@ -1,0 +1,86 @@
+.campaign-entry {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e8f7fc 100%);
+  padding: 32px;
+}
+
+.loading-container {
+  text-align: center;
+  max-width: 400px;
+}
+
+.xero-logo {
+  margin: 0 auto 32px;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-circle {
+  width: 60px;
+  height: 60px;
+  background: #13b5ea;
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+.loading-container h1 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #13b5ea;
+  margin: 0 0 12px 0;
+}
+
+.loading-container p {
+  font-size: 16px;
+  color: #666;
+  margin: 0 0 24px 0;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e0e0e0;
+  border-top-color: #13b5ea;
+  border-radius: 50%;
+  margin: 0 auto;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.campaign-info {
+  margin-top: 48px;
+  padding: 16px 24px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  border: 1px solid rgba(19, 181, 234, 0.2);
+}
+
+.info-text {
+  font-size: 13px;
+  color: #666;
+  margin: 0;
+  font-family: 'Courier New', monospace;
+}

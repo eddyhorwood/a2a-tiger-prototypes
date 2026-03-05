@@ -1,0 +1,6 @@
+{
+  "Status": 400,
+  "Title": "Conflict",
+  "Detail": "Payment intent is not cancellable",
+  "ProviderErrorCode": "invalid_request_error"
+}

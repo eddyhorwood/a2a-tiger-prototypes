@@ -1,0 +1,12 @@
+{
+  "id": "pi_mockedpi456",
+  "amount": 5000,
+  "currency": "usd",
+  "status": "requires_confirmation",
+  "paymentMethod": {
+    "type": "card",
+    "usBankAccount": null
+  },
+  "nextAction": null,
+  "lastPaymentError": null
+}

@@ -1,0 +1,44 @@
+{
+  "name": "payment-execution-service.loadtests",
+  "version": "1.0.0",
+  "description": "",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "build": "webpack",
+    "format": "prettier --write \"**/*.{js,jsx,json,ts,tsx,scss}\"",
+    "lint": "cross-env npm-run-all lint:ts",
+    "lint:fix": "npm-run-all format lint:ts:fix",
+    "lint:ts": "eslint \"src/**/*.ts?(x)\"",
+    "lint:ts:fix": "eslint \"src/**/*.ts?(x)\" --fix"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/k6": "0.50.1",
+    "@types/minimatch": "6.0.0",
+    "minimatch": "10.0.3",
+    "@typescript-eslint/eslint-plugin": "7.8.0",
+    "@typescript-eslint/parser": "7.8.0",
+    "clean-webpack-plugin": "4.0.0",
+    "copy-webpack-plugin": "12.0.2",
+    "core-js": "3.37.0",
+    "cross-env": "7.0.3",
+    "eslint": "8.57.0",
+    "eslint-config-airbnb-base": "15.0.0",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-plugin-prefer-arrow": "1.2.3",
+    "k6": "0.0.0",
+    "npm-run-all": "4.1.5",
+    "prettier": "3.2.5",
+    "ts-loader": "9.5.1",
+    "typescript": "5.4.5",
+    "webpack": "5.94.0",
+    "webpack-cli": "5.1.4",
+    "webpack-glob-entries": "1.0.1"
+  },
+  "dependencies": {
+    "uuid": "11.1.0"
+  }
+}

@@ -1,0 +1,31 @@
+INSERT INTO payment_execution.PaymentTransaction (
+    paymentTransactionId,
+    paymentRequestId,
+    providerserviceid,
+    organisationid,
+    status,
+    fee,
+    feeCurrency,
+    paymentproviderpaymentreferenceid,
+    providerType,
+    failureDetails,
+    paymentProviderPaymentTransactionId, 
+    eventCreatedDateTimeUtc,
+    createdUTC,
+    updatedUTC
+) VALUES (
+    'ed94c899-06a3-4773-b2e9-a04147137d23',
+    'b1448cb3-f4aa-4e04-a54a-03640f11b80a',
+    'cc0e6e28-9267-4e2a-845a-d8dc36a32fe0',
+    '05ab8355-234a-4c72-ac15-2eb3b5f8ab36',
+    'Failed',
+    0,
+    'aud',
+    'ch_synthetictest',
+    'Stripe', 
+    'synthetic_test_failures', 
+    'pi_synthetictest',
+    '2025-07-10 00:00:00',
+    '2025-07-10 00:00:00',
+    '2025-07-10 00:00:00'
+);

@@ -1,0 +1,5 @@
+{
+  "clientSecret": "pssst-secret",
+  "paymentIntentId": "pi_1234567890",
+  "providerServiceId": "ead3cba4-b845-493e-af36-8d7a37204766"
+}

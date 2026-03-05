@@ -1,0 +1,39 @@
+---
+Version: "2012-10-17"
+Statement:
+  - Effect: Allow
+    Action:
+      - cloudwatch:PutMetricAlarm
+      - cloudwatch:DescribeAlarms
+      - cloudwatch:ListTagsForResource
+      - cloudwatch:DeleteAlarms
+    Resource:
+      - arn:aws:cloudwatch:${region}:${aws_account_id}:alarm:execution-dlq-message-alarm-${environment}
+  - Effect: Allow
+    Action:
+      - sns:CreateTopic
+      - sns:SetTopicAttributes
+      - sns:DeleteTopic
+      - sns:Subscribe
+      - sns:SetSubscriptionAttributes
+      - sns:GetSubscriptionAttributes
+      - sns:ListTopics
+      - sns:Unsubscribe
+      - sns:TagResource
+      - sns:UntagResource
+      - sns:GetTopicAttributes
+      - sns:ListTagsForResource
+    Resource:
+      - arn:aws:sns:${region}:${aws_account_id}:execution-dlq-pagerduty-alerts-${environment}
+  - Effect: Allow
+    Action:
+      - secretsmanager:Get*
+      - secretsmanager:DescribeSecret
+    Resource:
+      - arn:aws:secretsmanager:${region}:${aws_account_id}:secret:${pagerduty_cloudwatch_endpoint_secret_name}-??????
+  - Effect: Allow
+    Action:
+      - kms:Decrypt
+      - kms:DescribeKey
+      - kms:ListAliases
+    Resource: ${cloudwatch_secret_kms_arn}

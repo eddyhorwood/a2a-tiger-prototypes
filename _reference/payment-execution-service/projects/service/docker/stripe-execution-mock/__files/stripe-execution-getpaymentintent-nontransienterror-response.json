@@ -1,0 +1,5 @@
+{
+  "Status": 422,
+  "Title": "Get payment intent error",
+  "Detail": "DB record does not exist for the provided payment request ID"
+}

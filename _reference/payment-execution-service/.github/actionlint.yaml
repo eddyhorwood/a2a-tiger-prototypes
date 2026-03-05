@@ -1,0 +1,2 @@
+self-hosted-runner:
+  labels: ["runners-ap-southeast-2", "runners-us-west-2", "runners-us-east-1", "on-demand", "linux-al2023"]

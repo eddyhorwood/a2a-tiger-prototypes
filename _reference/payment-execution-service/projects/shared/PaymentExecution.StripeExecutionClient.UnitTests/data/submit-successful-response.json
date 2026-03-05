@@ -1,0 +1,6 @@
+{
+  "clientSecret" : "super-secret",
+  "paymentIntentId": "7c1202d2-40fd-4b2e-8758-632b775ce175",
+  "providerServiceId" : "e60a425a-1688-4621-9dfc-9bd2c85c0726",
+  "ttlInSeconds": 900
+}

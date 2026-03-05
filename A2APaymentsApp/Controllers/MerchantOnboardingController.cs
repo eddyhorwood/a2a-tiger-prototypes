@@ -49,6 +49,12 @@ namespace A2APaymentsApp.Controllers
             return View(model);
         }
 
+        // React SPA route for new onboarding flow
+        public IActionResult React()
+        {
+            return View();
+        }
+
         private async Task PopulateOrganisationDetails(string tenantId)
         {
             var xeroOrg = await Api.GetOrganisationsAsync(XeroToken.AccessToken, tenantId);

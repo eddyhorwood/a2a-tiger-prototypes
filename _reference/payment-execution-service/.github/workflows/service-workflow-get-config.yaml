@@ -1,0 +1,39 @@
+# This is a reusable workflow that is is never triggered unless called by another workflow
+
+name: Service - Get config values
+
+on:
+  workflow_call:
+    outputs:
+      uuid:
+        value: "334db7HzPYMT119B9go9X9"
+      service-name-kebab-case:
+        value: "payment-execution-service"
+      service-name-pascal-case:
+        value: "PaymentExecutionService"
+      service-parent-solution-file:
+        value: "PaymentExecution.sln"
+      sonarqube-project-key-prefix:
+        value: "CollectingPayments"
+      sonarqube-project-key:
+        value: "xero-internal_payment-execution-service"
+      kubernetes-namespace:
+        value: "cp-payment-execution"
+      artifactory-repository:
+        value: "collecting-payments-execution-docker-common"
+      artifactory-user:
+        value: "collecting_payments_execution_deployer"
+      pact-artifact-name:
+        value: "service-consumer-pacts"
+
+permissions:
+  contents: read
+
+jobs:
+  get-variables:
+    name: Get config
+    runs-on: [ self-hosted, linux, x64, linux-al2023 ]
+    steps:
+      - name: "Set outputs"
+        run: |
+          echo "Setting outputs"

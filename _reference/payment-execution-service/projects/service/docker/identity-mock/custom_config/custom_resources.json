@@ -1,0 +1,32 @@
+[
+  {
+    "resourceName": "xero_collecting-payments-execution_payment-execution-service",
+    "scopes": [
+      "xero_collecting-payments-execution_payment-execution-service.read",
+      "xero_collecting-payments-execution_payment-execution-service.dchdelete",
+      "xero_collecting-payments-execution_payment-execution-service.submit",
+      "xero_collecting-payments-execution_payment-execution-service.complete",
+      "xero_collecting-payments-execution_payment-execution-service.requestcancel",
+      "xero_collecting-payments-execution_payment-execution-service.cancel",
+      "xero_collecting-payments-execution_payment-execution-service.readproviderstate"
+    ]
+  },
+  {
+    "resourceName": "xero_collecting-payments_collecting-payments-execution-stripe-payments-service",
+    "scopes": [
+      "xero_collecting-payments_collecting-payments-execution-stripe-payments-service.submit"
+    ]
+  },
+  {
+    "resourceName": "xero_collecting-payments_payment-request-service",
+    "scopes": [
+      "xero_collecting-payments_payment-request-service.submit"
+    ]
+  },
+  {
+    "resourceName": "xero_authorisation.pbac",
+    "scopes": [
+      "xero_authorisation.pbac"
+    ]
+  }
+]

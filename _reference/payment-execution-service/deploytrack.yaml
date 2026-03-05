@@ -1,0 +1,67 @@
+---
+checks:
+  # Partially satisfies XREQ-99
+  - notify_deployment
+
+notify_deployment:
+  test:
+    environment_regex: "^test$"
+    slack:
+      room: "#cashtopia-releases"
+    newrelic_deployment:
+      account_id: xero_fsrv
+      application_id: 1117619586
+    newrelic:
+      change_tracking:
+        - account_id: "1962019"
+          entity_guid: "MTk2MjAxOXxBUE18QVBQTElDQVRJT058MTExNzYxOTU4Ng"
+          deployment_type: "BASIC"
+        - account_id: "1962019"
+          entity_guid: "MTk2MjAxOXxBUE18QVBQTElDQVRJT058MTAxNjI1ODgwNw"
+          deployment_type: "BASIC"
+        - account_id: "1962019"
+          entity_guid: "MTk2MjAxOXxJTkZSQXxOQXwtNzM5NzYxMTkxMjk0MDQ4MDc5Mw"
+          deployment_type: "BASIC"
+  
+  uat:
+    environment_regex: "^uat$"
+    newrelic_rm:
+      enabled: true
+    slack:
+      room: "#cashtopia-releases"
+    newrelic_deployment:
+      account_id: xero_fsrv
+      application_id: 1114122702
+    newrelic:
+      change_tracking:
+        - account_id: "1962019"
+          entity_guid: "MTk2MjAxOXxBUE18QVBQTElDQVRJT058MTExNDEyMjcwMg"
+          deployment_type: "BASIC"
+        - account_id: "1962019"
+          entity_guid: "MTk2MjAxOXxBUE18QVBQTElDQVRJT058OTkzNDIzMDUw"
+          deployment_type: "BASIC"
+        - account_id: "1962019"
+          entity_guid: "MTk2MjAxOXxJTkZSQXxOQXwzNzUyNzIzNzkxNzQxNzYwOTky"
+          deployment_type: "BASIC"
+  
+  production:
+    environment_regex: "^production$"
+    newrelic_rm:
+      enabled: true
+    slack:
+      room: "#cashtopia-releases"
+    newrelic_deployment:
+      account_id: xero_fsrv
+      application_id: 1048561249
+    newrelic:
+      change_tracking:
+        - account_id: "1962019"
+          entity_guid: "MTk2MjAxOXxBUE18QVBQTElDQVRJT058MTA0ODU2MTI0OQ"
+          deployment_type: "BASIC"
+        - account_id: "1962019"
+          entity_guid: "MTk2MjAxOXxBUE18QVBQTElDQVRJT058MTA0MTg3MjYwOQ"
+          deployment_type: "BASIC"
+        - account_id: "1962019"
+          entity_guid: "MTk2MjAxOXxJTkZSQXxOQXwyMDk3OTE1MTc0NzQzNDk1MDIy"
+          deployment_type: "BASIC"
+    

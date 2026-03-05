@@ -1,0 +1,34 @@
+openapi: 3.1.0
+info:
+  title: Payment Execution Worker
+  description: Worker to process payment transaction updates 
+  x-cortex-tag: BdzazQewZtyQbUfCK7XYxc
+  x-cortex-git:
+    github:
+      alias: ghec-xero-internal
+      repository: xero-internal/payment-execution-service
+      basepath: projects/worker
+  x-cortex-type: service
+  x-cortex-slack:
+    channels:
+    - name: cashtopia-releases
+  x-cortex-owners:
+    - name: KWoKzMn5LkuWsnyjjGo0yw
+      type: GROUP
+      provider: CORTEX
+  x-cortex-parents:
+    - tag: 49xwsKimDUdmnG3H6riNhB
+  x-cortex-groups:
+  - phase:sustained-release
+  - data-sensitivity-level:sensitive
+  - personal-data-indicator:personal
+  - type:worker
+  x-cortex-static-analysis:
+    sonarqube:
+      project: xero-internal_payment-execution-worker
+      alias: sqc-xero-internal-prod
+  x-cortex-issues:
+    jira:
+      projects:
+        - name: INPAY
+  

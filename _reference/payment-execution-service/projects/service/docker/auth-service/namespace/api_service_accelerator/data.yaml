@@ -1,0 +1,15 @@
+---
+product_uuid: "49xwsKimDUdmnG3H6riNhB"
+authorisation_model:
+  GetHelloWorld:
+    permitted_roles:
+      - admin
+    included_in_features:
+      - organisation:universal
+
+  GetHelloWorldWithoutCorrelationId:
+    permitted_roles:
+      - admin
+      - employee
+    included_in_features:
+      - organisation:universal

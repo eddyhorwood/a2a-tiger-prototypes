@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat code coverage">
+        <Configuration>
+          <Format>opencover</Format>
+          <Exclude>
+            [PaymentExecutionService]Xero.Authorisation.*,
+            [PaymentExecutionService]*Program,
+            [PaymentExecutionService]*ServicesRegistry,
+            [PaymentExecutionService.Api]*HealthChecksRegistry,
+            [PaymentExecutionService.Api]PaymentExecutionService.Api.Accelerators.Api.Core.Constants,
+            [PaymentExecutionWorker]*Program.cs
+          </Exclude>
+          <ExcludeByFile>
+            **/Constants.cs,
+            **/Models/*.cs
+          </ExcludeByFile>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

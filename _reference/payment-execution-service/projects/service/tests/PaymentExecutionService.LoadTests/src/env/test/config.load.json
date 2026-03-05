@@ -1,0 +1,18 @@
+{
+  "scenarios": {
+    "performSubmit": {
+      "executor": "ramping-vus",
+      "exec": "performSubmit",
+      "stages": [
+        { "duration": "5s", "target": 2 },
+        { "duration": "10s", "target": 10 },
+        { "duration": "5s", "target": 2 }
+      ]
+    }
+  },
+  "thresholds": {
+    "http_req_failed": ["rate<0.01"],
+    "checks": ["rate>0.95"],     
+    "submit_payment_request_duration": ["p(95)<1500"]
+  }
+}

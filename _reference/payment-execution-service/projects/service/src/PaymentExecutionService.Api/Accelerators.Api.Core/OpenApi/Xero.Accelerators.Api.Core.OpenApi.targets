@@ -1,0 +1,52 @@
+<!--
+######################################################################################
+IMPORTANT: This file is part of API Service Accelerator core code.
+
+Editing, moving, renaming or deleting this file may impact your ability to upgrade
+this project to newer versions of the Accelerator template.
+
+See `docs/upgrade-support.md` for more information.
+######################################################################################
+-->
+
+<Project>
+    <Target Name="GenerateOpenApiSpec" DependsOnTargets="Build" AfterTargets="Build">
+        <PropertyGroup>
+            <ApiVersion>v1</ApiVersion>
+        </PropertyGroup>
+
+        <!--
+          .NET local tools aren't restored alongside other packages, so manually restore them first.
+          See:
+          - https://github.com/dotnet/sdk/issues/4241
+          - https://github.com/dotnet/sdk/issues/11253
+        -->
+        <Exec Command="dotnet tool restore"/>
+
+        <PropertyGroup>
+            <!-- Satisfies XREQ-108 - Uses OpenAPI spec 3.0.1 -->
+            <GenerateSpecCommand>dotnet swagger tofile</GenerateSpecCommand>
+            <GenerateSpecCommand>$(GenerateSpecCommand) --yaml</GenerateSpecCommand>
+            <GenerateSpecCommand>$(GenerateSpecCommand) --output $(OpenApiSpecFilePath)</GenerateSpecCommand>
+            <GenerateSpecCommand>$(GenerateSpecCommand) $(TargetPath)</GenerateSpecCommand>
+            <GenerateSpecCommand>$(GenerateSpecCommand) $(ApiVersion)</GenerateSpecCommand>
+            <OpenApiWarningPrefix>OpenAPI warning:</OpenApiWarningPrefix>
+        </PropertyGroup>
+        <Exec Command="$(GenerateSpecCommand)" EnvironmentVariables="@(OpenApiSpecGenEnvironmentVariables)" CustomErrorRegularExpression="$(OpenApiWarningPrefix)" IgnoreExitCode="True">
+            <Output TaskParameter="ExitCode" PropertyName="GenerateSpecExitCode"/>
+        </Exec>
+        <ItemGroup>
+            <ErrorMessageLines Include="---"/>
+            <ErrorMessageLines Include="One or more errors were encountered while generating the OpenAPI specification."/>
+            <ErrorMessageLines Include="Review the build log for details."/>
+            <ErrorMessageLines Include="---"/>
+            <ErrorMessageLines Include="Learn more about OpenAPI spec generation at the following guide:"/>
+            <ErrorMessageLines Include="https://accelerators.xero.dev/docs/api-accelerator/guides/creating-new-endpoints"/>
+        </ItemGroup>
+        <PropertyGroup>
+            <ErrorMessage>@(ErrorMessageLines, '%0a')</ErrorMessage>
+        </PropertyGroup>
+        <Error Text="$(ErrorMessage)" Condition="$(GenerateSpecExitCode) != 0"/>
+        <Message Text="Generated OpenAPI Specification: $(OpenApiSpecFileName)" Importance="high" Condition="$(GenerateSpecExitCode) == 0"/>
+    </Target>
+</Project>

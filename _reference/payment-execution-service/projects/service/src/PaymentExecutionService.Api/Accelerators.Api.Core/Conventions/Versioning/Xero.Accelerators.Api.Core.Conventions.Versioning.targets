@@ -1,0 +1,25 @@
+<!--
+######################################################################################
+IMPORTANT: This file is part of API Service Accelerator core code.
+
+Editing, moving, renaming or deleting this file may impact your ability to upgrade
+this project to newer versions of the Accelerator template.
+
+See `docs/upgrade-support.md` for more information.
+######################################################################################
+-->
+
+<Project>
+    <Target Name="AddGitMetadata" BeforeTargets="CoreGenerateAssemblyInfo">
+        <PropertyGroup>
+            <GitHash Condition="'$(GitHash)' == ''">unknown</GitHash>
+            <GitHash Condition="'$(GitHash)' != ''">$(GitHash)</GitHash>
+        </PropertyGroup>
+        <ItemGroup>
+            <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+                <_Parameter1>Xero.Accelerators.Api.Core.Conventions.Versioning.GitHash</_Parameter1>
+                <_Parameter2>$(GitHash)</_Parameter2>
+            </AssemblyAttribute>
+        </ItemGroup>
+    </Target>
+</Project>

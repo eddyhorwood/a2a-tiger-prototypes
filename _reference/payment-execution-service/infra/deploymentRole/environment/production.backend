@@ -1,0 +1,4 @@
+bucket =  "payment-execution-deployment-role-tf-state-production"
+region = "us-east-1"
+dynamodb_table = "payment-execution-deployment-role-tf-state-lock-production"
+kms_key_id = "arn:aws:kms:us-east-1:333186395126:key/mrk-b6707da6297841878502555ec9d1111e"

@@ -1,0 +1,9 @@
+{
+  "type": "https://common.service.xero.com/schema/problems/validation",
+  "title": "Internal server error",
+  "status": 500,
+  "detail": "Internal server error",
+  "providerErrorCode": null,
+  "errorCode": "paymentRequest_submit_error",
+  "errors": ["Expected payment status to be awaitingexecution but found created"]
+}

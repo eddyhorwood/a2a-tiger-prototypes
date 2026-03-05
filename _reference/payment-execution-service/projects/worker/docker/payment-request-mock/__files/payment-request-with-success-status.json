@@ -1,0 +1,43 @@
+{
+  "paymentRequestId": "4a8f29d2-e325-4441-ba2c-253a804f76d5",
+  "organisationId": "11111111-2222-3333-4444-555555555555",
+  "status": "success",
+  "contactId": "c986f6a0-5c76-4776-a272-2f904828a6ab",
+  "billingContactDetails": {
+    "email": "valid@email.com"
+  },
+  "paymentDescription": "description goes here!",
+  "merchantReference": "available upon request",
+  "amount": 100.00,
+  "currency": "AUD",
+  "scheduledDispatchDateUtc": null,
+  "paymentDateUtc": "2025-01-01T00:00:00Z",
+  "dueDateUtc": null,
+  "selectedPaymentMethod": {
+    "paymentGatewayId": "bf0d43e4-01b5-48d0-a88f-b5e3371f3676",
+    "paymentMethodName": "card",
+    "surchargeAmount": 10.00
+  },
+  "lineItems": [
+    {
+      "reference": "Some-reference",
+      "description": "Line item 1",
+      "unitCost": 100.0,
+      "quantity": 1,
+      "taxAmount": 10.0,
+      "discountAmount": 5.0
+    }
+  ],
+  "sourceContext": {
+    "identifier": "5a3af7fd-054e-4e1d-96f3-09e3b932b77a",
+    "type": "statementpayments",
+    "repeatingTemplateId": "bb37f482-294d-11f0-8c30-9326663c6184"
+  },
+  "executor": "paymentexecution",
+  "receivables": [
+    {
+      "identifier": "8495b684-3eae-45ee-8141-eb5df9de45e6",
+      "type": "invoice"
+    }
+  ]
+}

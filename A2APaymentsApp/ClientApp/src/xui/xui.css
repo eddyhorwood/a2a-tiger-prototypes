@@ -1,0 +1,290 @@
+/* Mock XUI Styles - Approximating Xero's design system */
+
+/* Typography */
+.xui-heading-xlarge {
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.xui-heading-large {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.xui-heading-medium {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.xui-heading-small {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.xui-font-size-large {
+  font-size: 1.125rem;
+}
+
+.xui-font-size-small {
+  font-size: 0.875rem;
+}
+
+.xui-text-deemphasis {
+  color: #6c757d;
+}
+
+/* Spacing */
+.xui-margin-bottom {
+  margin-bottom: 1rem;
+}
+
+.xui-margin-bottom-small {
+  margin-bottom: 0.5rem;
+}
+
+.xui-margin-bottom-large {
+  margin-bottom: 2rem;
+}
+
+.xui-margin-bottom-xlarge {
+  margin-bottom: 3rem;
+}
+
+.xui-margin-top {
+  margin-top: 1rem;
+}
+
+.xui-margin-top-large {
+  margin-top: 2rem;
+}
+
+.xui-margin-vertical {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.xui-margin-vertical-large {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.xui-margin-vertical-xlarge {
+  margin-top: 3rem;
+  margin-bottom: 3rem;
+}
+
+/* Layout */
+.xui-page-width-standard {
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.xui-page-width-large {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.xui-u-text-align-center {
+  text-align: center;
+}
+
+.xui-u-flex {
+  display: flex;
+}
+
+.xui-u-flex-justify-center {
+  justify-content: center;
+}
+
+/* Lists */
+.xui-list {
+  list-style: disc;
+  padding-left: 1.5rem;
+}
+
+/* Stepper Component */
+.xui-stepper {
+  padding: 1rem 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.xui-stepper-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+.xui-stepper-container::before {
+  content: '';
+  position: absolute;
+  top: 20px;
+  left: 40px;
+  right: 40px;
+  height: 2px;
+  background: #e0e0e0;
+  z-index: 0;
+}
+
+.xui-stepper-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.xui-stepper-step-indicator {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  transition: all 0.2s;
+}
+
+.xui-stepper-step--active .xui-stepper-step-indicator {
+  border-color: #0078ae;
+  background: #0078ae;
+  color: white;
+}
+
+.xui-stepper-step--completed .xui-stepper-step-indicator {
+  border-color: #00b347;
+  background: #00b347;
+  color: white;
+}
+
+.xui-stepper-step--disabled {
+  opacity: 0.5;
+}
+
+.xui-stepper-step-label {
+  font-size: 0.875rem;
+  text-align: center;
+  color: #333;
+}
+
+.xui-stepper-step--active .xui-stepper-step-label {
+  color: #0078ae;
+  font-weight: 600;
+}
+
+/* Button Component */
+.xui-button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.xui-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.xui-button--primary {
+  background: #0078ae;
+  color: white;
+}
+
+.xui-button--primary:hover:not(:disabled) {
+  background: #006090;
+}
+
+.xui-button--secondary {
+  background: white;
+  color: #0078ae;
+  border: 2px solid #0078ae;
+}
+
+.xui-button--secondary:hover:not(:disabled) {
+  background: #f0f7fb;
+}
+
+.xui-button--borderless-main {
+  background: transparent;
+  color: #0078ae;
+  padding: 0.5rem 1rem;
+}
+
+.xui-button--borderless-main:hover:not(:disabled) {
+  background: #f0f7fb;
+}
+
+.xui-button--borderless-destructive {
+  background: transparent;
+  color: #dc3545;
+  padding: 0.5rem 1rem;
+}
+
+.xui-button--borderless-destructive:hover:not(:disabled) {
+  background: #fff5f5;
+}
+
+/* Loader Component */
+.xui-loader {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.xui-loader-spinner {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #0078ae;
+  border-radius: 50%;
+  animation: xui-spin 1s linear infinite;
+}
+
+.xui-loader--small .xui-loader-spinner {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+}
+
+.xui-loader--medium .xui-loader-spinner {
+  width: 24px;
+  height: 24px;
+}
+
+.xui-loader--large .xui-loader-spinner {
+  width: 40px;
+  height: 40px;
+}
+
+@keyframes xui-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Composition Component */
+.xui-composition-detail {
+  width: 100%;
+}
+
+.xui-composition-detail--auto-space {
+  padding: 2rem;
+}

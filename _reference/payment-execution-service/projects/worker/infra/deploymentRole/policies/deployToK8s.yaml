@@ -1,0 +1,20 @@
+---
+Version: '2012-10-17'
+Statement:
+  - Effect: Allow
+    Action:
+      - ssm:DescribeParameters
+    Resource: "*"
+  - Effect: Allow
+    Action:
+      - ssm:GetParameters
+      - ssm:GetParameter
+    Resource: ${artifactory_password_arn}
+  - Effect: Allow
+    Action:
+      - kms:Decrypt
+    Resource: ${artifactory_password_kms_arn}
+  - Effect: Allow
+    Action:
+      - kms:ListAliases
+    Resource: "*"

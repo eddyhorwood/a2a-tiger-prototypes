@@ -1,0 +1,605 @@
+/* OnboardingWizardNew - One Onboarding Pattern (Layout Only) */
+/* Typography, buttons, and spacing use XUI classes in the component */
+
+/* CSS Variables from XERO_DESIGN_GUIDELINES.md */
+:root {
+  --xero-color-blue: #13B5EA;
+  --bg-page: #F3F4F6;
+  --bg-card: #FFFFFF;
+  --border-subtle: #E5E7EB;
+  --text-heading: #111827;
+  --text-muted: #6B7280;
+  --status-success-bg: #10B981;
+  --summary-bg: #EFF6FF;
+  --summary-border: #DBEAFE;
+}
+
+/* Main Layout: Left Stepper + Content Area */
+.onboarding-wizard-v2 {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg-page);
+}
+
+/* Left Stepper Sidebar (One Onboarding Pattern) */
+.onboarding-stepper {
+  width: 240px;
+  background: var(--bg-card);
+  padding: 32px 24px;
+  border-right: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.stepper-step {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  position: relative;
+}
+
+/* Connecting line between steps */
+.stepper-step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 32px;
+  width: 2px;
+  height: calc(100% + 8px);
+  background: var(--border-subtle);
+}
+
+.stepper-step.complete::after {
+  background: var(--xero-color-blue);
+}
+
+.stepper-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 2px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  margin-right: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.stepper-step.active .stepper-circle {
+  background: var(--xero-color-blue);
+  border-color: var(--xero-color-blue);
+  color: white;
+}
+
+.stepper-step.complete .stepper-circle {
+  background: var(--xero-color-blue);
+  border-color: var(--xero-color-blue);
+  color: white;
+}
+
+.stepper-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  padding-top: 4px;
+}
+
+.stepper-step.active .stepper-label {
+  color: var(--text-heading);
+  font-weight: 600;
+}
+
+.stepper-step.complete .stepper-label {
+  color: var(--text-heading);
+}
+
+/* Main Content Area */
+.onboarding-main-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 48px 24px;
+}
+
+.onboarding-screen {
+  background: var(--bg-card);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 48px;
+  max-width: 680px;
+  width: 100%;
+}
+
+.oauth-screen {
+  max-width: 480px;
+}
+
+/* Screen Header Layouts */
+.screen-header-with-exit {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.checklist-header-centered {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+/* Checklist Screen Layout */
+.checklist-screen {
+  max-width: 640px;
+}
+
+.business-structure-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #D1D5DB;
+  border-radius: 6px;
+  font-size: 14px;
+  color: var(--text-heading);
+  background: var(--bg-card);
+  cursor: pointer;
+}
+
+.business-structure-select:focus {
+  outline: none;
+  border-color: var(--xero-color-blue);
+  box-shadow: 0 0 0 3px rgba(19, 181, 234, 0.1);
+}
+
+.what-expect-section {
+  text-align: left;
+}
+
+.checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.checklist-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 20px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: #F9FAFB;
+}
+
+.checklist-icon {
+  font-size: 32px;
+  margin-right: 16px;
+  flex-shrink: 0;
+}
+
+.checklist-content {
+  flex: 1;
+}
+
+.data-protection {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.data-protection-box {
+  padding: 16px;
+  background: #F9FAFB;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+}
+
+.data-protection-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+
+.protection-icon {
+  font-size: 16px;
+}
+
+/* Invite Owner Section */
+.invite-owner-section {
+  text-align: left;
+}
+
+.invite-owner-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: var(--bg-card);
+}
+
+.invite-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.invite-icon {
+  font-size: 24px;
+}
+
+/* Organization Badge */
+.org-badge {
+  display: inline-block;
+  background: var(--summary-bg);
+  color: #1E40AF;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-weight: 500;
+}
+
+/* Form Elements (Layout Only - XUI handles styling) */
+.form-group {
+  margin-bottom: 24px;
+}
+
+.account-select,
+.bank-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #D1D5DB;
+  border-radius: 6px;
+  font-size: 14px;
+  color: var(--text-heading);
+  background: var(--bg-card);
+  cursor: pointer;
+}
+
+.account-select:focus,
+.bank-select:focus {
+  outline: none;
+  border-color: var(--xero-color-blue);
+  box-shadow: 0 0 0 3px rgba(19, 181, 234, 0.1);
+}
+
+.account-select:disabled,
+.bank-select:disabled {
+  background: #F3F4F6;
+  cursor: not-allowed;
+}
+
+.error-message {
+  padding: 12px;
+  background: #FEF2F2;
+  border: 1px solid #FEE2E2;
+  border-radius: 6px;
+  color: #991B1B;
+}
+
+/* Legal Footer */
+.legal-footer {
+  padding: 16px 0;
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* Review Screen */
+.review-screen {
+  max-width: 680px;
+}
+
+.review-header-centered {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.review-illustration {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #93C5FD 0%, #3B82F6 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  margin: 0 auto;
+}
+
+.review-section {
+  margin-bottom: 32px;
+}
+
+.review-card {
+  background: #EFF6FF;
+  border: 1px solid #DBEAFE;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.review-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #DBEAFE;
+  margin-bottom: 16px;
+}
+
+.director-initials {
+  background: #86EFAC;
+  color: #166534;
+}
+
+.director-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.menu-button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: var(--xero-color-blue);
+  cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
+}
+
+.menu-button:hover {
+  background: rgba(19, 181, 234, 0.1);
+  border-radius: 4px;
+}
+
+.consent-text {
+  text-align: center;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+/* Business Details Screen */
+.auto-fill-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  border-radius: 6px;
+}
+
+.auto-fill-notice .notice-icon {
+  color: #16A34A;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.business-info-card {
+  background: #EFF6FF;
+  border: 1px solid #DBEAFE;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #DBEAFE;
+}
+
+.org-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.org-initials {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #93C5FD;
+  color: #1E40AF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.org-name {
+  font-weight: 600;
+  color: var(--text-heading);
+}
+
+.info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.info-row {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 16px;
+  align-items: baseline;
+}
+
+.info-label {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.info-value {
+  color: var(--text-heading);
+}
+
+.security-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px;
+  background: #F9FAFB;
+  border-radius: 6px;
+}
+
+.security-notice .notice-icon-small {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .info-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
+
+/* Summary Card */
+.summary-card {
+  background: var(--summary-bg);
+  border: 1px solid var(--summary-border);
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+/* Consent Section */
+.consent-section {
+  padding: 20px;
+  background: #F9FAFB;
+  border-radius: 8px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+
+.checkbox-label input[type="checkbox"] {
+  margin: 4px 12px 0 0;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+/* OAuth Screen Layout */
+.oauth-container {
+  text-align: center;
+}
+
+.permissions-list {
+  text-align: left;
+  padding: 16px;
+  background: #F9FAFB;
+  border-radius: 8px;
+}
+
+/* Success Screen */
+.success-screen {
+  text-align: center;
+}
+
+.success-icon {
+  width: 64px;
+  height: 64px;
+  background: var(--status-success-bg);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  color: white;
+  margin: 0 auto;
+}
+
+.what-next-section {
+  text-align: left;
+  background: #F9FAFB;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+/* Screen Actions Layout (XUIButton handles styling) */
+.screen-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.screen-actions-centered {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.success-screen .screen-actions,
+.checklist-screen .screen-actions {
+  justify-content: center;
+}
+
+/* Links */
+.learn-more-link,
+.terms-link {
+  color: var(--xero-color-blue);
+  text-decoration: none;
+}
+
+.learn-more-link:hover,
+.terms-link:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Layout */
+@media (max-width: 768px) {
+  .onboarding-wizard-v2 {
+    flex-direction: column;
+  }
+  
+  .onboarding-stepper {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 16px;
+  }
+  
+  .stepper-step {
+    flex-direction: row;
+    margin-bottom: 16px;
+  }
+  
+  .stepper-step::after {
+    display: none;
+  }
+  
+  .onboarding-main-content {
+    padding: 24px 16px;
+  }
+  
+  .onboarding-screen {
+    padding: 24px;
+  }
+  
+  .screen-actions {
+    flex-direction: column-reverse;
+  }
+  
+  .screen-actions > * {
+    width: 100%;
+  }
+}

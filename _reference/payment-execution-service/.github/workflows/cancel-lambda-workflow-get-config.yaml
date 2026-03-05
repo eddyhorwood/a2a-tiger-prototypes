@@ -1,0 +1,37 @@
+# This is a reusable workflow that is is never triggered unless called by another workflow
+
+name: Cancel Lambda - Get config values
+
+on:
+  workflow_call:
+    outputs:
+      uuid:
+        value: "bfifma5ebpfcbq4cb9a5ud"
+      lambda-name-kebab-case:
+        value: "cancel-execution-lambda"
+      lambda-name-pascal-case:
+        value: "CancelExecutionLambda"
+      lambda-parent-solution-file:
+        value: "PaymentExecution.sln"
+      sonarqube-project-key-prefix:
+        value: 'CollectingPayments'
+      sonarqube-project-key:
+        value: "xero-internal_payment-execution-cancel-lambda"
+      artifactory-repository:
+        value: "collecting-payments-execution-docker-common"
+      artifactory-user:
+        value: "collecting_payments_execution_deployer"
+      pact-artifact-name:
+        value: "cancel-lambda-consumer-pacts"
+
+permissions:
+  contents: read
+
+jobs:
+  get-variables:
+    name: Get config
+    runs-on: [self-hosted, linux, x64, linux-al2023]
+    steps:
+      - name: "Set outputs"
+        run: |
+          echo "Setting outputs"

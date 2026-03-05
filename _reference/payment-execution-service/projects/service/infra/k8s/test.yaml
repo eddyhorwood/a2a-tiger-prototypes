@@ -1,0 +1,28 @@
+---
+iamRole: "arn:aws:iam::590184096169:role/service-execution-test-payment-execution-service"
+replicaCount: 2
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 4
+  targetCPUUtilizationPercentage: 75
+  targetMemoryUtilizationPercentage: 75
+extraEnvMap:
+  DOTNET_ENVIRONMENT: Test
+  # This follows SRE Naming Convention for New Relic APM
+  # https://xero.atlassian.net/wiki/spaces/SRE/pages/10021183975/New+Relic+APM#Naming-Convention
+  NEW_RELIC_APP_NAME: test payment-execution-service
+  NEW_RELIC_LABELS: >-
+    uuid:334db7HzPYMT119B9go9X9;
+    env:test;
+  # Satisfies XREQ-247
+  NEW_RELIC_LICENSE_KEY: "{aws-sm}arn:aws:secretsmanager:ap-southeast-2:372425709208:secret:newrelic.xero_fsrv.licensekey"
+  Override_Identity__Client__ClientSecret: "{aws-sm}collecting-payments-execution/payment-execution-service/identity-client-secret"
+  Override_DataAccess__PaymentExecutionDB__ConnectionString: "{aws-sm}collecting-payments-execution/collecting-payments-execution-payment-execution-database/payment-execution-db/connection-string"
+  Override_LaunchDarkly__SdkKey: "{aws-sm}collecting-payments-execution/payment-execution-service/launch-darkly-config/xero-global-sdk-key"
+podAnnotations:
+  # The Sumo Logic source category that logs will be pushed into.
+  # Follow the instructions here to get the values of <product> and <component>:
+  # https://xero.atlassian.net/wiki/spaces/SRE/pages/9963963359/Source+Category+Structure+Requirements#Values
+  # Satisfies XREQ-289, XREQ-292
+  sumologic.com/sourceCategory: collecting_payments_execution/payment_execution_service/test/app/serilog/json

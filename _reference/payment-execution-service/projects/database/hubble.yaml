@@ -1,0 +1,26 @@
+---
+checks:
+  # Partially satisfies XREQ-99
+  - notify_deployment
+
+notify_deployment:
+  test:
+    environment_regex: "^test"
+    newrelic_rm:
+      enabled: true
+    slack:
+      room: "#cashtopia-releases"
+
+  uat:
+    environment_regex: "^uat$"
+    newrelic_rm:
+      enabled: true
+    slack:
+      room: "#cashtopia-releases"
+
+  production:
+    environment_regex: "^production$"
+    newrelic_rm:
+      enabled: true
+    slack:
+      room: "#cashtopia-releases"

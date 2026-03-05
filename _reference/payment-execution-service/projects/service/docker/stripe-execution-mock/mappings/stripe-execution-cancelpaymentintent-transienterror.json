@@ -1,0 +1,15 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPathPattern": "/v1/payments/cancel/([0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12})",
+    "headers": {
+      "Xero-Tenant-Id": {
+        "equalTo": "68fbe448-691e-45d2-a328-df7ac3db6c90"
+      }
+    }
+  },
+  "response": {
+    "status": 503,
+    "bodyFileName": "stripe-execution-generic-transienterror-response.json"
+  }
+}

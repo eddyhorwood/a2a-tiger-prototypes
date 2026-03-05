@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Amazon.Lambda.SQSEvents" Version="2.2.0" />
+      <PackageReference Include="AutoFixture.Xunit2" Version="4.18.1" />
+      <PackageReference Include="AWSSDK.SQS" Version="3.7.400.92" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.3" />
+      <PackageReference Include="Moq" Version="4.20.70" />
+      <PackageReference Include="Npgsql" Version="8.0.4" />
+      <PackageReference Include="xunit.extensibility.core" Version="2.9.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\PaymentExecution.Common\PaymentExecution.Common.csproj" />
+      <ProjectReference Include="..\PaymentExecution.Repository\PaymentExecution.Repository.csproj" />
+      <ProjectReference Include="..\PaymentExecution.SqsIntegrationClient\PaymentExecution.SqsIntegrationClient.csproj" />
+    </ItemGroup>
+
+</Project>

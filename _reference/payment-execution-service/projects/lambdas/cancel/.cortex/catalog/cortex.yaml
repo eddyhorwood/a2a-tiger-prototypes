@@ -1,0 +1,46 @@
+openapi: 3.1.0
+info:
+  x-cortex-link:
+    - url: https://xero.atlassian.net/jira/software/c/projects/INPAY/boards/6016/backlog
+      name: Jira Backlog
+      type: BACKLOG
+    - url: https://github.com/xero-internal/payment-execution-service/blob/main/projects/lambdas/cancel/README.md
+      name: README
+      type: README
+    - url: https://github.com/xero-internal/payment-execution-service/blob/main/CONTRIBUTING.md
+      name: Contributing
+      type: CONTRIBUTING
+  title: Cancel Execution Lambda
+  description: Lambda to Cancel Abandoned Payments
+  x-cortex-tag: bfifma5ebpfcbq4cb9a5ud
+  x-cortex-git:
+    github:
+      alias: ghec-xero-internal
+      repository: xero-internal/payment-execution-service
+      basepath: projects/cancel-lambda
+  x-cortex-type: service
+  x-cortex-slack:
+    channels:
+    - name: pod-cashtopia
+  x-cortex-owners:
+    - name: KWoKzMn5LkuWsnyjjGo0yw
+      type: GROUP
+      provider: CORTEX
+  x-cortex-parents:
+    - tag: 49xwsKimDUdmnG3H6riNhB
+  x-cortex-static-analysis:
+    sonarqube:
+      project: xero-internal_payment-execution-service
+      alias: sqc-xero-internal-prod
+  x-cortex-issues:
+    jira:
+      projects:
+        - name: INPAY
+  x-cortex-groups:
+  - phase:restricted-release
+  - data-sensitivity-level:sensitive
+  - personal-data-indicator:personal
+  - type:worker
+
+
+

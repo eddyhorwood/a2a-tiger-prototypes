@@ -1,0 +1,9 @@
+---
+Version: "2012-10-17"
+Statement:
+  - Effect: Allow
+    Action:
+      - sqs:*
+    Resource:
+      - arn:aws:sqs:${region}:${aws_account_id}:${queue_name}-${environment}
+      - arn:aws:sqs:${region}:${aws_account_id}:${dlq_name}-${environment}

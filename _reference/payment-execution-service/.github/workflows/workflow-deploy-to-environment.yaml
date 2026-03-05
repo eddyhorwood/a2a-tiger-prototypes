@@ -1,0 +1,101 @@
+# This is a reusable workflow that is is never triggered unless called by another workflow
+
+name: WF - Deployment to environment
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: The environment to deploy to (test|uat|production)
+        type: string
+        required: true
+      infra_working_dir:
+        description: The directory where the terraform files are located
+        type: string
+        required: true
+      kube_values_file_path:
+        description: The directory where the k8s values files are located
+        type: string
+        required: true
+      docker_image_tag:
+        description: Tag for your docker image
+        type: string
+        required: true
+      uuid:
+        description: Cortex uuid
+        type: string
+        required: true
+      namespace:
+        description: the k8s namespace
+        type: string
+        required: true
+      release-name:
+        description: the k8s release name
+        type: string
+        required: true
+    secrets:
+      deploy-track-token:
+        description: Token for DeployTrack
+        required: true
+
+env:
+  aws_region: ${{ inputs.environment == 'production' && 'us-east-1' || inputs.environment == 'uat' && 'us-west-2' || 'ap-southeast-2' }}
+  k8s_cluster: ${{ inputs.environment == 'production' && 'us-east-1-k8s-paas-prod-rua' || inputs.environment == 'uat' && 'us-west-2-k8s-paas-uat-rua' || 'ap-southeast-2-k8s-paas-test-rua' }}
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy-to-env:
+    runs-on: [self-hosted, linux-al2023, x64, runners-us-west-2]
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Start DeployTrack
+        id: start_deploytrack
+        uses: xero-internal/github-actions/DeployTrack@v1
+        with:
+          kotahi_id: ${{ inputs.uuid }}
+          environment: ${{ inputs.environment }}
+          status: in_progress
+          token: ${{ secrets.deploy-track-token }}
+
+      # Partially Satisfies XREQ-44, XREQ-45
+      - name: Deploy Infra (${{ inputs.environment }})
+        uses: xero-internal/github-actions/terraform-apply@v1
+        with:
+          environment: ${{ inputs.environment }}
+          aws_region: ${{ env.aws_region }}
+          working_dir: ${{ inputs.infra_working_dir}}
+          oidc_role: ${{ vars.OIDC_ROLE_ARN  }}
+          target_role: ${{ vars.DEPLOYMENT_ROLE_ARN}}
+          terraform_backend: environment/${{ inputs.environment }}.backend
+          terraform_var_files: |
+            environment/${{ inputs.environment }}.tfvars
+
+      # Partially Satisfies XREQ-44, XREQ-45
+      - name: Deploy Component (${{ inputs.environment }})
+        uses: xero-internal/github-actions/deploy-to-k8s@v1
+        with:
+          environment: ${{ inputs.environment }}
+          aws-region: ${{ env.aws_region }}
+          oidc-role: ${{ vars.OIDC_ROLE_ARN  }}
+          target-role: ${{ vars.DEPLOYMENT_ROLE_ARN }}
+          namespace: ${{ inputs.namespace }}
+          release-name: ${{ inputs.release-name }}
+          context: ${{ env.k8s_cluster }}
+          values-file: ${{ inputs.kube_values_file_path }}/shared.yaml
+          override-values-file: ${{ inputs.kube_values_file_path }}/${{ inputs.environment }}.yaml
+          docker-image-tag: ${{ inputs.docker_image_tag }}
+
+      # Partially satisfies XREQ-99, XREQ-56
+      - name: End DeployTrack (${{ inputs.environment }})
+        uses: xero-internal/github-actions/DeployTrack@v1
+        if: ${{ always() }}
+        env:
+          conclusion: ${{ (contains(job.status,'failure') || contains(steps.*.outcome,'failure') || contains(steps.*.outcome,'cancelled')) && 'failed' || 'success' }}
+        with:
+          status: ${{ env.conclusion }}
+          kotahi_id: ${{ inputs.uuid }}
+          environment: ${{ inputs.environment }}
+          token: ${{ secrets.deploy-track-token }}

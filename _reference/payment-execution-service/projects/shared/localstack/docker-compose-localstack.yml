@@ -1,0 +1,30 @@
+services:
+  localstack:
+    container_name: "localstack-main"
+    image: localstack/localstack:latest
+    hostname: localstack
+    ports:
+      - "127.0.0.1:4566:4566"            # LocalStack Gateway
+      - "127.0.0.1:4510-4559:4510-4559"  # external services port range
+    environment:
+      - DEBUG=${DEBUG-}
+      - LS_LOG=${LS_LOG-}
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - SERVICES=sqs, kms, iam
+      - AWS_DEFAULT_REGION=ap-southeast-2
+    volumes:
+      - "/tmp/volume:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    command:
+      - tail -f /dev/null
+
+  terraform-runner:
+    image: "hashicorp/terraform:1.10.4"
+    container_name: "terraform-runner"
+    volumes:
+      - ../..:/workspace
+    working_dir: "/workspace/shared/localstack"
+    entrypoint: "./runTerraformLocalstack.sh"
+    depends_on:
+      localstack:
+        condition: service_started

@@ -1,0 +1,1053 @@
+openapi: 3.0.1
+info:
+  title: Payment Execution Service
+  description: The Execution Service is a central data store designed to manage and track execution transactions across multiple payment providers
+  contact:
+    url: https://app.getcortexapp.com/admin/service?tenantCode=Xero&tag=334db7HzPYMT119B9go9X9/
+  version: '1.0'
+  x-xero-api-type: Product
+servers:
+  - url: http://localhost:5000
+    description: Local URL
+  - url: https://payment-execution.global.xero-uat.com/execution
+    description: Uat URL
+  - url: https://payment-execution.global.xero.com/execution
+    description: Production URL
+  - url: https://payment-execution.global.xero-test.com/execution
+    description: Test URL
+paths:
+  /v1/payments/dch-delete:
+    post:
+      tags:
+        - DchDelete
+      operationId: DCHDelete
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/DchDeletePayload'
+          text/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/DchDeletePayload'
+          application/*+json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/DchDeletePayload'
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '403':
+          description: Forbidden
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not Found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '500':
+          description: Internal Server Error
+      security:
+        - XeroIdentity:
+            - xero_collecting-payments-execution_payment-execution-service.dchdelete
+  '/v1/payments/payment-requests/{paymentRequestId}/provider-executions/{providerServiceId}/complete':
+    post:
+      tags:
+        - Payments
+      operationId: Complete
+      parameters:
+        - name: paymentRequestId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: providerServiceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: Xero-Tenant-Id
+          in: header
+          description: Xero Tenant Id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: Xero-Correlation-Id
+          in: header
+          description: Xero Correlation Id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CompletePaymentTransactionRequest'
+          text/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CompletePaymentTransactionRequest'
+          application/*+json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CompletePaymentTransactionRequest'
+      responses:
+        '202':
+          description: Accepted
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '500':
+          description: Internal Server Error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+      security:
+        - XeroIdentity:
+            - xero_collecting-payments-execution_payment-execution-service.complete
+  /v1/payments:
+    get:
+      tags:
+        - Payments
+      operationId: GetPaymentTransaction
+      parameters:
+        - name: paymentRequestId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: Xero-Correlation-Id
+          in: header
+          description: Xero Correlation Id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/GetPaymentTransactionQueryResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPaymentTransactionQueryResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/GetPaymentTransactionQueryResponse'
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '500':
+          description: Internal Server Error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+      security:
+        - XeroIdentity:
+            - xero_collecting-payments-execution_payment-execution-service.read
+  /v1/payments/provider-state:
+    get:
+      tags:
+        - Payments
+      operationId: GetProviderState
+      parameters:
+        - name: paymentRequestId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: Xero-Tenant-Id
+          in: header
+          description: Xero Tenant Id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: Xero-Correlation-Id
+          in: header
+          description: Xero Correlation Id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/GetProviderStateResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetProviderStateResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/GetProviderStateResponse'
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '403':
+          description: Forbidden
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not Found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '424':
+          description: Failed Dependency
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '500':
+          description: Internal Server Error
+        '503':
+          description: Service Unavailable
+      security:
+        - XeroIdentity:
+            - xero_collecting-payments-execution_payment-execution-service.readproviderstate
+  '/v1/payments/request-cancel/{paymentRequestId}':
+    post:
+      tags:
+        - Payments
+      operationId: RequestCancel
+      parameters:
+        - name: paymentRequestId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: Xero-Tenant-Id
+          in: header
+          description: Xero Tenant Id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: Xero-Correlation-Id
+          in: header
+          description: Xero Correlation Id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/RequestCancelPayload'
+          text/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/RequestCancelPayload'
+          application/*+json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/RequestCancelPayload'
+        required: true
+      responses:
+        '202':
+          description: Accepted
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '403':
+          description: Forbidden
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not Found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '500':
+          description: Internal Server Error
+      security:
+        - XeroIdentity:
+            - xero_collecting-payments-execution_payment-execution-service.requestcancel
+  '/v1/payments/cancel/{paymentRequestId}':
+    post:
+      tags:
+        - Payments
+      operationId: Cancel
+      parameters:
+        - name: paymentRequestId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: Xero-Tenant-Id
+          in: header
+          description: Xero Tenant Id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: Xero-Correlation-Id
+          in: header
+          description: Xero Correlation Id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CancelPayload'
+          text/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CancelPayload'
+          application/*+json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CancelPayload'
+        required: true
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '403':
+          description: Forbidden
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not Found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '500':
+          description: Internal Server Error
+        '503':
+          description: Service Unavailable
+      security:
+        - XeroIdentity:
+            - xero_collecting-payments-execution_payment-execution-service.cancel
+  /v1/payments/stripe/submit:
+    post:
+      tags:
+        - SubmitStripe
+      operationId: SubmitStripe
+      parameters:
+        - name: Xero-Tenant-Id
+          in: header
+          description: Xero Tenant Id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: Provider-Account-Id
+          in: header
+          description: Provider Account Id
+          required: true
+          schema:
+            type: string
+        - name: Xero-Correlation-Id
+          in: header
+          description: Xero Correlation Id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/SubmitStripeRequest'
+          text/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/SubmitStripeRequest'
+          application/*+json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/SubmitStripeRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/SubmitStripePaymentCommandResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitStripePaymentCommandResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/SubmitStripePaymentCommandResponse'
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '403':
+          description: Forbidden
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '500':
+          description: Internal Server Error
+      security:
+        - XeroIdentity:
+            - xero_collecting-payments-execution_payment-execution-service.submit
+  /healthcheck:
+    get:
+      tags:
+        - Health checks
+      operationId: HealthCheck
+      parameters:
+        - name: X-Secret
+          in: header
+          description: A secret value known only by the service owners.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Healthy
+        '503':
+          description: Degraded
+        '500':
+          description: Unhealthy
+        '401':
+          description: Unauthorized
+  /ready:
+    get:
+      tags:
+        - Health checks
+      operationId: Ready
+      parameters:
+        - name: X-Secret
+          in: header
+          description: A secret value known only by the service owners.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Healthy
+        '503':
+          description: Degraded
+        '500':
+          description: Unhealthy
+        '401':
+          description: Unauthorized
+  /ping:
+    get:
+      tags:
+        - Health checks
+      operationId: Ping
+      responses:
+        '200':
+          description: Healthy
+        '503':
+          description: Degraded
+        '500':
+          description: Unhealthy
+  /secure-ping:
+    get:
+      tags:
+        - Health checks
+      operationId: SecurePing
+      responses:
+        '200':
+          description: Healthy
+        '503':
+          description: Degraded
+        '500':
+          description: Unhealthy
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+      security:
+        - XeroIdentity:
+            - xero_collecting-payments-execution_payment-execution-service.read
+            - xero_collecting-payments-execution_payment-execution-service.dchdelete
+            - xero_collecting-payments-execution_payment-execution-service.submit
+            - xero_collecting-payments-execution_payment-execution-service.complete
+            - xero_collecting-payments-execution_payment-execution-service.requestcancel
+            - xero_collecting-payments-execution_payment-execution-service.readproviderstate
+components:
+  schemas:
+    AbaResponse:
+      required:
+        - accountNumber
+        - bankName
+        - routingNumber
+      type: object
+      properties:
+        accountNumber:
+          type: string
+        bankName:
+          type: string
+        routingNumber:
+          type: string
+      additionalProperties: false
+    BankTransferInstructionsResponse:
+      required:
+        - paymentProviderPaymentCurrency
+      type: object
+      properties:
+        financialAddresses:
+          allOf:
+            - $ref: '#/components/schemas/FinancialAddressesResponse'
+          nullable: true
+        amount:
+          type: integer
+          format: int64
+        paymentProviderPaymentCurrency:
+          type: string
+        bankTransferCurrency:
+          type: string
+          nullable: true
+        amountRemaining:
+          type: integer
+          format: int64
+          nullable: true
+        reference:
+          type: string
+          nullable: true
+      additionalProperties: false
+    CancelPayload:
+      required:
+        - cancellationReason
+      type: object
+      properties:
+        cancellationReason:
+          type: string
+      additionalProperties: false
+    CompletePaymentTransactionRequest:
+      required:
+        - eventCreatedDateTime
+        - providerType
+        - status
+      type: object
+      properties:
+        fee:
+          maximum: 2147483647
+          minimum: 0
+          type: number
+          format: double
+          nullable: true
+        feeCurrency:
+          type: string
+          nullable: true
+        paymentProviderPaymentTransactionId:
+          type: string
+          description: PaymentIntentIntentId for Stripe
+          nullable: true
+        paymentProviderPaymentReferenceId:
+          type: string
+          description: ChargeId for stripe
+          nullable: true
+        providerType:
+          allOf:
+            - $ref: '#/components/schemas/ProviderType'
+          nullable: true
+        status:
+          allOf:
+            - $ref: '#/components/schemas/TerminalStatus'
+          nullable: true
+        failureDetails:
+          type: string
+          nullable: true
+        eventCreatedDateTime:
+          type: string
+          format: date-time
+        paymentProviderLastUpdatedAt:
+          type: string
+          format: date-time
+          nullable: true
+        cancellationReason:
+          type: string
+          nullable: true
+      additionalProperties: false
+    DchDeletePayload:
+      required:
+        - idToDelete
+      type: object
+      properties:
+        idToDelete:
+          type: string
+          format: uuid
+      additionalProperties: false
+    FinancialAddressesResponse:
+      type: object
+      properties:
+        aba:
+          allOf:
+            - $ref: '#/components/schemas/AbaResponse'
+          nullable: true
+        swift:
+          allOf:
+            - $ref: '#/components/schemas/SwiftResponse'
+          nullable: true
+      additionalProperties: false
+    GetPaymentTransactionQueryResponse:
+      required:
+        - paymentRequestId
+        - providerType
+        - status
+      type: object
+      properties:
+        paymentTransactionId:
+          type: string
+          format: uuid
+          nullable: true
+        paymentRequestId:
+          type: string
+          format: uuid
+        status:
+          type: string
+        fee:
+          type: number
+          format: double
+          nullable: true
+        feeCurrency:
+          type: string
+          nullable: true
+        paymentProviderPaymentReferenceId:
+          type: string
+          nullable: true
+        paymentProviderPaymentTransactionId:
+          type: string
+          nullable: true
+        failureDetails:
+          type: string
+          nullable: true
+        eventCreatedDateTimeUtc:
+          type: string
+          format: date-time
+          nullable: true
+        providerServiceId:
+          type: string
+          format: uuid
+          nullable: true
+        providerType:
+          type: string
+        createdUtc:
+          type: string
+          format: date-time
+          nullable: true
+        updatedUtc:
+          type: string
+          format: date-time
+          nullable: true
+        cancellationReason:
+          type: string
+          nullable: true
+      additionalProperties: false
+    GetProviderStateResponse:
+      required:
+        - paymentProviderPaymentTransactionId
+      type: object
+      properties:
+        paymentProviderStatus:
+          allOf:
+            - $ref: '#/components/schemas/PaymentProviderStatusResponse'
+        paymentProviderPaymentTransactionId:
+          type: string
+        providerType:
+          allOf:
+            - $ref: '#/components/schemas/ProviderTypeResponse'
+        lastPaymentErrorCode:
+          type: string
+          nullable: true
+        pendingStatusDetails:
+          allOf:
+            - $ref: '#/components/schemas/PendingStatusDetailsResponse'
+          nullable: true
+      additionalProperties: false
+    MicroDepositVerificationResponse:
+      required:
+        - hostedVerificationUrl
+      type: object
+      properties:
+        hostedVerificationUrl:
+          type: string
+        bankAccountLast4:
+          type: string
+          nullable: true
+      additionalProperties: false
+    PaymentMethodTypeResponse:
+      enum:
+        - Card
+        - Link
+        - CustomerBalance
+        - AfterPay
+        - AuBecsDebit
+        - BacsDebit
+        - Klarna
+        - UsBankAccount
+        - Zip
+        - PayTo
+        - PayByBank
+        - ApplePay
+        - GooglePay
+      type: string
+    PaymentProviderStatusResponse:
+      enum:
+        - Submitted
+        - Processing
+        - RequiresAction
+        - Terminal
+      type: string
+    PendingStatusDetailsResponse:
+      type: object
+      properties:
+        paymentMethodType:
+          allOf:
+            - $ref: '#/components/schemas/PaymentMethodTypeResponse'
+        requiresActionType:
+          allOf:
+            - $ref: '#/components/schemas/RequiresActionTypeResponse'
+        hasActionValue:
+          type: boolean
+        bankTransferInstructions:
+          allOf:
+            - $ref: '#/components/schemas/BankTransferInstructionsResponse'
+          nullable: true
+        redirectToUrl:
+          allOf:
+            - $ref: '#/components/schemas/RedirectToUrlResponse'
+          nullable: true
+        microDepositVerification:
+          allOf:
+            - $ref: '#/components/schemas/MicroDepositVerificationResponse'
+          nullable: true
+      additionalProperties: false
+    ProblemDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          nullable: true
+        title:
+          type: string
+          nullable: true
+        status:
+          type: integer
+          format: int32
+          nullable: true
+        detail:
+          type: string
+          nullable: true
+        instance:
+          type: string
+          nullable: true
+      additionalProperties: { }
+    ProviderType:
+      enum:
+        - Stripe
+        - Paypal
+        - GoCardless
+      type: string
+    ProviderTypeResponse:
+      enum:
+        - Stripe
+        - Paypal
+        - GoCardless
+      type: string
+    RedirectToUrlResponse:
+      type: object
+      properties:
+        redirectUrl:
+          type: string
+          nullable: true
+      additionalProperties: false
+    RequestCancelPayload:
+      required:
+        - cancellationReason
+      type: object
+      properties:
+        cancellationReason:
+          minLength: 1
+          type: string
+      additionalProperties: false
+    RequiresActionTypeResponse:
+      enum:
+        - BankTransferInstructions
+        - RedirectToUrl
+        - MicrodepositVerification
+        - PayToAuthorization
+        - Unknown
+        - None
+      type: string
+    SubmitStripePaymentCommandResponse:
+      required:
+        - clientSecret
+        - paymentIntentId
+      type: object
+      properties:
+        paymentIntentId:
+          type: string
+        clientSecret:
+          type: string
+      additionalProperties: false
+    SubmitStripeRequest:
+      required:
+        - paymentRequestId
+      type: object
+      properties:
+        paymentRequestId:
+          type: string
+          format: uuid
+        paymentMethodsMadeAvailable:
+          maxItems: 999
+          type: array
+          items:
+            type: string
+          nullable: true
+        paymentMethodId:
+          type: string
+          nullable: true
+      additionalProperties: false
+    SwiftResponse:
+      required:
+        - swiftCode
+      type: object
+      properties:
+        swiftCode:
+          type: string
+      additionalProperties: false
+    TerminalStatus:
+      enum:
+        - Succeeded
+        - Failed
+        - Cancelled
+      type: string
+  securitySchemes:
+    XeroIdentity:
+      type: oauth2
+      description: Xero Identity Security Scheme
+      flows:
+        clientCredentials:
+          tokenUrl: https://identity.xero.com/connect/token
+          refreshUrl: https://identity.xero.com/connect/token
+          scopes:
+            xero_collecting-payments-execution_payment-execution-service.read: xero_collecting-payments-execution_payment-execution-service.read
+            xero_collecting-payments-execution_payment-execution-service.dchdelete: xero_collecting-payments-execution_payment-execution-service.dchdelete
+            xero_collecting-payments-execution_payment-execution-service.submit: xero_collecting-payments-execution_payment-execution-service.submit
+            xero_collecting-payments-execution_payment-execution-service.complete: xero_collecting-payments-execution_payment-execution-service.complete
+            xero_collecting-payments-execution_payment-execution-service.requestcancel: xero_collecting-payments-execution_payment-execution-service.requestcancel
+            xero_collecting-payments-execution_payment-execution-service.readproviderstate: xero_collecting-payments-execution_payment-execution-service.readproviderstate
+            xero_collecting-payments-execution_payment-execution-service.cancel: xero_collecting-payments-execution_payment-execution-service.cancel

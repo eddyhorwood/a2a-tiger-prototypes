@@ -1,0 +1,360 @@
+/* Xero Design Language - Invoice Detail Page */
+
+/* === Invoice Page Layout === */
+.x-invoice-page {
+  min-height: 100vh;
+  background-color: #F3F4F6; /* --bg-page */
+  padding: 24px 32px 40px;
+}
+
+/* === Invoice Header === */
+.x-invoice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  max-width: 840px;
+}
+
+.x-invoice-header__title {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.x-back-link {
+  background: none;
+  border: none;
+  color: #3B82F6; /* --xero-color-blue-alt */
+  font-size: 14px;
+  padding: 0;
+  cursor: pointer;
+  font-weight: 500;
+  transition: color 120ms ease-out;
+}
+
+.x-back-link:hover {
+  color: #2563EB;
+}
+
+.x-invoice-header__actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* === Invoice Form === */
+.x-invoice-form {
+  background: #FFFFFF;
+  border-radius: 8px;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+  padding: 32px;
+  max-width: 1440px;
+}
+
+/* Invoice header rows - grid layout matching screenshot */
+.x-invoice-header-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+/* Contact badge - matches screenshot */
+.x-contact-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 6px;
+  padding: 6px 8px 6px 6px;
+  margin-top: 4px;
+  max-width: fit-content;
+}
+
+.x-contact-initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: #F472B6; /* Pink like screenshot */
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.x-contact-name {
+  font-size: 14px;
+  color: #111827;
+  font-weight: 400;
+}
+
+.x-contact-remove {
+  background: none;
+  border: none;
+  color: #9CA3AF;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 120ms ease-out;
+}
+
+.x-contact-remove:hover {
+  color: #6B7280;
+}
+
+/* Form inputs with icons */
+.x-form-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #E5E7EB;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-top: 4px;
+  background: #FFFFFF;
+  min-height: 38px;
+}
+
+.x-form-input.x-form-select {
+  cursor: pointer;
+  justify-content: space-between;
+}
+
+.x-input-icon {
+  font-size: 14px;
+  color: #6B7280;
+  flex-shrink: 0;
+}
+
+.x-dropdown-icon {
+  font-size: 10px;
+  color: #9CA3AF;
+  flex-shrink: 0;
+}
+
+/* Payment card logos */
+.x-payment-card-logos {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.x-card-logo {
+  height: 20px;
+  width: auto;
+  border-radius: 2px;
+  border: 1px solid #E5E7EB;
+}
+
+.x-invoice-form__section {
+  margin-bottom: 24px;
+}
+
+.x-invoice-form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.x-invoice-form__field {
+  display: flex;
+  flex-direction: column;
+}
+
+/* === Invoice Items Table === */
+.x-invoice-items {
+  margin: 32px 0;
+}
+
+.x-invoice-items__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.x-invoice-items__table thead {
+  border-bottom: 2px solid #E5E7EB;
+}
+
+.x-invoice-items__table th {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6B7280;
+  text-align: left;
+  padding: 12px 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.x-invoice-items__table tbody tr {
+  border-bottom: 1px solid #F3F4F6;
+}
+
+.x-invoice-items__table td {
+  padding: 16px 8px;
+  font-size: 14px;
+  color: #111827;
+}
+
+.x-invoice-items__total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 8px 0;
+  border-top: 2px solid #E5E7EB;
+  margin-top: 16px;
+}
+
+/* === Payment Empty State === */
+.x-payment-empty-state {
+  border: 2px dashed #D1D5DB;
+  border-radius: 8px;
+  padding: 32px;
+  text-align: center;
+  background: #FAFAFA;
+}
+
+/* === OPMM Modal Empty State === */
+.x-opmm-empty-state {
+  text-align: center;
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* === Payment Option Card (Modal) === */
+.x-payment-option-card {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  padding: 32px;
+  margin: 0 auto;
+  max-width: 560px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+.x-payment-option-content {
+  /* Content wrapper */
+}
+
+/* Bank logo badges */
+.x-bank-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  background: #F3F4F6;
+  border: 1px solid #E5E7EB;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  letter-spacing: 0.3px;
+}
+
+/* Feature list with checkmarks */
+.x-feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.x-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #374151;
+}
+
+.x-feature-item:last-child {
+  margin-bottom: 0;
+}
+
+.x-checkmark {
+  flex-shrink: 0;
+  color: #10B981; /* Green checkmark */
+  margin-top: 2px;
+}
+
+/* Demo config collapsible */
+.x-demo-config {
+  border-top: 1px solid #E5E7EB;
+  padding-top: 20px;
+}
+
+.x-demo-config summary {
+  user-select: none;
+}
+
+.x-demo-config summary::-webkit-details-marker {
+  display: none;
+}
+
+.x-demo-config summary::before {
+  content: "▸ ";
+  display: inline-block;
+  margin-right: 6px;
+  transition: transform 120ms ease-out;
+}
+
+.x-demo-config[open] summary::before {
+  transform: rotate(90deg);
+}
+
+/* === Text Right Alignment === */
+.x-text-right {
+  text-align: right !important;
+}
+
+/* === Responsive === */
+@media (max-width: 768px) {
+  .x-invoice-page {
+    padding: 16px 20px 32px;
+  }
+
+  .x-invoice-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .x-invoice-form {
+    padding: 24px 20px;
+  }
+
+  .x-invoice-header-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .x-invoice-form__row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .x-invoice-items__table {
+    font-size: 13px;
+  }
+
+  .x-invoice-items__table th,
+  .x-invoice-items__table td {
+    padding: 12px 6px;
+  }
+
+  .x-payment-empty-state {
+    padding: 24px 16px;
+  }
+}

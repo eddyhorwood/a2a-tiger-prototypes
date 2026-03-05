@@ -1,0 +1,100 @@
+name: Service - Deploy PR to Env
+run-name: Service deploy PR to env by @${{ github.actor }}
+
+# Satisfies XREQ-27, XREQ-298, XREQ-40, XREQ-43
+on:
+  pull_request:
+    types: [ labeled ]
+
+permissions:
+  contents: read
+
+jobs:
+  get-config:
+    if: ${{ github.event.label.name == 'deploy-service-test' }}
+    name: Get config values
+    uses: ./.github/workflows/service-workflow-get-config.yaml
+
+  terraform-validate:
+    if: ${{ github.event.label.name == 'deploy-service-test' }}
+    name: Terraform validate
+    runs-on: [self-hosted, linux, x64, runners-us-west-2, linux-al2023]
+    environment: test
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: xero-internal/github-actions/terraform-validate@v1
+        with:
+          aws_region: ap-southeast-2
+          oidc_role: ${{ vars.OIDC_ROLE_ARN  }}
+          target_role: ${{ vars.DEPLOYMENT_ROLE_ARN }}
+          working_dir: ./projects/service/infra/terraform
+          terraform_backend: environment/test.backend
+          terraform_var_files: environment/test.tfvars
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+  # Partially satisfies XREQ-56
+  semver:
+    if: ${{ github.event.label.name == 'deploy-service-test' }}
+    name: Calculate package version
+    runs-on: [self-hosted, linux, linux-al2023]
+    outputs:
+      build-version: ${{ steps.version.outputs.assemblySemVer }}
+      image-tag: "${{ github.sha }}.${{ steps.version.outputs.majorMinorPatch }}.${{ github.run_number }}.${{ github.run_attempt }}"
+      repo-tag: ${{ steps.version.outputs.majorMinorPatch }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v3.1.11
+        with:
+          versionSpec: "5.x"
+      - name: Determine Version
+        uses: gittools/actions/gitversion/execute@v3.1.11
+        id: version
+        with:
+          useConfigFile: true
+          configFilePath: ./projects/service/GitVersion.yml
+
+    # Satisfies XREQ-47, XREQ-98
+  docker-branch-image-build-and-push:
+    if: ${{ github.event.label.name == 'deploy-service-test' }}
+    name: Build and push Docker Image
+    runs-on: [self-hosted, linux, x64, linux-al2023]
+    needs: [terraform-validate, get-config, semver]
+    steps:
+      - name: Build and push
+        uses: xero-internal/github-actions/docker-image-build-push@v1
+        with:
+          version: ${{ needs.semver.outputs.image-tag }}
+          docker-image-name: ${{ needs.get-config.outputs.service-name-kebab-case }}
+          af-registry: ${{ needs.get-config.outputs.artifactory-repository }}.artifactory.xero-support.com
+          af-user: ${{ needs.get-config.outputs.artifactory-user }}
+          af-password: ${{ secrets.ARTIFACTORY_PASSWORD }}
+          working-directory: ./projects
+          docker-file: ./projects/service/src/${{ needs.get-config.outputs.service-name-pascal-case }}.Api/Dockerfile
+
+  deploy-test:
+    if: ${{ github.event.label.name == 'deploy-service-test' }}
+    name: Deploy Test
+    needs: [get-config, semver, docker-branch-image-build-and-push]
+    uses: ./.github/workflows/workflow-deploy-to-environment.yaml
+    permissions:
+      contents: read
+      id-token: write
+    with:
+      environment: test
+      docker_image_tag: ${{ needs.semver.outputs.image-tag }}
+      uuid: ${{ needs.get-config.outputs.uuid }}
+      namespace: ${{ needs.get-config.outputs.kubernetes-namespace }}
+      release-name: ${{ needs.get-config.outputs.service-name-kebab-case }}
+      infra_working_dir: ./projects/service/infra/terraform
+      kube_values_file_path: ./projects/service/infra/k8s
+    secrets:
+      deploy-track-token: ${{ secrets.DEPLOY_TRACK_API_TOKEN }}

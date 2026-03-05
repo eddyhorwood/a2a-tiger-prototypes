@@ -1,0 +1,128 @@
+name: Cancel Lambda - Deploy PR to Env
+run-name: Cancel Lambda - Deploy PR to Env by @${{ github.actor }}
+
+# This workflow deploys PRs to test environment when labeled with 'deploy-lambda-test'
+# It SKIPS pact verification gates to allow fast testing of changes
+
+on:
+  pull_request:
+    types: [labeled]
+    paths:
+      - "projects/lambdas/cancel/src/**"
+      - "projects/lambdas/cancel/infra/terraform/**"
+      - "projects/shared/**"
+      - ".github/workflows/cancel-lambda-**"
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  get-config:
+    name: Get config values
+    if: ${{ github.event.label.name == 'deploy-lambda-test' || contains(github.event.pull_request.labels.*.name, 'deploy-lambda-test') }}
+    uses: ./.github/workflows/cancel-lambda-workflow-get-config.yaml
+
+  static-analysis:
+    name: Static analysis
+    if: ${{ github.event.label.name == 'deploy-lambda-test' || contains(github.event.pull_request.labels.*.name, 'deploy-lambda-test') }}
+    runs-on: [self-hosted, linux, x64, linux-al2023]
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Megalinter
+        uses: xero-internal/github-actions/megalinter@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_WORKSPACE: ./projects/lambdas/cancel
+          MEGALINTER_CONFIG: ./projects/lambdas/cancel/.mega-linter.yml
+
+  run-tests-and-sonarscan:
+    name: Test and SonarScan
+    if: ${{ github.event.label.name == 'deploy-lambda-test'}}
+    runs-on: [self-hosted, linux, x64]
+    needs: [get-config]
+    permissions:
+      contents: read
+      actions: read
+      checks: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Start local dependencies
+        shell: bash
+        working-directory: ./projects/lambdas/cancel
+        run: make start-local-dependencies
+      - name: Dotnet test and sonarscan
+        uses: xero-internal/github-actions/dotnet-build-test@v1
+        with:
+          dotnet-version: 8.0.x
+          dotnet-solution-file: ./${{ needs.get-config.outputs.lambda-parent-solution-file }}
+          dotnet-test-additional-command: --settings ./.runsettings --filter 'FullyQualifiedName!~Worker.UnitTest&FullyQualifiedName!~Worker.ComponentTests&FullyQualifiedName!~Worker.ConsumerPactTests&FullyQualifiedName!~Service.ProviderPactTests&FullyQualifiedName!~Service.UnitTests&FullyQualifiedName!~Service.ComponentTests&FullyQualifiedName!~Service.ConsumerPactTests&FullyQualifiedName!~Service.ProviderPactTests'
+          app-version: ${{ github.sha }}
+          checkout-enabled: false
+          sonarqube-enabled: true
+          use-sonarcloud: true
+          sonarqube-gate-check-enabled: true
+          sonarqube-token: ${{ secrets.SONARCLOUD_TOKEN }}
+          sonarqube-project-key: ${{ needs.get-config.outputs.sonarqube-project-key }}
+          sonarqube-project-name: "[${{ needs.get-config.outputs.sonarqube-project-key-prefix }}]${{ needs.get-config.outputs.lambda-name-pascal-case }}"
+          sonarqube-organization: xero-internal
+          sonarqube-exclusions: "**/worker/**,**/shared/**,**/service/**"
+      - name: Stop local dependencies
+        if: ${{ always() }}
+        shell: bash
+        working-directory: ./projects/lambdas/cancel
+        run: make stop-local-dependencies
+
+  terraform-validate:
+    name: Terraform validate
+    if: ${{ github.event.label.name == 'deploy-lambda-test'}}
+    runs-on: [self-hosted, linux, x64, runners-us-west-2, linux-al2023]
+    environment: test
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: xero-internal/github-actions/terraform-validate@v1
+        with:
+          aws_region: ap-southeast-2
+          oidc_role: ${{ vars.OIDC_ROLE_ARN  }}
+          target_role: ${{ vars.DEPLOYMENT_ROLE_ARN}}
+          working_dir: ./projects/lambdas/cancel/infra/terraform
+          terraform_backend: environment/test.backend
+          terraform_var_files: environment/test.tfvars
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+  terraform-apply-test:
+    name: Terraform apply Test
+    if: ${{ github.event.label.name == 'deploy-lambda-test'}}
+    runs-on: [self-hosted, linux, x64, runners-ap-southeast-2]
+    needs: [get-config, run-tests-and-sonarscan, terraform-validate]
+    environment: test
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Deploy Terraform
+        uses: xero-internal/github-actions/terraform-apply@v1.0
+        with:
+          environment: test
+          component_uuid: ${{ needs.get-config.outputs.uuid }}
+          aws_region: ap-southeast-2
+          oidc_role: ${{ vars.OIDC_ROLE_ARN }}
+          target_role: ${{ vars.DEPLOYMENT_ROLE_ARN }}
+          working_dir: ./projects/lambdas/cancel/infra/terraform
+          terraform_backend: environment/test.backend
+          terraform_var_files: environment/test.tfvars
+          deploytrack_api_token: ${{ secrets.DEPLOY_TRACK_API_TOKEN }}

@@ -1,0 +1,46 @@
+{
+  "mappings": [
+    {
+      "scenarioName": "TransientFailureScenario",
+      "requiredScenarioState": "Started",
+      "newScenarioState": "SecondAttempt",
+
+      "request": {
+        "method": "POST",
+        "urlPathPattern": "/v1/payments/submit",
+        "headers": {
+          "Provider-Account-Id": {
+            "matches": "transient-error-account-id"
+          },
+          "Xero-Correlation-Id": {
+            "matches": "[0-9A-Fa-f]{8}-([0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}"
+          }
+        }
+      },
+      "response": {
+        "status": 500,
+        "bodyFileName": "stripe-execution-submit-500-response.json"
+      }
+    },
+    {
+      "scenarioName": "TransientFailureScenario",
+      "requiredScenarioState": "SecondAttempt",
+      "request": {
+        "method": "POST",
+        "urlPathPattern": "/v1/payments/submit",
+        "headers": {
+          "Provider-Account-Id": {
+            "matches": "transient-error-account-id"
+          },
+          "Xero-Correlation-Id": {
+            "matches": "[0-9A-Fa-f]{8}-([0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "bodyFileName": "stripe-execution-submit-response.json"
+      }
+    }
+  ]
+}

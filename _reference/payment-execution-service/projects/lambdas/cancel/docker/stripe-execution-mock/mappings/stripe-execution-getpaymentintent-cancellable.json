@@ -1,0 +1,20 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/v1/payments/payment-intent",
+    "queryParameters": {
+      "paymentRequestId": {
+        "matches": "[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}"
+      }
+    },
+    "headers": {
+      "Xero-Tenant-Id": {
+        "matches": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "stripe-execution-getpaymentintent-cancellable-response.json"
+  }
+}

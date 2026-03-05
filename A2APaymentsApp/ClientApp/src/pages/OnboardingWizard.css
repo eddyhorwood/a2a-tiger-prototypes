@@ -1,0 +1,57 @@
+/* Xero Design Language - Onboarding Wizard */
+/* Per Wizard Stepper Pattern (§4.5) */
+
+.onboarding-wizard {
+  min-height: 100vh;
+  background-color: var(--bg-page);
+}
+
+/* Entry context banner (for demo) */
+.entry-context-banner {
+  background: linear-gradient(135deg, #fff9e6 0%, #fffbf0 100%);
+  border-bottom: 2px solid #ffd966;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: #666;
+}
+
+.context-label {
+  font-weight: 600;
+  color: #333;
+}
+
+.mode-badge {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 10px;
+  background: #e67e22;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.onboarding-wizard-stepper {
+  background-color: var(--bg-card);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: var(--space-5) 0;
+}
+
+.onboarding-wizard-content {
+  padding: var(--space-8) var(--space-6);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .onboarding-wizard-content {
+    padding: var(--space-6) var(--space-4);
+  }
+
+  .onboarding-wizard-stepper {
+    padding: var(--space-4) 0;
+  }
+}

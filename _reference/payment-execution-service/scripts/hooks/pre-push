@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+cd "$(dirname "$0")"/../..
+
+readonly TYPE_PATH="PATH"
+readonly TYPE_EXTENSION="EXTENSION"
+
+PREREQS_INSTALLED=0
+CHANGES=""
+
+has_been_changed() {
+  SOURCE=$1
+  TYPE=$2
+  FILTERED_CHANGES=""
+  case $TYPE in
+  "${TYPE_PATH}")
+    FILTERED_CHANGES=$(echo "${CHANGES}" | grep -E "^${SOURCE}/" | grep -Ev "${SOURCE}/*.md")
+    ;;
+  "${TYPE_EXTENSION}")
+    FILTERED_CHANGES=$(echo "${CHANGES}" | grep -E "\.${SOURCE}$")
+    ;;
+  *)
+    false
+    ;;
+  esac
+  [ -n "${FILTERED_CHANGES}" ] && return
+  false
+}
+
+prereq_verification() {
+  check_prereq_installed docker --version
+  check_prereq_installed make --version
+
+  if [ $PREREQS_INSTALLED == 1 ]; then
+    echo "Complete installations to push changes up"
+
+    exit 1
+  fi
+}
+
+check_prereq_installed() {
+  if type "$1" >/dev/null 2>&1; then
+    return
+  else
+    echo "Please install $1"
+    PREREQS_INSTALLED=1
+  fi
+}
+
+prereq_verification
+
+PARALLEL_MAKE_TASKS="checkov-secrets-only"
+while read localname localhash remotename remotehash; do
+  if git cat-file -e $remotehash^{commit}; then
+    CHANGES=$(git diff --name-only $localhash $remotehash)
+    if has_been_changed cs $TYPE_EXTENSION; then
+      PARALLEL_MAKE_TASKS+=" component-test unit-test"
+    fi
+  fi
+done
+
+#make -j -o=target $PARALLEL_MAKE_TASKS

@@ -1,0 +1,33 @@
+services:
+  payment-execution-db:
+    image: docker-hub.artifactory.xero-support.com/postgres:16.6
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      timeout: 3s
+      retries: 3
+    volumes:
+      - ./bootstrap.sql:/docker-entrypoint-initdb.d/init-user.sql
+  
+  run-migration:
+    image: flyway/flyway:10
+    depends_on:
+      payment-execution-db:
+        condition: service_healthy
+    environment:
+      FLYWAY_URL: jdbc:postgresql://payment-execution-db:5432/payment_execution_db
+      FLYWAY_USER: payment_execution_schema_manager
+      FLYWAY_PASSWORD: local_p@ssword
+      FLYWAY_DEFAULT_SCHEMA: payment_execution
+      FLYWAY_LOCATIONS: filesystem:/flyway/callback_scripts, filesystem:/flyway/migration_scripts
+      FLYWAY_CLEAN_DISABLED: false
+    command: clean migrate -connectRetries=60 -validateMigrationNaming=true
+    volumes:
+      - ./migration_scripts:/flyway/migration_scripts
+      - ./callback_scripts:/flyway/callback_scripts

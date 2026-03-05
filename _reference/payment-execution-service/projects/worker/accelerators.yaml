@@ -1,0 +1,27 @@
+###############################################################
+## This file contains configuration used by Accelerators.
+## ------------------------------------------------------------
+## Learn more about Accelerators:
+## https://accelerators.xero.dev/
+##
+###############################################################
+
+project:
+  name: Payment Execution Worker
+  id: BdzazQewZtyQbUfCK7XYxc
+  description: Worker to process payment transaction updates
+  repositoryUrl: https://github.com/xero-internal/payment-execution-service
+  domainId: 49xwsKimDUdmnG3H6riNhB
+  domainName: Collecting Payments Execution
+  teamName: Cashtopia
+  type: worker
+accelerators:
+  - name: "@accelerators/worker-generator"
+    config:
+      slackDeploymentChannel: cashtopia-releases
+      awsAccountIdUat: "471112828694"
+      awsAccountIdProd: "211125634578"
+      infraKmsKeyUat: arn:aws:kms:us-west-2:333186395126:key/mrk-02d6309915624425bb2c221f1420e06d
+      infraKmsKeyProd: arn:aws:kms:us-east-1:333186395126:key/mrk-99c14f3773964c1a87a5f03e1c08f00b
+      sonarqubePrefix: CollectingPayments
+    templateVersion: 3.0.0

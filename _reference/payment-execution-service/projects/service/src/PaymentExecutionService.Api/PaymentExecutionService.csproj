@@ -1,0 +1,71 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <Import Project="$(MSBuildThisFileDirectory)\Accelerators.Api.Core\Xero.Accelerators.Api.Core.props" />
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <SonarQubeTestProject>false</SonarQubeTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="14.0.0" />
+    <PackageReference Include="AutoMapper.Extensions.EnumMapping" Version="4.1.0" />
+    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.301" />
+    <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.401.47" />
+    <PackageReference Include="AWSSDK.SQS" Version="3.7.400.92" />
+    <PackageReference Include="Asp.Versioning.Mvc" Version="8.1.0" />
+    <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
+    <PackageReference Include="MediatR" Version="12.4.1" />
+    <PackageReference Include="Microsoft.AspNetCore.HeaderPropagation" Version="8.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="9.5.0" />
+    <PackageReference Include="Polly" Version="8.5.2" />
+    <PackageReference Include="Serilog.Expressions" Version="4.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <PackageReference Include="Xero.Identity.Authentication.HealthChecks" Version="1.1.0" />
+    <PackageReference Include="Xero.Identity.Integration.Api" Version="0.1.49" />
+    <PackageReference Include="Xero.Identity.Integration.Client" Version="0.3.17" />
+    <PackageReference Include="Xero.Authorisation.Integration.NetCore.Sdk" Version="2.8.6" />
+    <PackageReference Include="Xero.Authorisation.Integration.Policy" Version="2.2.2">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Serilog" Version="3.1.1" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Serilog.Formatting.Compact" Version="2.0.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
+    <PackageReference Include="Serilog.Sinks.Seq" Version="7.0.0" />
+    <PackageReference Include="NewRelic.Agent.Api" Version="10.23.1" />
+  </ItemGroup>
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
+  <!--
+    Configure OpenAPI specification generation (Satisfies XREQ-110)
+    If you update `OpenApiSpecFileName` or `OpenApiSpecFilePath`, ensure you also update the following locations:
+    - 'info/x-cortex-link/url' for item 'OpenAPI specification' in '.cortex/cortex.yaml'
+    - '.gitattributes' file
+  -->
+  <PropertyGroup>
+    <OpenApiSpecFileName>payment-execution-service-api.yaml</OpenApiSpecFileName>
+    <OpenApiSpecFilePath>$(ProjectDir)../../$(OpenApiSpecFileName)</OpenApiSpecFilePath>
+  </PropertyGroup>
+  <ItemGroup>
+    <OpenApiSpecGenEnvironmentVariables Include="DOTNET_ENVIRONMENT=Production" />
+    <OpenApiSpecGenEnvironmentVariables Include="Override_Serilog__MinimumLevel=Warning" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\shared\PaymentExecution.Domain\PaymentExecution.Domain.csproj" />
+    <ProjectReference Include="..\..\..\shared\PaymentExecution.FeatureFlagClient\PaymentExecution.FeatureFlagClient.csproj" />
+    <ProjectReference Include="..\..\..\shared\PaymentExecution.Repository\PaymentExecution.Repository.csproj" />
+    <ProjectReference Include="..\..\..\shared\PaymentExecution.SqsIntegrationClient\PaymentExecution.SqsIntegrationClient.csproj" />
+    <ProjectReference Include="..\..\..\shared\PaymentExecution.StripeExecutionClient\PaymentExecution.StripeExecutionClient.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <SonarQubeSetting Include="sonar.coverage.exclusions">
+      <Value>**/Program.cs</Value>
+    </SonarQubeSetting>
+  </ItemGroup>
+  <Import Project="$(MSBuildThisFileDirectory)\Accelerators.Api.Core\Xero.Accelerators.Api.Core.targets" />
+</Project>

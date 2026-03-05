@@ -1,0 +1,17 @@
+{
+  "id": "pi_mockedpi123",
+  "amount": 5000,
+  "currency": "usd",
+  "status": "requires_action",
+  "paymentMethod": {
+    "type": "klarna",
+    "usBankAccount": null
+  },
+  "nextAction": {
+    "type": "redirect_to_url",
+    "redirectToUrl": {
+      "url": "https://hooks.stripe.com/3d_secure_redirect/mock_redirect"
+    }
+  },
+  "lastPaymentError": null
+}

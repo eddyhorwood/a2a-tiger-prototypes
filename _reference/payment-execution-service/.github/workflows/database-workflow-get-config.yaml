@@ -1,0 +1,23 @@
+# This is a reusable workflow that is is never triggered unless called by another workflow
+
+name: Worker - Get config values
+
+on:
+  workflow_call:
+    outputs:
+      uuid:
+        value: "svZ2goYQnrGkthqfsaUeBb"
+      database-name:
+        value: "PaymentExecutionDB"
+
+permissions:
+  contents: read
+
+jobs:
+  get-variables:
+    name: Get config
+    runs-on: [self-hosted, linux, x64, linux-al2023]
+    steps:
+      - name: "Set outputs"
+        run: |
+          echo "Setting outputs"

@@ -1,0 +1,15 @@
+[
+  {
+    "clientType": "ClientCredentials",
+    "clientId": "xero_collecting-payments-execution_cancel-execution-lambda",
+    "clientSecret": "secret",
+    "scopes": [
+      "xero_collecting-payments_collecting-payments-execution-stripe-payments-service.cancel",
+      "xero_collecting-payments_collecting-payments-execution-stripe-payments-service.readstripepaymentintent"
+    ],
+    "allowDelegation": false,
+    "allowedCorsOrigins": [
+      "http://localhost:5000/"
+    ]
+  }
+]

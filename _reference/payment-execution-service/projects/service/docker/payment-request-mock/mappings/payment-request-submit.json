@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPathPattern": "/v1/payment-requests/.*/submit",
+    "headers": {
+      "Xero-Correlation-Id": {
+        "matches": "[0-9A-Fa-f]{8}-([0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}"
+      },
+      "Xero-Tenant-Id": {
+        "doesNotMatch" : "11111111-2222-3333-4444-55555555555[56]"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "payment-request-submit-response.json"
+  }
+}

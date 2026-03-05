@@ -1,0 +1,323 @@
+name: Cancel Lambda - CI/CD
+run-name: Cancel Lambda - CI/CD by @${{ github.actor }}
+
+# Satisfies XREQ-27, XREQ-298, XREQ-40, XREQ-43
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - "projects/lambdas/cancel/src/**"
+      - "projects/lambdas/cancel/infra/terraform/**"
+      - "projects/shared/**"
+      - ".github/workflows/cancel-lambda-**"
+  workflow_dispatch:
+  push:
+    paths:
+      - "projects/lambdas/cancel/src/**"
+      - "projects/lambdas/cancel/infra/terraform/**"
+      - "projects/shared/**"
+      - ".github/workflows/cancel-lambda-**"
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  ###
+  ### ONLY PULL REQUESTS
+  ###
+
+  check-jira-references:
+    name: Check Jira References
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: [self-hosted, linux, x64]
+    steps:
+      - name: check jira references
+        uses: xero-internal/github-actions/check-jira-references@v1
+        with:
+          check_pr_title: true
+          check_commits: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+  ###
+  ### BOTH MAIN & PULL REQUESTS
+  ###
+  get-config:
+    name: Get config values
+    uses: ./.github/workflows/cancel-lambda-workflow-get-config.yaml
+
+  static-analysis:
+    name: Static analysis
+    runs-on: [self-hosted, linux, x64, linux-al2023]
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Megalinter
+        uses: xero-internal/github-actions/megalinter@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_WORKSPACE: ./projects/lambdas/cancel
+          MEGALINTER_CONFIG: ./projects/lambdas/cancel/.mega-linter.yml
+
+  run-tests-and-sonarscan:
+    name: Test and SonarScan
+    runs-on: [self-hosted, linux, x64]
+    needs: [get-config]
+    permissions:
+      contents: read
+      actions: read
+      checks: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Start local dependencies
+        shell: bash
+        working-directory: ./projects/lambdas/cancel
+        run: make start-local-dependencies
+      - name: Dotnet test and sonarscan
+        uses: xero-internal/github-actions/dotnet-build-test@v1
+        with:
+          dotnet-version: 8.0.x
+          dotnet-solution-file: ./${{ needs.get-config.outputs.lambda-parent-solution-file }}
+          dotnet-test-additional-command: --settings ./.runsettings --filter 'FullyQualifiedName!~Worker.UnitTest&FullyQualifiedName!~Worker.ComponentTests&FullyQualifiedName!~Worker.ConsumerPactTests&FullyQualifiedName!~Service.ProviderPactTests&FullyQualifiedName!~Service.UnitTests&FullyQualifiedName!~Service.ComponentTests&FullyQualifiedName!~Service.ConsumerPactTests&FullyQualifiedName!~Service.ProviderPactTests'
+          app-version: ${{ github.sha }}
+          checkout-enabled: false
+          sonarqube-enabled: true
+          use-sonarcloud: true
+          sonarqube-gate-check-enabled: true
+          sonarqube-token: ${{ secrets.SONARCLOUD_TOKEN }}
+          sonarqube-project-key: ${{ needs.get-config.outputs.sonarqube-project-key }}
+          sonarqube-project-name: "[${{ needs.get-config.outputs.sonarqube-project-key-prefix }}]${{ needs.get-config.outputs.lambda-name-pascal-case }}"
+          sonarqube-organization: xero-internal
+          sonarqube-exclusions: "**/worker/**,**/shared/**,**/service/**"
+      - name: Stop local dependencies
+        if: ${{ always() }}
+        shell: bash
+        working-directory: ./projects/lambdas/cancel
+        run: make stop-local-dependencies
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ needs.get-config.outputs.pact-artifact-name }}
+          path: ./projects/lambdas/cancel/tests/PaymentExecutionLambda.CancelLambda.ConsumerPactTests/pacts
+
+  consumer-publish-pact-files:
+    name: Publish consumer pact files
+    runs-on: [self-hosted, linux, x64, linux-al2023]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+    needs: [get-config, run-tests-and-sonarscan]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.get-config.outputs.pact-artifact-name }}
+          path: ./pacts
+      - uses: pactflow/actions/publish-pact-files@v2
+        with:
+          pactfiles: ./pacts
+          broker_url: ${{ secrets.PACT_BROKER_BASE_URL }}
+          token: ${{ secrets.PACT_BROKER_TOKEN }}
+
+  ###
+  ### ONLY MAIN
+  ###
+  terraform-validate:
+    name: Terraform validate
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+    runs-on: [self-hosted, linux, x64, runners-us-west-2, linux-al2023]
+    environment: uat
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: xero-internal/github-actions/terraform-validate@v1
+        with:
+          aws_region: us-west-2
+          oidc_role: ${{ vars.OIDC_ROLE_ARN  }}
+          target_role: ${{ vars.DEPLOYMENT_ROLE_ARN}}
+          working_dir: ./projects/lambdas/cancel/infra/terraform
+          terraform_backend: environment/uat.backend
+          terraform_var_files: environment/uat.tfvars
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+  can-i-deploy-test:
+    name: Can I Deploy to Test
+    runs-on: [self-hosted, linux, x64, linux-al2023]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+    needs: [get-config, consumer-publish-pact-files]
+    steps:
+      - uses: pactflow/actions/can-i-deploy@v2
+        with:
+          application_name: ${{ needs.get-config.outputs.lambda-name-pascal-case }}
+          broker_url: ${{ secrets.PACT_BROKER_BASE_URL }}
+          token: ${{ secrets.PACT_BROKER_TOKEN }}
+          version: ${{ github.sha }}
+          retry_while_unknown: 10
+          retry_interval: 10
+          to_environment: "test"
+
+  terraform-apply-test:
+    name: Terraform apply Test
+    runs-on: [self-hosted, linux, x64, runners-ap-southeast-2]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+    needs:
+      [
+        get-config,
+        terraform-validate,
+        run-tests-and-sonarscan,
+        can-i-deploy-test,
+      ]
+    environment: test
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Deploy Terraform
+        uses: xero-internal/github-actions/terraform-apply@v1.0
+        with:
+          environment: test
+          component_uuid: ${{ needs.get-config.outputs.uuid }}
+          aws_region: ap-southeast-2
+          oidc_role: ${{ vars.OIDC_ROLE_ARN }}
+          target_role: ${{ vars.DEPLOYMENT_ROLE_ARN }}
+          working_dir: ./projects/lambdas/cancel/infra/terraform
+          terraform_backend: environment/test.backend
+          terraform_var_files: environment/test.tfvars
+          deploytrack_api_token: ${{ secrets.DEPLOY_TRACK_API_TOKEN }}
+
+  pact-record-deployment-test:
+    name: Record deployment in Pactflow for Test
+    needs: [get-config, terraform-apply-test]
+    runs-on: [self-hosted, linux, x64, linux-al2023]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+    steps:
+      - uses: pactflow/actions/record-deployment@v2
+        with:
+          version: ${{ github.sha }}
+          environment: "test"
+          application_name: ${{ needs.get-config.outputs.lambda-name-pascal-case }}
+          broker_url: ${{ secrets.PACT_BROKER_BASE_URL }}
+          token: ${{ secrets.PACT_BROKER_TOKEN }}
+
+  can-i-deploy-uat:
+    name: Can I Deploy to Uat
+    runs-on: [self-hosted, linux, x64, linux-al2023]
+    needs: [get-config, pact-record-deployment-test]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+    steps:
+      - uses: pactflow/actions/can-i-deploy@v2
+        with:
+          application_name: ${{ needs.get-config.outputs.lambda-name-pascal-case }}
+          broker_url: ${{ secrets.PACT_BROKER_BASE_URL }}
+          token: ${{ secrets.PACT_BROKER_TOKEN }}
+          version: ${{ github.sha }}
+          to_environment: "uat"
+
+  terraform-apply-uat:
+    name: Terraform apply UAT
+    runs-on: [self-hosted, linux, x64, runners-us-west-2]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+    needs: [get-config, terraform-apply-test, can-i-deploy-uat]
+    environment: uat
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Deploy Terraform
+        uses: xero-internal/github-actions/terraform-apply@v1.0
+        with:
+          environment: uat
+          component_uuid: ${{ needs.get-config.outputs.uuid }}
+          aws_region: us-west-2
+          oidc_role: ${{ vars.OIDC_ROLE_ARN }}
+          target_role: ${{ vars.DEPLOYMENT_ROLE_ARN }}
+          working_dir: ./projects/lambdas/cancel/infra/terraform
+          terraform_backend: environment/uat.backend
+          terraform_var_files: environment/uat.tfvars
+          deploytrack_api_token: ${{ secrets.DEPLOY_TRACK_API_TOKEN }}
+
+  pact-record-deployment-uat:
+    name: Record deployment in Pactflow for Uat
+    needs: [get-config, terraform-apply-uat]
+    runs-on: [self-hosted, linux, x64, linux-al2023]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+    steps:
+      - uses: pactflow/actions/record-deployment@v2
+        with:
+          version: ${{ github.sha }}
+          environment: "uat"
+          application_name: ${{ needs.get-config.outputs.lambda-name-pascal-case }}
+          broker_url: ${{ secrets.PACT_BROKER_BASE_URL }}
+          token: ${{ secrets.PACT_BROKER_TOKEN }}
+
+  can-i-deploy-production:
+    name: Can I Deploy to Production
+    runs-on: [self-hosted, linux, x64, linux-al2023]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+    needs: [get-config, pact-record-deployment-uat]
+    steps:
+      - uses: pactflow/actions/can-i-deploy@v2
+        with:
+          application_name: ${{ needs.get-config.outputs.lambda-name-pascal-case }}
+          broker_url: ${{ secrets.PACT_BROKER_BASE_URL }}
+          token: ${{ secrets.PACT_BROKER_TOKEN }}
+          version: ${{ github.sha }}
+          to_environment: "production"
+
+  terraform-apply-production:
+    name: Terraform apply Production
+    runs-on: [self-hosted, linux, x64, runners-us-east-1]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+    needs: [get-config, terraform-apply-uat, can-i-deploy-production]
+    environment: production
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Deploy Terraform
+        uses: xero-internal/github-actions/terraform-apply@v1.0
+        with:
+          environment: production
+          component_uuid: ${{ needs.get-config.outputs.uuid }}
+          aws_region: us-east-1
+          oidc_role: ${{ vars.OIDC_ROLE_ARN }}
+          target_role: ${{ vars.DEPLOYMENT_ROLE_ARN }}
+          working_dir: ./projects/lambdas/cancel/infra/terraform
+          terraform_backend: environment/production.backend
+          terraform_var_files: environment/production.tfvars
+          deploytrack_api_token: ${{ secrets.DEPLOY_TRACK_API_TOKEN }}
+
+  pact-record-deployment-production:
+    name: Record deployment in Pactflow for Production
+    needs: [get-config, terraform-apply-production]
+    runs-on: [self-hosted, linux, x64, linux-al2023]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+    steps:
+      - uses: pactflow/actions/record-deployment@v2
+        with:
+          version: ${{ github.sha }}
+          environment: "production"
+          application_name: ${{ needs.get-config.outputs.lambda-name-pascal-case }}
+          broker_url: ${{ secrets.PACT_BROKER_BASE_URL }}
+          token: ${{ secrets.PACT_BROKER_TOKEN }}

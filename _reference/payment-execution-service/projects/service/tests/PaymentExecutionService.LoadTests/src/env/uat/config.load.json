@@ -1,0 +1,28 @@
+{
+  "scenarios": {
+    "performSubmit": {
+      "executor": "ramping-arrival-rate",
+      "startRate": 50,
+      "preAllocatedVUs": 50,
+      "timeUnit": "1m",
+      "exec": "performSubmit",
+      "stages": [
+        { "duration": "5m", "target": 50 },
+        { "duration": "15m", "target": 100 },
+        { "duration": "10m", "target": 200 },
+        { "duration": "1m", "target": 50 }
+      ]
+    }
+  },
+  "thresholds": {
+    "http_req_failed": [
+      "rate<0.01"
+    ],
+    "checks": [
+      "rate>0.95"
+    ],
+    "submit_payment_request_duration": [
+      "p(95)<1500"
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+name: "Validate Open API specification"
+description: "Validates that Open API Spec matches the source code"
+
+runs:
+  using: composite
+  steps:
+    - name: Validate OpenAPI specification
+      shell: bash
+      working-directory: projects/service
+      run: |
+        output=$(make generate-api-spec)
+        open_api_spec_filename=$(echo "$output" | grep "Generated OpenAPI Specification:" | sed 's/.*Generated OpenAPI Specification: //')
+        open_api_spec_filepath=$(find . -type f -name $open_api_spec_filename)
+
+        [[ -z $open_api_spec_filepath ]] && echo "Cannot find the Open API specification file: $open_api_spec_filename" && exit 1
+
+        echo "The Open API specification file is at: $open_api_spec_filepath"
+        git diff --exit-code $open_api_spec_filepath
+        git rev-parse HEAD:$open_api_spec_filepath

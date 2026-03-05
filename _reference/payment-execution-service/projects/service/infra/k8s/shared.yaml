@@ -1,0 +1,48 @@
+---
+# These values files populate the PaaS generic-service helm chart. Read more about all possible fields:
+# https://github.com/xero-internal/helm.charts/tree/master/incubator/generic-service
+# Akamai sits alongside the Nginx Ingress, Satisfies XREQ-117
+
+name: payment-execution-service
+kotahi:
+  catalogueUUID: 334db7HzPYMT119B9go9X9
+extraEnvMap:
+  Override_SqsConfigurations__ExecutionQueue__QueueUrl: "{aws-ssm}/collecting-payments-execution/collecting-payments-execution/execution-queue-url"
+  Override_SqsConfigurations__CancelExecutionQueue__QueueUrl: "{aws-ssm}/collecting-payments-execution/collecting-payments-execution/cancel-execution-queue-url"
+podAnnotations:
+  sumologic.com/include: "true"
+maxUnavailable: 1
+image:
+  tag:
+  # If you modify this value, ensure you also update 'artifactory-repository' and 'service-name-kebab-case' in '.github/workflows/workflow-get-config.yaml'.
+  repository: >-
+    collecting-payments-execution-docker-common.artifactory.xero-support.com/payment-execution-service
+containerPort: 5000
+resources:
+  requests:
+    cpu: 400m
+    memory: 512Mi
+  limits:
+    cpu: 800m
+    memory: 1024Mi
+ingress:
+  # Nginx ingress config here has been disabled in favour of Xero Gateway.
+  enabled: false
+liveness:
+  path: /ping
+  initialDelaySeconds: 7
+  timeoutSeconds: 3
+  periodSeconds: 10
+readiness:
+  path: /ready
+  initialDelaySeconds: 7
+  timeoutSeconds: 3
+  periodSeconds: 10
+  # If you modify this value, ensure you also update 'SecretKeys' and 'SecretHeaderName' in 'src/PaymentExecutionService.Api/appsettings.json'.
+  httpHeaders:
+    - name: X-Secret
+      value: TERCES
+lifecycle:
+  preStop:
+    exec:
+      command: ["/bin/sh", "-c", "sleep 10"]

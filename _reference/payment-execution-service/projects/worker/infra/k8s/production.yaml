@@ -1,0 +1,47 @@
+---
+iamRole: "arn:aws:iam::211125634578:role/service-execution-production-payment-execution-worker"
+# Read more about configuring autoscaling to suit your service:
+# https://paas.xero.dev/docs/kubernetes/deployment#autoscaling-horizontal-pod-autoscaler
+replicaCount: 3
+autoscaling:
+  keda:
+    enabled: true
+    scaledObject:
+      minReplicaCount: 3
+      maxReplicaCount: 8
+      pollingInterval: 1
+      cooldownPeriod: 30
+      triggers:
+        cpu:
+          enabled: true
+          metricType: Utilization
+          metadata:
+            value: "40"
+        memory:
+          enabled: true
+          metricType: Utilization
+          metadata:
+            value: "50"
+        awsSqs:
+          enabled: true
+          metadata:
+            queueURL: "https://sqs.us-east-1.amazonaws.com/211125634578/collectingpayments-execution-payment-execution-queue-production"
+            queueLength: "360"
+            awsRegion: "us-east-1"
+extraEnvMap:
+  DOTNET_ENVIRONMENT: Production
+  # This follows SRE Naming Convention for New Relic APM
+  # https://xero.atlassian.net/wiki/spaces/SRE/pages/10021183975/New+Relic+APM#Naming-Convention
+  NEW_RELIC_APP_NAME: prod payment-execution-worker
+  NEW_RELIC_LABELS: >-
+    uuid:BdzazQewZtyQbUfCK7XYxc;
+    env:prod;
+  # Satisfies XREQ-247
+  NEW_RELIC_LICENSE_KEY: "{aws-sm}arn:aws:secretsmanager:us-east-1:372425709208:secret:newrelic.xero_fsrv.licensekey"
+  Override_Identity__Client__ClientSecret: "{aws-sm}collecting-payments-execution/payment-execution-worker/identity-client-secret"
+podAnnotations:
+  # The Sumo Logic source category that logs will be pushed into.
+  # Follow the instructions here to get the values of <product> and <component>:
+  # https://xero.atlassian.net/wiki/spaces/SRE/pages/9963963359/Source+Category+Structure+Requirements#Values
+  # Satisfies XREQ-289, XREQ-292
+  sumologic.com/sourceCategory: collecting_payments_execution/payment_execution_worker/prod/app/serilog/json

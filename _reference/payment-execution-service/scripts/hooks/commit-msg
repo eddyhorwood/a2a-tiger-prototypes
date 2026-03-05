@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+IS_MERGE_OR_REVERT_REGEX="^(Merge|Revert).+"
+if (grep -Eq "${IS_MERGE_OR_REVERT_REGEX}" "$1"); then
+  exit 0
+fi
+
+# Satisfies XREQ-88, XREQ-89, XREQ-59
+HAS_JIRA_STORY_PREFIX_REGEX="\[?[A-Z]+-[0-9]+\]? .+"
+if ! (grep -Eq "${HAS_JIRA_STORY_PREFIX_REGEX}" "$1"); then
+  echo >&2 "[ERR] NO JIRA TAG IN COMMIT MESSAGE"
+  exit 1
+fi

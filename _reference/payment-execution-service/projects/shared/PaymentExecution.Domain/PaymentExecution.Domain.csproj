@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="AutoMapper" Version="14.0.0" />
+      <PackageReference Include="FluentResults" Version="3.16.0" />
+      <PackageReference Include="MediatR" Version="12.4.1" />
+      <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.5" />
+      <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\PaymentExecution.FeatureFlagClient\PaymentExecution.FeatureFlagClient.csproj" />
+      <ProjectReference Include="..\PaymentExecution.SqsIntegrationClient\PaymentExecution.SqsIntegrationClient.csproj" />
+      <ProjectReference Include="..\PaymentExecution.PaymentRequestClient\PaymentExecution.PaymentRequestClient.csproj" />
+      <ProjectReference Include="..\PaymentExecution.Repository\PaymentExecution.Repository.csproj" />
+      <ProjectReference Include="..\PaymentExecution.StripeExecutionClient\PaymentExecution.StripeExecutionClient.csproj" />
+    </ItemGroup>
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>PaymentExecution.Domain.UnitTests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+</Project>

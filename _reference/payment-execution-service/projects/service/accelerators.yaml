@@ -1,0 +1,30 @@
+###############################################################
+## This file contains configuration used by Accelerators.
+## ------------------------------------------------------------
+## Learn more about Accelerators:
+## https://xero-internal.github.io/Accelerators.Documentation/
+##
+###############################################################
+
+project:
+  name: Payment Execution Service
+  id: 334db7HzPYMT119B9go9X9
+  description: The Execution Service is a central data store designed to manage
+    and track execution transactions across multiple payment providers
+  repositoryUrl: https://github.com/xero-internal/payment-execution-service
+  domainId: 49xwsKimDUdmnG3H6riNhB
+  domainName: Collecting Payments Execution
+  teamName: Cashtopia
+  type: service
+accelerators:
+  - name: "@xop/xop-generator-api-service"
+    config:
+      slackDeploymentChannel: cashtopia-releases
+      awsAccountIdUat: "471112828694"
+      awsAccountIdProd: "211125634578"
+      infraKmsKeyUat: arn:aws:kms:us-west-2:333186395126:key/mrk-49934c31ff914ae2b43295def2aef70c
+      infraKmsKeyProd: arn:aws:kms:us-east-1:333186395126:key/mrk-f415b15ce76c49c482d2760c2af20de5
+      portfolio: Collecting Payments Execution
+      sonarqubePrefix: CollectingPayments
+      retrieveXeroUserIdFrom: Header
+    templateVersion: 1.0.19

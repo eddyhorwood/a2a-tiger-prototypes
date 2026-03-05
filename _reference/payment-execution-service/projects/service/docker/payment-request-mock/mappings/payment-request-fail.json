@@ -1,0 +1,14 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPathPattern": "/v1/payment-requests/.*/fail",
+    "headers": {
+      "Xero-Correlation-Id": {
+        "matches": "[0-9A-Fa-f]{8}-([0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}"
+      }
+    }
+  },
+  "response": {
+    "status": 204
+  }
+}

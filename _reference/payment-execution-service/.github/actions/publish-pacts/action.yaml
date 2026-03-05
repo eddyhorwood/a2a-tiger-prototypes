@@ -1,0 +1,14 @@
+name: "Publish pacts for component"
+description: "Publishes the pacts for the component to be deployed"
+
+runs:
+  using: composite
+  steps:
+    - name: Publish pacts
+      shell: bash
+      working-directory: projects/service
+      run: |
+        pacts_filepaths=$(find ./tests/PaymentExecutionService.PactTests/pacts -type f -name $pacts_filename)
+
+        [[ -z $pacts_filepaths ]] && echo "Cannot find the pacts file: $pacts_filename" && exit 1
+

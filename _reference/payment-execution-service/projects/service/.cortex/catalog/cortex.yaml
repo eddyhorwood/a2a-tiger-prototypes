@@ -1,0 +1,39 @@
+openapi: 3.1.0
+info:
+  x-cortex-link:
+    - url: ./payment-execution-service-api.yaml
+      name: OpenAPI specification
+      type: OPENAPI
+  title: Payment Execution Service
+  description: The Execution Service is a central data store designed to manage and track execution transactions across multiple payment providers
+  x-cortex-tag: 334db7HzPYMT119B9go9X9
+  x-cortex-git:
+    github:
+      alias: ghec-xero-internal
+      repository: xero-internal/payment-execution-service
+      basepath: projects/service
+  x-cortex-type: service
+  x-cortex-slack:
+    channels:
+    - name: pod-cashtopia
+  x-cortex-owners:
+    - name: KWoKzMn5LkuWsnyjjGo0yw
+      type: GROUP
+      provider: CORTEX
+  x-cortex-parents:
+    - tag: 49xwsKimDUdmnG3H6riNhB
+  x-cortex-groups:
+  - phase:sustained-release
+  - data-sensitivity-level:sensitive
+  - personal-data-indicator:personal
+  - type:api-service
+  x-cortex-static-analysis:
+    sonarqube:
+      project: xero-internal_payment-execution-service
+      alias: sqc-xero-internal-prod
+  x-cortex-issues:
+    jira:
+      projects:
+        - name: INPAY
+
+

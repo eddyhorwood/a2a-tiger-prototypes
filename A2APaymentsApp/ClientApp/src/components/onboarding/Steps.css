@@ -1,0 +1,210 @@
+/* Xero Design Language - Step Components */
+/* Per Card/Tile Pattern (§4.1) */
+
+.step-container {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-subtle);
+}
+
+.step-content {
+  margin-bottom: var(--space-6);
+}
+
+.step-actions {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: flex-end;
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--border-subtle);
+  margin-top: var(--space-6);
+}
+
+/* Account Selection Pattern */
+.account-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.account-item {
+  display: flex;
+  align-items: center;
+  padding: var(--space-4);
+  border: 2px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color 120ms ease-out,
+              background-color 120ms ease-out,
+              transform 80ms ease-out;
+  background-color: var(--bg-card);
+}
+
+.account-item:hover {
+  border-color: var(--border-focus-blue);
+  background-color: var(--xero-grey-50);
+}
+
+.account-item:active {
+  transform: translateY(1px);
+}
+
+.account-item--selected {
+  border-color: var(--border-focus-blue);
+  background-color: rgba(19, 181, 234, 0.05);
+}
+
+.account-radio {
+  margin-right: var(--space-4);
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--xero-color-blue);
+}
+
+.account-details {
+  flex: 1;
+}
+
+.account-name {
+  margin-bottom: var(--space-1);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--text-heading);
+}
+
+.account-number {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--text-muted);
+}
+
+.account-checkmark {
+  font-size: 24px;
+  color: var(--xero-color-blue);
+  font-weight: bold;
+  margin-left: var(--space-4);
+}
+
+/* Legal Content Pattern */
+.legal-content {
+  background-color: var(--xero-grey-50);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-body);
+}
+
+.acknowledgement-checkbox {
+  margin-top: var(--space-5);
+  padding: var(--space-5);
+  background-color: var(--bg-card);
+  border: 2px solid var(--border-focus-blue);
+  border-radius: var(--radius-md);
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  cursor: pointer;
+}
+
+.checkbox-input {
+  margin-top: var(--space-1);
+  margin-right: var(--space-4);
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  flex-shrink: 0;
+  accent-color: var(--xero-color-blue);
+}
+
+.checkbox-text {
+  flex: 1;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-body);
+}
+
+/* Confirmation Step Pattern (§10.5) */
+.confirmation-step {
+  text-align: center;
+}
+
+.success-icon {
+  display: flex;
+  justify-content: center;
+}
+
+.confirmation-summary {
+  background-color: var(--xero-grey-50);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  text-align: left;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.summary-list {
+  margin: 0;
+}
+
+.summary-label {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  margin-bottom: var(--space-2);
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+.summary-value {
+  margin: 0 0 var(--space-1) 0;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-heading);
+}
+
+.summary-subvalue {
+  margin: 0 0 var(--space-4) 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--text-muted);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .step-container {
+    padding: var(--space-6);
+  }
+
+  .account-item {
+    padding: var(--space-3);
+  }
+
+  .legal-content {
+    padding: var(--space-5);
+  }
+
+  .acknowledgement-checkbox {
+    padding: var(--space-4);
+  }
+
+  .confirmation-summary {
+    padding: var(--space-5);
+  }
+}

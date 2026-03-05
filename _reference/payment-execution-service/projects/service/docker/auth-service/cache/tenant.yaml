@@ -1,0 +1,13 @@
+---
+tenants:
+  "11111111-2222-3333-4444-555555555555":
+    tenantType: organisation
+    features:
+      - organisation:universal
+    users:
+      "c371f142-2b8d-4501-9873-dbf20c0c5f4b":
+        roles:
+          - "employee"
+      "0c89fed3-4690-44c5-ac1c-7e9e7322dfae":
+        roles:
+          - "admin"

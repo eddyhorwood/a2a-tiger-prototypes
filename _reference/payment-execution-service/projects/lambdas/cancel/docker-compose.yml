@@ -1,0 +1,45 @@
+---
+include:
+  - ../../database/docker-compose.yml
+
+services:
+  dotnet:
+    # Dockerfile location: https://github.com/xero-internal/Accelerators.Docker/tree/main/Dockerfiles/dotnet8/debianNet8
+    image: xop-accelerator-framework-docker-common.artifactory.xero-support.com/accelerators-docker/dotnet8/debian-dotnet-8:newest
+    volumes:
+      - ../../shared:/code/shared
+      - ./:/code/cancel
+      - /code/.git
+      - /code/infra
+    working_dir: /code/cancel
+    environment:
+      Override_DataAccess__PaymentExecutionDB__ConnectionString: "Server=host.docker.internal;Database=payment_execution_db;User Id=payment_execution_user;Password=temp_p@ssw0rd;"
+
+  identity-mock:
+    # Dockerfile location: https://github.com/xero-internal/identity.docker.identity-mock
+    image: token-compliance-docker-common.artifactory.xero-support.com/identity-mock:4.2.0@sha256:9cc8ab5a690ab4f53fe34684a57563e27e42f3edd6bfa300e44e76cebf032b98
+    environment:
+      Identity__ConfigPath: /app/my_config
+      Identity__IssuerUri: http://localhost:5003
+    ports:
+      - 5003:80
+    volumes:
+      - ./docker/identity-mock/custom_config:/app/my_config
+
+  stripe-execution-mock:
+    image: wiremock/wiremock:3.12.1
+    ports:
+      - "12112:8080"
+    volumes:
+      - ./docker/stripe-execution-mock:/home/wiremock
+
+  megalinter:
+    image: docker-hub.artifactory.xero-support.com/oxsecurity/megalinter:v8
+    volumes:
+      - .:/tmp/lint
+    environment:
+      - GITHUB_TOKEN
+
+networks:
+  default:
+    name: ${DOCKER_NETWORK_NAME:-payment-execution-cancel-lambda-default}

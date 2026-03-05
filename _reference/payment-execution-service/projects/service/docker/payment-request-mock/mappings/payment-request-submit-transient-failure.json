@@ -1,0 +1,40 @@
+{
+  "mappings": [
+    {
+      "scenarioName": "TransientFailureScenario",
+      "requiredScenarioState": "Started",
+      "newScenarioState": "SecondAttempt",
+
+      "request": {
+        "method": "POST",
+        "urlPathPattern": "/v1/payment-requests/.*/submit",
+        "headers": {
+          "Xero-Tenant-Id": {
+            "matches": "11111111-2222-3333-4444-555555555556"
+          }
+        }
+      },
+      "response": {
+        "status": 500,
+        "bodyFileName": "payment-request-submit-500-response.json"
+      }
+    },
+    {
+      "scenarioName": "TransientFailureScenario",
+      "requiredScenarioState": "SecondAttempt",
+      "request": {
+        "method": "POST",
+        "urlPathPattern": "/v1/payment-requests/.*/submit",
+        "headers": {
+          "Xero-Tenant-Id": {
+            "matches": "11111111-2222-3333-4444-555555555556"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "bodyFileName": "payment-request-submit-response.json"
+      }
+    }
+  ]
+}

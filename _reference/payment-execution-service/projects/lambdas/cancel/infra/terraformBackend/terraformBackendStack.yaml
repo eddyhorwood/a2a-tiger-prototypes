@@ -1,0 +1,78 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: Stack to create a Terraform backend.
+
+Parameters:
+  Env:
+    Type: String
+    Default: test
+  KMSKeyId:
+    Type: String
+  ServiceName:
+    Type: String
+
+Resources:
+  TerraformStateBucket:
+    # checkov:skip=CKV_AWS_18:Terraform State does not need to be access logged.
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketName: !Sub "${ServiceName}-tf-state-${Env}"
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: aws:kms
+              KMSMasterKeyID: !Ref KMSKeyId
+      VersioningConfiguration:
+        Status: Enabled
+
+  TerraformStateBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref TerraformStateBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "Allow Developer role access to Deployment role state"
+            Effect: Allow
+            Principal: "*"
+            Action:
+              - "s3:GetObject"
+              - "s3:PutObject"
+              - "s3:ListBucket"
+            Resource:
+              - !Sub "${TerraformStateBucket.Arn}"
+              - !Sub "${TerraformStateBucket.Arn}/infra/deploymentRole/*"
+            Condition:
+              StringLike:
+                "aws:userId": !Sub "arn:aws:sts::${AWS::AccountId}:assumed-role/AWSReservedSSO_Developer_*"
+          - Sid: "Deny unencrypted objects uploads"
+            Effect: Deny
+            Principal: "*"
+            Action: "s3:PutObject"
+            Resource:
+              - !Sub "${TerraformStateBucket.Arn}/*"
+            Condition:
+              StringNotEquals:
+                "s3:x-amz-server-side-encryption": "aws:kms"
+          - Sid: "Deny encrypted objects uploads with the wrong key"
+            Effect: Deny
+            Principal: "*"
+            Action: "s3:PutObject"
+            Resource:
+              - !Sub "${TerraformStateBucket.Arn}/*"
+            Condition:
+              StringNotEquals:
+                "s3:x-amz-server-side-encryption-aws-kms-key-id": !Ref KMSKeyId
+
+Outputs:
+  TerraformStateBucketName:
+    Description: Name of Terraform State Bucket
+    Value: !Ref TerraformStateBucket

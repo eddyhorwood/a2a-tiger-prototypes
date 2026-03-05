@@ -1,0 +1,38 @@
+---
+# These values files populate the PaaS generic-service helm chart. Read more about all possible fields:
+# https://github.com/xero-internal/helm.charts/tree/master/incubator/generic-service
+
+name: payment-execution-worker
+kotahi:
+  catalogueUUID: BdzazQewZtyQbUfCK7XYxc
+extraEnvMap:
+  Override_SqsConfigurations__ExecutionQueue__QueueUrl: "{aws-ssm}/collecting-payments-execution/collecting-payments-execution/execution-queue-url"
+  Override_SqsConfigurations__CancelExecutionQueue__QueueUrl: "{aws-ssm}/collecting-payments-execution/collecting-payments-execution/cancel-execution-queue-url"
+  Override_DataAccess__PaymentExecutionDB__ConnectionString: "{aws-sm}collecting-payments-execution/collecting-payments-execution-payment-execution-database/payment-execution-db/connection-string"
+  Override_LaunchDarkly__SdkKey: "{aws-sm}collecting-payments-execution/payment-execution-worker/launch-darkly-config/xero-global-sdk-key"
+podAnnotations:
+  sumologic.com/include: "true"
+maxUnavailable: 1
+image:
+  tag:
+  # If you modify this value, ensure you also update 'Artifactory.REPOSITORY' and 'K8s.DOCKER_IMAGE_NAME' in '.teamcity/config.kt'.
+  repository: >-
+    collecting-payments-execution-docker-common.artifactory.xero-support.com/payment-execution-worker
+containerPort: 5000
+resources:
+  requests:
+    cpu: 400m
+    memory: 512Mi
+  limits:
+    cpu: 800m
+    memory: 1024Mi
+# If you change this path, ensure you update the `_fileName` variable in `HealthCheckPublisher.cs`
+liveness:
+  exec:
+    command:
+      - /bin/sh
+      - -c
+      - '[ $(find /app/healthy.txt | wc -l) -eq 1 ] && [ "$(cat /app/healthy.txt)" = "dbready" ]'
+  initialDelaySeconds: 10
+  timeoutSeconds: 5
+  periodSeconds: 10

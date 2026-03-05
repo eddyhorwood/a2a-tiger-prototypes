@@ -1,0 +1,26 @@
+# .NET
+**/bin
+**/obj
+
+# Test reports
+tests/results
+
+# Linting reports
+megalinter-reports/
+
+# JetBrains IDEs
+.idea
+*.DotSettings.user
+
+# Visual Studio
+**/.vs/
+
+# Terraform
+infra/terraform/.terraform/*
+infra/deploymentRole/.terraform/*
+infra/deploymentRole/terraform.tfstate*
+infra/terraform/localstack/*tfstate*
+.terraform.lock.hcl
+
+# Miscellaneous
+.DS_Store

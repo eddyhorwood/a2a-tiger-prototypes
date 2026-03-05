@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPathPattern": "/v1/payments/submit",
+    "headers": {
+      "Provider-Account-Id": {
+        "doesNotMatch": "(invalid-account-id|transient-error-account-id)"
+      },
+      "Xero-Correlation-Id": {
+        "matches": "[0-9A-Fa-f]{8}-([0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "stripe-execution-submit-response.json"
+  }
+}

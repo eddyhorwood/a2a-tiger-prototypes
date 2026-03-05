@@ -1,0 +1,45 @@
+---
+iamRole: "arn:aws:iam::590184096169:role/service-execution-test-payment-execution-worker"
+replicaCount: 1
+autoscaling:
+  keda:
+    enabled: true
+    scaledObject:
+      minReplicaCount: 1
+      maxReplicaCount: 2
+      pollingInterval: 1
+      cooldownPeriod: 30
+      triggers:
+        cpu:
+          enabled: true
+          metricType: Utilization
+          metadata:
+            value: "75"
+        memory:
+          enabled: true
+          metricType: Utilization
+          metadata:
+            value: "75"
+        awsSqs:
+          enabled: true
+          metadata:
+            queueURL: "https://sqs.ap-southeast-2.amazonaws.com/590184096169/collectingpayments-execution-payment-execution-queue-test"
+            queueLength: "360"
+            awsRegion: "ap-southeast-2"
+extraEnvMap:
+  DOTNET_ENVIRONMENT: Test
+  # This follows SRE Naming Convention for New Relic APM
+  # https://xero.atlassian.net/wiki/spaces/SRE/pages/10021183975/New+Relic+APM#Naming-Convention
+  NEW_RELIC_APP_NAME: test payment-execution-worker
+  NEW_RELIC_LABELS: >-
+    uuid:BdzazQewZtyQbUfCK7XYxc;
+    env:test;
+  # Satisfies XREQ-247
+  NEW_RELIC_LICENSE_KEY: "{aws-sm}arn:aws:secretsmanager:ap-southeast-2:372425709208:secret:newrelic.xero_fsrv.licensekey"
+  Override_Identity__Client__ClientSecret: "{aws-sm}collecting-payments-execution/payment-execution-worker/identity-client-secret"
+podAnnotations:
+  # The Sumo Logic source category that logs will be pushed into.
+  # Follow the instructions here to get the values of <product> and <component>:
+  # https://xero.atlassian.net/wiki/spaces/SRE/pages/9963963359/Source+Category+Structure+Requirements#Values
+  # Satisfies XREQ-289, XREQ-292
+  sumologic.com/sourceCategory: collecting_payments_execution/payment_execution_worker/test/app/serilog/json

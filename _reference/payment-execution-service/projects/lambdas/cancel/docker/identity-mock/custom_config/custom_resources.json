@@ -1,0 +1,9 @@
+[
+  {
+    "resourceName": "xero_collecting-payments_collecting-payments-execution-stripe-payments-service",
+    "scopes": [
+      "xero_collecting-payments_collecting-payments-execution-stripe-payments-service.cancel",
+      "xero_collecting-payments_collecting-payments-execution-stripe-payments-service.readstripepaymentintent"
+    ]
+  }
+]

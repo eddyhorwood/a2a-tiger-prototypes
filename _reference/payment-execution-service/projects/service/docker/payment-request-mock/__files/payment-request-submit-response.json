@@ -1,0 +1,38 @@
+{
+  "PaymentRequestId": "93e66095-8704-417c-9b85-bab8afd183c9",
+  "OrganisationId": "3a966b31-14a8-4c02-a38f-1539a231da00",
+  "PaymentDateUtc": "2015-06-18T17:35:50Z",
+  "ContactId": "8d07c211-3e71-4e85-8476-647de3f3f05b",
+  "Status": "executioninprogress",
+  "BillingContactDetails": {
+    "Email": "some-email@emailplace.com"
+  },
+  "Amount": 100.50,
+  "Currency": "USD",
+  "PaymentDescription": "Invoice Payment",
+  "SelectedPaymentMethod": {
+    "PaymentGatewayId": "3d17d20a-80c3-432a-94d8-d5338b83a3b5",
+    "PaymentMethodName": "card",
+    "SurchargeAmount": 1.2
+  },
+  "LineItems": [{
+    "Reference": "line-item-ref",
+    "Description": "description for line item",
+    "UnitCost": 15.5,
+    "Quantity": 3,
+    "TaxAmount": 5.5,
+    "DiscountAmount": 2.5
+  }],
+  "SourceContext": {
+    "Identifier": "2c00350e-305e-4fab-b685-f7b545f968d9",
+    "Type": "statementpayments",
+    "RepeatingTemplateId": "c0185dd0-3c2f-4630-b79c-e47c30949c62"
+  },
+  "Executor": "paymentexecution",
+  "Receivables": [{
+    "Identifier": "f402aed0-0068-4dd2-986b-ca05144987b3",
+    "Type": "invoice"
+  }],
+  "DueDateUtc": "2015-06-22T17:35:50Z",
+  "MerchantReference": "INV-12345"
+}

@@ -1,0 +1,31 @@
+name: Actions Dependency Submission
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  submit-dependencies:
+    name: Submit action dependencies
+    runs-on: [ self-hosted, linux, x64 ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Submit Action Dependencies
+        id: submit
+        uses: xero-internal/action-actions-dependency-submission@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          path: '.'
+
+      - name: Print results
+        run: |
+          echo "Snapshot ID: ${{ steps.submit.outputs.snapshot-id }}"
+          echo "Dependencies Found: ${{ steps.submit.outputs.dependencies-found }}"

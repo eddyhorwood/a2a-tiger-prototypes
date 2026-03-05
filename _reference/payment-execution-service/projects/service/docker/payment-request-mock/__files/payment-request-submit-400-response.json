@@ -1,0 +1,9 @@
+{
+  "type": "https://common.service.xero.com/schema/problems/validation",
+  "title": "Validation error",
+  "status": 400,
+  "detail": "Expected payment status to be awaitingexecution but found created",
+  "providerErrorCode": null,
+  "errorCode": "paymentRequest_submit_error",
+  "errors": ["Expected payment status to be awaitingexecution but found created"]
+}

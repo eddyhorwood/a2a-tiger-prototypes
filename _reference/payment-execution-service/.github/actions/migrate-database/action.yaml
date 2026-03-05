@@ -1,0 +1,67 @@
+name: "Migrate Database"
+description: "Runs the migration on target environment database"
+
+inputs:
+  aws_region:
+    description: "AWS region"
+    required: true
+  oidc_role:
+    description: "OIDC role ARN"
+    required: true
+  target_role:
+    description: "Target role ARN"
+    required: true
+  schema_manager_secret:
+    description: "Secret name for schema manager password"
+    required: true
+  connection_string_secret:
+    description: "Secret name for connection string"
+    required: true
+  retool_user_secret:
+    description: "Secret name for retool user connection string"
+    required: true
+  server_endpoint:
+    description: "The endpoint of the database server cluster"
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Assume Deployment role via OIDC
+      uses: xero-internal/github-actions/aws-assume-oidc@v1
+      with:
+        aws-region: ${{ inputs.aws_region }}
+        oidc-role-to-assume: ${{ inputs.oidc_role }}
+        target-role-to-assume: ${{ inputs.target_role }}
+    - name: Retrieve required secrets
+      id: retrieve-secret
+      uses: aws-actions/aws-secretsmanager-get-secrets@v2
+      with:
+        secret-ids: |
+          SCHEMA_MANAGER_PASSWORD, ${{ inputs.schema_manager_secret }}
+          USER_CONNECTION_STRING, ${{ inputs.connection_string_secret }}
+          RETOOL_USER_PASSWORD, ${{ inputs.retool_user_secret }}
+    - name: extract and replace password in script
+      shell: bash
+      run: |
+        password=$(echo "${{ env.USER_CONNECTION_STRING }}" | grep -oP 'Password=\K[^;]+') 
+        echo ::add-mask::$password
+        sed -i "s/temp_p@ssw0rd/$password/g" ./projects/database/migration_scripts/V2__CreatePaymentExecutionUser.sql
+    - name: extract and replace password for retool user
+      shell: bash
+      run: |
+        sed -i "s/temp_p@ssw0rd/${{ env.RETOOL_USER_PASSWORD }}/g" ./projects/database/migration_scripts/V16__ResetRetoolReadonlyUser.sql    
+    - name: run migration
+      shell: bash
+      id: run-migration
+      env: 
+        SERVER_ENDPOINT: ${{ inputs.server_endpoint }}
+      run: |
+        docker compose -f ./projects/database/docker-compose.yml run \
+          -e FLYWAY_URL="jdbc:postgresql://$SERVER_ENDPOINT:5432/payment_execution_db" \
+          -e FLYWAY_USER="payment_execution_schema_manager" \
+          -e FLYWAY_PASSWORD="${{ env.SCHEMA_MANAGER_PASSWORD }}" \
+          -e FLYWAY_LOCATIONS=filesystem:/flyway/migration_scripts \
+          -e FLYWAY_DEFAULT_SCHEMA=payment_execution \
+          -e FLYWAY_CLEAN_DISABLED=true \
+          run-migration migrate -connectRetries=60

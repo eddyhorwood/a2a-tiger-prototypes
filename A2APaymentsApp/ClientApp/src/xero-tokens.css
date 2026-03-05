@@ -1,0 +1,244 @@
+/**
+ * Xero Design Language Tokens
+ * Based on XERO_DESIGN_GUIDELINES.md
+ * 
+ * Use these CSS custom properties throughout the application
+ * for consistent styling that matches production Xero.
+ */
+
+:root {
+  /* ============================================
+     1. BRAND COLORS
+     ============================================ */
+  --xero-color-blue: #13B5EA;
+  --xero-color-blue-alt: #06B3E8;
+  --xero-color-black: #000000;
+  --xero-color-white: #FFFFFF;
+
+  /* ============================================
+     2. NEUTRAL GREYS
+     ============================================ */
+  --xero-grey-900: #111827;
+  --xero-grey-800: #1F2933;
+  --xero-grey-700: #4B5563;
+  --xero-grey-600: #6B7280;
+  --xero-grey-500: #9CA3AF;
+  --xero-grey-400: #D1D5DB;
+  --xero-grey-300: #E5E7EB;
+  --xero-grey-200: #EDF1F5;
+  --xero-grey-100: #F3F4F6;
+  --xero-grey-50: #F9FAFB;
+
+  /* ============================================
+     3. SEMANTIC STATUS COLORS
+     ============================================ */
+  --xero-green-success: #22C55E;
+  --xero-red-error: #EF4444;
+  --xero-amber-warn: #F59E0B;
+  --xero-blue-info: #0EA5E9;
+
+  /* ============================================
+     4. BACKGROUND COLORS
+     ============================================ */
+  --bg-page: #F3F4F6;
+  --bg-page-alt: #EDF1F5;
+  --bg-card: #FFFFFF;
+  --bg-input: #FFFFFF;
+  --bg-input-disabled: #F3F4F6;
+
+  /* ============================================
+     5. BORDER COLORS
+     ============================================ */
+  --border-subtle: #E5E7EB;
+  --border-strong: #D1D5DB;
+  --border-focus-blue: #13B5EA;
+  --border-destructive: #EF4444;
+  --border-disabled: #E5E7EB;
+
+  /* ============================================
+     6. TEXT COLORS
+     ============================================ */
+  --text-heading: #111827;
+  --text-body: #111827;
+  --text-muted: #6B7280;
+  --text-disabled: #9CA3AF;
+  --text-link: #0EA5E9;
+  --text-error: #B91C1C;
+  --text-success: #166534;
+  --text-on-blue: #FFFFFF;
+
+  /* ============================================
+     7. BUTTON COLORS
+     ============================================ */
+  /* Primary */
+  --button-primary-bg: #13B5EA;
+  --button-primary-bg-hover: #0EA5E9;
+  --button-primary-bg-active: #0891D2;
+  --button-primary-text: #FFFFFF;
+
+  /* Standard / Secondary */
+  --button-standard-bg: #FFFFFF;
+  --button-standard-border: #D1D5DB;
+  --button-standard-bg-hover: #F9FAFB;
+  --button-standard-text: #111827;
+
+  /* Borderless / Tertiary */
+  --button-borderless-text: #0EA5E9;
+  --button-borderless-bg-hover: #E0F2FE;
+
+  /* Destructive */
+  --button-danger-bg: #EF4444;
+  --button-danger-bg-hover: #DC2626;
+  --button-danger-text: #FFFFFF;
+
+  /* ============================================
+     8. STATUS FILLS (badges, pills, banners)
+     ============================================ */
+  --status-success-bg: #ECFDF3;
+  --status-success-border: #BBF7D0;
+  --status-success-text: #166534;
+
+  --status-warn-bg: #FFFBEB;
+  --status-warn-border: #FDE68A;
+  --status-warn-text: #92400E;
+
+  --status-error-bg: #FEF2F2;
+  --status-error-border: #FECACA;
+  --status-error-text: #B91C1C;
+
+  --status-info-bg: #ECFEFF;
+  --status-info-border: #BAE6FD;
+  --status-info-text: #0E7490;
+
+  /* ============================================
+     9. TYPOGRAPHY
+     ============================================ */
+  --font-display: "National 2", system-ui, -apple-system, BlinkMacSystemFont,
+                  "Segoe UI", sans-serif;
+  --font-ui: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
+             "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+               "Liberation Mono", "Courier New", monospace;
+
+  /* ============================================
+     10. SPACING SCALE (4px grid)
+     ============================================ */
+  --space-0: 0px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* ============================================
+     11. BORDER RADIUS
+     ============================================ */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-full: 9999px;
+
+  /* ============================================
+     12. SHADOWS (Elevation)
+     ============================================ */
+  --shadow-none: none;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 8px rgba(15, 23, 42, 0.10);
+  --shadow-lg: 0 16px 32px rgba(15, 23, 42, 0.18);
+}
+
+/* ============================================
+   UTILITY CLASSES (Optional)
+   ============================================ */
+
+/* Spacing utilities */
+.u-mt-4 { margin-top: var(--space-4); }
+.u-mb-4 { margin-bottom: var(--space-4); }
+.u-mt-6 { margin-top: var(--space-6); }
+.u-mb-6 { margin-bottom: var(--space-6); }
+.u-p-4 { padding: var(--space-4); }
+
+/* Layout utilities */
+.u-flex { display: flex; }
+.u-flex-between { justify-content: space-between; }
+.u-flex-center { align-items: center; }
+
+/* Text utilities */
+.u-text-muted { color: var(--text-muted); }
+.u-text-danger { color: var(--text-error); }
+
+/* ============================================
+   BASE TYPOGRAPHY CLASSES
+   ============================================ */
+.x-heading-xxl {
+  font-family: var(--font-display);
+  font-size: 32px;
+  line-height: 40px;
+  font-weight: 600;
+  color: var(--text-heading);
+}
+
+.x-heading-xl {
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 600;
+  color: var(--text-heading);
+}
+
+.x-heading-lg {
+  font-family: var(--font-display);
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 600;
+  color: var(--text-heading);
+}
+
+.x-heading-md {
+  font-family: var(--font-display);
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--text-heading);
+}
+
+.x-text-lg {
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  color: var(--text-body);
+}
+
+.x-text-md {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+  color: var(--text-body);
+}
+
+.x-text-sm {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+  color: var(--text-body);
+}
+
+.x-label {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.x-mono {
+  font-family: var(--font-mono);
+}

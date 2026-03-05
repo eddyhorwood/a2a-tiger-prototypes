@@ -1,0 +1,20 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/v1/payments/payment-intent",
+    "queryParameters": {
+      "paymentRequestId": {
+        "matches": "[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}"
+      }
+    },
+    "headers": {
+      "Xero-Tenant-Id": {
+        "matches": "68fbe448-691e-45d2-a328-df7ac3db6c90"
+      }
+    }
+  },
+  "response": {
+    "status": 503,
+    "bodyFileName": "stripe-execution-getpaymentintent-transienterror-response.json"
+  }
+}

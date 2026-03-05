@@ -1,0 +1,72 @@
+[
+  {
+    "clientType": "ClientCredentials",
+    "clientId": "xero_collecting-payments-execution_payment-execution-service",
+    "clientSecret": "secret",
+    "scopes": [
+      "xero_authorisation.pbac",
+      "xero_collecting-payments_collecting-payments-execution-stripe-payments-service.submit",
+      "xero_collecting-payments_payment-request-service.submit",
+      "xero_collecting-payments_collecting-payments-execution-stripe-payments-service.readstripepaymentintent"
+    ],
+    "AllowDelegation": false,
+    "allowedCorsOrigins": [
+      "http://localhost:5000/"
+    ]
+  },
+  {
+    "clientType": "ClientCredentials",
+    "clientId": "local_caller",
+    "clientSecret": "secret",
+    "scopes": [
+      "xero_collecting-payments-execution_payment-execution-service",
+      "xero_collecting-payments-execution_payment-execution-service.read",
+      "xero_collecting-payments-execution_payment-execution-service.dchdelete",
+      "xero_collecting-payments-execution_payment-execution-service.submit",
+      "xero_collecting-payments-execution_payment-execution-service.complete",
+      "xero_collecting-payments-execution_payment-execution-service.requestcancel",
+      "xero_collecting-payments-execution_payment-execution-service.cancel",
+      "xero_collecting-payments-execution_payment-execution-service.readproviderstate",
+      "xero_authorisation.pbac"
+    ],
+    "AllowDelegation": false,
+    "allowedCorsOrigins": [
+      "http://localhost:5000/"
+    ]
+  },
+  {
+    "clientType": "ClientCredentials",
+    "clientId": "local_caller_non-whitelisted",
+    "clientSecret": "secret",
+    "scopes": [
+      "xero_collecting-payments-execution_payment-execution-service",
+      "xero_collecting-payments-execution_payment-execution-service.read",
+      "xero_collecting-payments-execution_payment-execution-service.dchdelete",
+      "xero_collecting-payments-execution_payment-execution-service.submit",
+      "xero_collecting-payments-execution_payment-execution-service.complete",
+      "xero_collecting-payments-execution_payment-execution-service.requestcancel",
+      "xero_collecting-payments-execution_payment-execution-service.cancel",
+      "xero_collecting-payments-execution_payment-execution-service.readproviderstate"
+    ],
+    "AllowDelegation": false,
+    "allowedCorsOrigins": [
+      "http://localhost:5000/"
+    ]
+  },
+  {
+    "clientId": "xero_identity_test-user-token-client",
+    "clientType": "TestUserToken",
+    "clientSecret": "secret",
+    "scopes": [
+      "xero_collecting-payments-execution_payment-execution-service",
+      "xero_collecting-payments-execution_payment-execution-service.read",
+      "xero_collecting-payments-execution_payment-execution-service.dchdelete",
+      "xero_collecting-payments-execution_payment-execution-service.submit",
+      "xero_collecting-payments-execution_payment-execution-service.complete",
+      "xero_collecting-payments-execution_payment-execution-service.requestcancel",
+      "xero_collecting-payments-execution_payment-execution-service.cancel",
+      "xero_collecting-payments-execution_payment-execution-service.readproviderstate",
+      "xero_authorisation.pbac"
+    ]
+  }
+]

@@ -1,0 +1,62 @@
+---
+# Megalint configuration variables https://megalinter.io/configuration/, can override any configuration in this file using environment variables
+PARALLEL: true
+VALIDATE_ALL_CODEBASE: true
+IGNORE_GITIGNORED_FILES: true
+APPLY_FIXES: none
+SHOW_SKIPPED_LINTERS: false
+FLAVOR_SUGGESTIONS: false
+PRINT_ALPACA: false
+SHOW_ELAPSED_TIME: true
+
+ENABLE_LINTERS:
+ - CSHARP_DOTNET_FORMAT
+ - BASH_SHELLCHECK
+ - BASH_EXEC
+ - POWERSHELL_POWERSHELL
+ - REPOSITORY_CHECKOV
+ - TERRAFORM_TFLINT
+ - OPENAPI_SPECTRAL
+ - YAML_YAMLLINT
+ - DOCKERFILE_HADOLINT
+ - CLOUDFORMATION_CFN_LINT
+
+# CSHARP_DOTNET_FORMAT https://megalinter.io/latest/descriptors/csharp_dotnet_format/
+CSHARP_DOTNET_FORMAT_ARGUMENTS: "--verbosity diagnostic --severity error"
+CSHARP_DOTNET_FORMAT_FILE_EXTENSIONS:
+ - ".sln"
+
+
+# BASH_SHELLCHECK https://megalinter.io/latest/descriptors/bash_shellcheck/
+BASH_SHELLCHECK_ARGUMENTS: "--severity=error"
+
+# BASH_EXEC https://megalinter.io/latest/descriptors/bash_bash_exec/
+ERROR_ON_MISSING_EXEC_BIT: true
+BASH_EXEC_ARGUMENTS: ""
+
+# POWERSHELL_POWERSHELL https://megalinter.io/latest/descriptors/powershell_powershell/
+POWERSHELL_POWERSHELL_ARGUMENTS: "-Severity Error"
+
+# REPOSITORY_CHECKOV https://megalinter.io/latest/descriptors/repository_checkov/
+REPOSITORY_CHECKOV_ARGUMENTS: "--skip-check CKV_OPENAPI_4,CKV_OPENAPI_5,CKV_TF_1 --skip-path obj --skip-path bin"
+
+# TERRAFORM_TFLINT https://megalinter.io/latest/descriptors/terraform_tflint/
+TERRAFORM_TFLINT_ARGUMENTS: "--minimum-failure-severity=error"
+TERRAFORM_TFLINT_UNSECURED_ENV_VARIABLES:
+ - GITHUB_TOKEN
+
+# OPENAPI_SPECTRAL https://megalinter.io/latest/descriptors/openapi_spectral/
+OPENAPI_SPECTRAL_ARGUMENTS: "--fail-severity error"
+OPENAPI_SPECTRAL_FILTER_REGEX_EXCLUDE: "(cortex.yaml)"
+
+# YAML_YAMLLINT https://megalinter.io/latest/descriptors/yaml_yamllint/
+YAML_YAMLLINT_ARGUMENTS: "--no-warnings"
+YAML_YAMLLINT_FILTER_REGEX_EXCLUDE: "payment-execution-service-api\\.yaml|\\.mega-linter\\.yml"
+
+# DOCKERFILE_HADOLINT https://megalinter.io/latest/descriptors/dockerfile_hadolint/
+DOCKERFILE_HADOLINT_ARGUMENTS: "--failure-threshold=error"
+
+# CLOUDFORMATION_CFN_LINT https://megalinter.io/latest/descriptors/cloudformation_cfn_lint/
+CLOUDFORMATION_CFN_LINT_ARGUMENTS: "--non-zero-exit-code error"
+
+EXCLUDED_DIRECTORIES: [".cortex"]

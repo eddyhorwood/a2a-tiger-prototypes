@@ -1,0 +1,25 @@
+name: Service - Stress test
+run-name: Service - Stress test UAT by @${{ github.actor }}
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  get-config:
+    name: Get config values
+    uses: ./.github/workflows/workflow-get-config.yaml
+
+  k6-stress-test:
+    runs-on: [ self-hosted, linux-al2023, x64, runners-us-west-2 ]
+    needs: [ get-config ]
+    steps:
+      - name: K6 test
+        uses: xero-internal/github-actions/performance-test@v1
+        with:
+          working_dir: ./projects/service/tests/${{needs.get-config.outputs.service-name-pascal-case}}.LoadTests
+          test_path: ./dist/example.test.js
+          k6_flags: -e ENV=uat -c projects/service/tests/${{needs.get-config.outputs.service-name-pascal-case}}.LoadTests/src/env/uat/config.stress.json
+          is_ts: true

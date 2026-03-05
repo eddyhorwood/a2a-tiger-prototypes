@@ -1,0 +1,1 @@
+CREATE INDEX payment_transaction_organisation_id_index ON payment_execution.paymenttransaction (organisationId);

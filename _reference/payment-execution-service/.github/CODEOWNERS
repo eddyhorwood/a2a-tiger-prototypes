@@ -1,0 +1,5 @@
+# Each line is a file pattern followed by one or more owners.
+# Note: A later match takes precedence, so please ensure any sub-directories are configured accordingly.
+
+# Default: unmatched entries are owned by cashtopia
+* @hugh-feary_xero @palaash-srivastava_xero @matt-liu_xero @xero-internal/cashtopia

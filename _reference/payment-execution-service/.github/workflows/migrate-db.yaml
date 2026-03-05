@@ -1,0 +1,84 @@
+name: Database - CI/CD
+run-name: Database - CI/CD by @${{ github.actor }}
+
+on:
+  pull_request:
+    types: [labeled, opened, synchronize, reopened]
+    paths:
+      - "projects/database/callback_scripts/**"
+      - "projects/database/infra/**"
+      - "projects/database/migration_scripts/**"
+      - "projects/database/docker-compose.yml"
+      - ".github/workflows/database-**.yaml"
+      - ".github/workflows/migrate-db.yaml"
+      - ".github/actions/migrate-database/**"
+      - ".github/actions/deploy-database-infra/**"
+  workflow_dispatch:
+  push:
+    paths:
+      - "projects/database/callback_scripts/**"
+      - "projects/database/infra/**"
+      - "projects/database/migration_scripts/**"
+      - "projects/database/docker-compose.yml"
+      - ".github/workflows/database-**.yaml"
+      - ".github/workflows/migrate-db.yaml"
+      - ".github/actions/migrate-database/**"
+      - ".github/actions/deploy-database-infra/**"
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
+jobs:
+  get-config:
+    name: Get config values
+    uses: ./.github/workflows/database-workflow-get-config.yaml
+
+  deploy-database-to-test:
+    name: Deploy Database to Test
+    needs: [get-config]
+    uses: ./.github/workflows/database-deployment-to-env.yaml
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'deploy-database-test'}}
+    with:
+      environment: test
+      aws_region: ap-southeast-2
+      cortex_id: ${{ needs.get-config.outputs.uuid }}
+    secrets:
+      DEPLOY_TRACK_API_TOKEN: ${{ secrets.DEPLOY_TRACK_API_TOKEN }}
+
+  deploy-database-to-uat:
+    name: Deploy Database to UAT
+    needs: [get-config, deploy-database-to-test]
+    uses: ./.github/workflows/database-deployment-to-env.yaml
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+    with:
+      environment: uat
+      aws_region: us-west-2
+      cortex_id: ${{ needs.get-config.outputs.uuid }}
+    secrets:
+      DEPLOY_TRACK_API_TOKEN: ${{ secrets.DEPLOY_TRACK_API_TOKEN }}
+
+  run-e2e-tests:
+    name: Run E2E tests for the payment execution platform in UAT
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+    needs: [deploy-database-to-uat]
+    uses: xero-internal/payment-execution-e2e-tests/.github/workflows/e2e-test.yaml@main
+    secrets: inherit
+    permissions:
+      contents: read
+      checks: write
+
+  deploy-database-to-production:
+    name: Deploy Database to Production
+    needs: [get-config, run-e2e-tests]
+    uses: ./.github/workflows/database-deployment-to-env.yaml
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+    with:
+      environment: production
+      aws_region: us-east-1
+      cortex_id: ${{ needs.get-config.outputs.uuid }}
+    secrets:
+      DEPLOY_TRACK_API_TOKEN: ${{ secrets.DEPLOY_TRACK_API_TOKEN }}

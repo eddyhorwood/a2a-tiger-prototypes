@@ -1,0 +1,371 @@
+name: Worker - CI/CD
+run-name: Worker - CI/CD by @${{ github.actor }}
+
+# Satisfies XREQ-27, XREQ-298, XREQ-40, XREQ-43
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+on:
+  pull_request:
+    types: [labeled, opened, synchronize, reopened]
+    paths:
+      - "projects/worker/src/**"
+      - "projects/worker/infra/k8s/**"
+      - "projects/worker/infra/terraform/**"
+      - "projects/shared/**"
+      - ".github/workflows/worker-**"
+  workflow_dispatch:
+  push:
+    paths:
+      - "projects/worker/src/**"
+      - "projects/worker/infra/k8s/**"
+      - "projects/worker/infra/terraform/**"
+      - "projects/shared/**"
+      - ".github/workflows/worker-**"
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  ###
+  ### ONLY PULL REQUESTS
+  ###
+  docker-image-build:
+    name: Build Docker Image
+    runs-on: [self-hosted, linux, x64, linux-al2023]
+    if: ${{ github.event_name == 'pull_request' }}
+    needs: [get-config]
+    steps:
+      - name: Build and push
+        uses: xero-internal/github-actions/docker-image-build-push@v1
+        with:
+          version: "0.0.0"
+          working-directory: ./projects
+          docker-file: ./projects/worker/src/${{ needs.get-config.outputs.worker-name-pascal-case }}.Worker/Dockerfile
+          build-args: |-
+            GitHash=${{ github.sha }}
+            GitVersion=0.0.0
+
+  check-jira-references:
+    name: Check Jira References
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: [self-hosted, linux, x64]
+    steps:
+      - name: check jira references
+        uses: xero-internal/github-actions/check-jira-references@v1
+        with:
+          check_pr_title: true
+          check_commits: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+  ###
+  ### BOTH MAIN & PULL REQUESTS
+  ###
+  get-config:
+    name: Get config values
+    uses: ./.github/workflows/worker-workflow-get-config.yaml
+
+  validate-openapi-spec:
+    name: Validate OpenAPI specification
+    runs-on: [self-hosted, linux, x64, runners-ap-southeast-2]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/validate-open-api-spec
+
+  static-analysis:
+    name: Static analysis
+    runs-on: [self-hosted, linux, x64, linux-al2023]
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Megalinter
+        uses: xero-internal/github-actions/megalinter@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_WORKSPACE: ./projects/worker
+          MEGALINTER_CONFIG: ./projects/worker/.mega-linter.yml
+
+  # Satisfies XREQ-33, XREQ-29, XREQ-30
+  run-tests-and-sonarscan:
+    name: Test and SonarScan
+    runs-on: [self-hosted, linux, x64]
+    needs: [get-config]
+    permissions:
+      contents: read
+      actions: read
+      checks: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Start local dependencies
+        shell: bash
+        working-directory: ./projects/worker
+        run: make start-local-dependencies
+      - name: Dotnet test and sonarscan
+        uses: xero-internal/github-actions/dotnet-build-test@v1
+        with:
+          dotnet-version: 8.0.x
+          dotnet-solution-file: ./${{ needs.get-config.outputs.worker-parent-solution-file }}
+          dotnet-test-additional-command: --settings ./.runsettings --filter 'FullyQualifiedName!~Service.UnitTests&FullyQualifiedName!~Service.ComponentTests&FullyQualifiedName!~Service.ConsumerPactTests&FullyQualifiedName!~Service.ProviderPactTests&FullyQualifiedName!~CancelLambda.UnitTests&FullyQualifiedName!~CancelLambda.ComponentTests&FullyQualifiedName!~CancelLambda.ConsumerPactTests'
+          app-version: ${{ github.sha }}
+          checkout-enabled: false
+          sonarqube-enabled: true
+          use-sonarcloud: true
+          sonarqube-gate-check-enabled: true
+          sonarqube-token: ${{ secrets.SONARCLOUD_TOKEN }}
+          sonarqube-project-key: ${{ needs.get-config.outputs.sonarqube-project-key }}
+          sonarqube-project-name: "[${{ needs.get-config.outputs.sonarqube-project-key-prefix }}]${{ needs.get-config.outputs.worker-name-pascal-case }}"
+          sonarqube-organization: xero-internal
+          sonarqube-exclusions: "**/service/**,**/shared/**,**/lambdas/**"
+      - name: Stop local dependencies
+        if: ${{ always() }}
+        shell: bash
+        working-directory: ./projects/worker
+        run: make stop-local-dependencies
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ needs.get-config.outputs.pact-artifact-name }}
+          path: ./projects/worker/tests/PaymentExecutionWorker.ConsumerPactTests/pacts
+
+  ###
+  ### ONLY MAIN
+  ###
+  terraform-validate:
+    name: Terraform validate
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'deploy-worker-test' }}
+    runs-on: [self-hosted, linux, x64, runners-us-west-2, linux-al2023]
+    environment: ${{ github.event.label.name == 'deploy-worker-test' && 'test' || 'uat' }}
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: xero-internal/github-actions/terraform-validate@v1
+        with:
+          aws_region: ${{ github.event.label.name == 'deploy-worker-test' && 'ap-southeast-2' || 'us-west-2' }}
+          oidc_role: ${{ vars.OIDC_ROLE_ARN }}
+          target_role: ${{ vars.DEPLOYMENT_ROLE_ARN }}
+          working_dir: ./projects/worker/infra/terraform
+          terraform_backend: environment/${{ github.event.label.name == 'deploy-worker-test' && 'test' || 'uat' }}.backend
+          terraform_var_files: environment/${{ github.event.label.name == 'deploy-worker-test' && 'test' || 'uat' }}.tfvars
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+  # Partially satisfies XREQ-56
+  semver:
+    name: Calculate package version
+    runs-on: [self-hosted, linux, linux-al2023]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'deploy-worker-test'}}
+    outputs:
+      build-version: ${{ steps.version.outputs.assemblySemVer }}
+      image-tag: "${{ github.event.label.name == 'deploy-worker-test' && format('{0}.', github.sha) || '' }}${{ steps.version.outputs.majorMinorPatch }}.${{ github.run_number }}.${{ github.run_attempt }}"
+      repo-tag: "worker-${{ steps.version.outputs.majorMinorPatch }}.${{ github.run_number }}.${{ github.run_attempt }}"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v1.1.1
+        with:
+          versionSpec: "5.x"
+      - name: Determine Version
+        uses: gittools/actions/gitversion/execute@v1.1.1
+        id: version
+        with:
+          useConfigFile: true
+          configFilePath: ./projects/worker/GitVersion.yml
+
+  # Satisfies XREQ-47, XREQ-98
+  docker-image-build-and-push:
+    name: Build and push Docker Image
+    runs-on: [self-hosted, linux, x64, linux-al2023]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'deploy-worker-test'}}
+    needs:
+      [
+        get-config,
+        run-tests-and-sonarscan,
+        validate-openapi-spec,
+        static-analysis,
+        semver,
+        terraform-validate,
+      ]
+    steps:
+      - name: Build and push
+        uses: xero-internal/github-actions/docker-image-build-push@v1
+        with:
+          version: ${{ needs.semver.outputs.image-tag }}
+          docker-image-name: ${{ needs.get-config.outputs.worker-name-kebab-case }}
+          af-registry: ${{ needs.get-config.outputs.artifactory-repository }}.artifactory.xero-support.com
+          af-user: ${{ needs.get-config.outputs.artifactory-user }}
+          af-password: ${{ secrets.ARTIFACTORY_PASSWORD }}
+          working-directory: ./projects
+          docker-file: ./projects/worker/src/${{ needs.get-config.outputs.worker-name-pascal-case }}.Worker/Dockerfile
+          build-args: |-
+            GitHash=${{ github.sha }}
+            GitVersion=${{ needs.semver.outputs.build-version }}
+
+  publish-consumer-pact-files:
+    runs-on: [self-hosted, linux, x64, linux-al2023]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'deploy-worker-test'}}
+    needs: [get-config, semver, docker-image-build-and-push]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.get-config.outputs.pact-artifact-name }}
+          path: ./pacts
+      - uses: pactflow/actions/publish-pact-files@v2
+        with:
+          pactfiles: ./pacts
+          broker_url: ${{ secrets.PACT_BROKER_BASE_URL }}
+          token: ${{ secrets.PACT_BROKER_TOKEN }}
+
+  # Satisfies XREQ-48
+  deploy-test:
+    name: Deploy Test
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'deploy-worker-test'}}
+    needs: [get-config, semver, docker-image-build-and-push]
+    uses: xero-internal/github-workflows/.github/workflows/deploy-infra-and-k8s-app.yml@v3
+    permissions:
+      contents: read
+      id-token: write
+    with:
+      environment: test
+      component-uuid: ${{ needs.get-config.outputs.uuid }}
+      namespace: ${{ needs.get-config.outputs.kubernetes-namespace }}
+      release-name: ${{ needs.get-config.outputs.worker-name-kebab-case }}
+      k8s-context: ap-southeast-2-k8s-paas-test-rua
+      values-file: ./projects/worker/infra/k8s/shared.yaml
+      override-values-file: ./projects/worker/infra/k8s/test.yaml
+      docker-image-tag: ${{ needs.semver.outputs.image-tag }}
+      aws-region: ap-southeast-2
+      terraform-working-dir: ./projects/worker/infra/terraform
+      terraform-backend: environment/test.backend
+      terraform-var-files: |
+        environment/test.tfvars
+    secrets: inherit
+
+  pact-record-deployment-test:
+    name: Record deployment in Pactflow for Test
+    needs: [get-config, publish-consumer-pact-files, deploy-test]
+    runs-on: [self-hosted, linux, x64, linux-al2023]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+    steps:
+      - uses: pactflow/actions/record-deployment@v2
+        with:
+          version: ${{ github.sha }}
+          environment: "test"
+          application_name: ${{ needs.get-config.outputs.worker-name-pascal-case }}
+          broker_url: ${{ secrets.PACT_BROKER_BASE_URL }}
+          token: ${{ secrets.PACT_BROKER_TOKEN }}
+
+  deploy-uat:
+    name: Deploy UAT
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+    needs: [get-config, deploy-test, semver]
+    uses: xero-internal/github-workflows/.github/workflows/deploy-infra-and-k8s-app.yml@v3
+    permissions:
+      contents: read
+      id-token: write
+    with:
+      environment: uat
+      component-uuid: ${{ needs.get-config.outputs.uuid }}
+      namespace: ${{ needs.get-config.outputs.kubernetes-namespace }}
+      release-name: ${{ needs.get-config.outputs.worker-name-kebab-case }}
+      k8s-context: us-west-2-k8s-paas-uat-rua
+      values-file: ./projects/worker/infra/k8s/shared.yaml
+      override-values-file: ./projects/worker/infra/k8s/uat.yaml
+      docker-image-tag: ${{ needs.semver.outputs.image-tag }}
+      aws-region: us-west-2
+      terraform-working-dir: ./projects/worker/infra/terraform
+      terraform-backend: environment/uat.backend
+      terraform-var-files: |
+        environment/uat.tfvars
+    secrets: inherit
+
+  pact-record-deployment-uat:
+    name: Record deployment in Pactflow for Uat
+    needs: [get-config, deploy-uat, publish-consumer-pact-files]
+    runs-on: [self-hosted, linux, x64, linux-al2023]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+    steps:
+      - uses: pactflow/actions/record-deployment@v2
+        with:
+          version: ${{ github.sha }}
+          environment: "uat"
+          application_name: ${{ needs.get-config.outputs.worker-name-pascal-case }}
+          broker_url: ${{ secrets.PACT_BROKER_BASE_URL }}
+          token: ${{ secrets.PACT_BROKER_TOKEN }}
+
+  run-e2e-tests:
+    name: Run E2E tests for the payment execution platform in UAT
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+    needs: [deploy-uat]
+    uses: xero-internal/payment-execution-e2e-tests/.github/workflows/e2e-test.yaml@main
+    secrets:
+      E2E_IDENTITY_CLIENT_SECRET: ${{ secrets.E2E_IDENTITY_CLIENT_SECRET }}
+      E2E_STRIPE_API_RESTRICTED_KEY: ${{ secrets.E2E_STRIPE_API_RESTRICTED_KEY }}
+    permissions:
+      contents: read
+      checks: write
+
+  deploy-production:
+    name: Deploy Production
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+    needs: [get-config, run-e2e-tests, semver]
+    uses: xero-internal/github-workflows/.github/workflows/deploy-infra-and-k8s-app.yml@v3
+    permissions:
+      contents: read
+      id-token: write
+    with:
+      environment: production
+      component-uuid: ${{ needs.get-config.outputs.uuid }}
+      namespace: ${{ needs.get-config.outputs.kubernetes-namespace }}
+      release-name: ${{ needs.get-config.outputs.worker-name-kebab-case }}
+      k8s-context: us-east-1-k8s-paas-prod-rua
+      values-file: ./projects/worker/infra/k8s/shared.yaml
+      override-values-file: ./projects/worker/infra/k8s/production.yaml
+      docker-image-tag: ${{ needs.semver.outputs.image-tag }}
+      aws-region: us-east-1
+      terraform-working-dir: ./projects/worker/infra/terraform
+      terraform-backend: environment/production.backend
+      terraform-var-files: |
+        environment/production.tfvars
+    secrets: inherit
+
+  pact-record-deployment-production:
+    name: Record deployment in Pactflow for Uat
+    needs: [get-config, deploy-production, publish-consumer-pact-files]
+    runs-on: [self-hosted, linux, x64, linux-al2023]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+    steps:
+      - uses: pactflow/actions/record-deployment@v2
+        with:
+          version: ${{ github.sha }}
+          environment: "production"
+          application_name: ${{ needs.get-config.outputs.worker-name-pascal-case }}
+          broker_url: ${{ secrets.PACT_BROKER_BASE_URL }}
+          token: ${{ secrets.PACT_BROKER_TOKEN }}
+
+  create-release:
+    name: Create release
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+    needs: [deploy-production, semver]
+    runs-on: [self-hosted, linux, x64, linux-al2023]
+    permissions:
+      contents: write
+    steps:
+      - uses: xero-internal/github-actions/tag-and-release@v1
+        with:
+          full-version: ${{ needs.semver.outputs.repo-tag }}
+          create-gh-release: "true"
+          github-token: ${{ secrets.GITHUB_TOKEN }}

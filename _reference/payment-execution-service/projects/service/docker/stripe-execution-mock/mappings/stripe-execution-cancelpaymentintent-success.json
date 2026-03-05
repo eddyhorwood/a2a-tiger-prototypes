@@ -1,0 +1,14 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPathPattern": "/v1/payments/cancel/([0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12})",
+    "headers": {
+      "Xero-Tenant-Id": {
+        "matches": "55159241-3379-4884-8b38-bd730fe8ea9b"
+      }
+    }
+  },
+  "response": {
+    "status": 200
+  }
+}

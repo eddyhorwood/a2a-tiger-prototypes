@@ -1,0 +1,98 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: Stack to create a Terraform backend.
+
+Parameters:
+  Env:
+    Type: String
+    Default: uat
+  KMSKeyId:
+    Type: String
+  ServiceName:
+    Type: String
+
+Resources:
+  TerraformStateBucket:
+    # checkov:skip=CKV_AWS_18:Terraform State does not need to be access logged.
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketName: !Sub "${ServiceName}-tf-state-${Env}"
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: aws:kms
+              KMSMasterKeyID: !Ref KMSKeyId
+      VersioningConfiguration:
+        Status: Enabled
+
+  TerraformStateBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref TerraformStateBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "Allow Developer role access to terraform state"
+            Effect: Allow
+            Principal: "*"
+            Action:
+              - "s3:GetObject"
+              - "s3:PutObject"
+              - "s3:ListBucket"
+            Resource:
+              - !Sub "${TerraformStateBucket.Arn}"
+              - !Sub "${TerraformStateBucket.Arn}/infra/terraform/*"
+            Condition:
+              StringLike:
+                "aws:userId": !Sub "arn:aws:sts::${AWS::AccountId}:assumed-role/AWSReservedSSO_Developer_*"
+          - Sid: "Deny unencrypted objects uploads"
+            Effect: Deny
+            Principal: "*"
+            Action: "s3:PutObject"
+            Resource:
+              - !Sub "${TerraformStateBucket.Arn}/*"
+            Condition:
+              StringNotEquals:
+                "s3:x-amz-server-side-encryption": "aws:kms"
+          - Sid: "Deny encrypted objects uploads with the wrong key"
+            Effect: Deny
+            Principal: "*"
+            Action: "s3:PutObject"
+            Resource:
+              - !Sub "${TerraformStateBucket.Arn}/*"
+            Condition:
+              StringNotEquals:
+                "s3:x-amz-server-side-encryption-aws-kms-key-id": !Ref KMSKeyId
+
+  TerraformStateLockTable:
+    # checkov:skip=CKV_AWS_28:Terraform State Lock does not require point in time recovery as lock hash is only needed temporarily.
+    # checkov:skip=CKV_AWS_119:Terraform State Lock does not need to be encrypted as its only needed temporarily and is not personal data.
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub "${ServiceName}-tf-state-lock-${Env}"
+      BillingMode: PAY_PER_REQUEST
+      DeletionProtectionEnabled: true
+      KeySchema:
+        - AttributeName: LockID
+          KeyType: HASH
+      AttributeDefinitions:
+        - AttributeName: LockID
+          AttributeType: S
+
+Outputs:
+  TerraformStateBucketName:
+    Description: Name of Terraform State Bucket
+    Value: !Ref TerraformStateBucket
+  TerraformStateLockTableName:
+    Description: Name of Terraform State Locking Table
+    Value: !Select [1, !Split ["/", !GetAtt TerraformStateLockTable.Arn]]
