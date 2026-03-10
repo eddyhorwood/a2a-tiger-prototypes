@@ -30,6 +30,12 @@ This index helps LLMs quickly locate relevant documentation. Each entry specifie
 - **LLM use**: Payment flow implementation, error handling, status updates
 - **Key topics**: Payment initiation, polling, webhooks, reconciliation
 
+### specifications/pay-by-bank-decision-log.md
+- **Purpose**: Lightweight decision log for Pay by Bank / Safer A2A alignment
+- **When to use**: Checking current product decisions, open questions, and accepted outcomes
+- **LLM use**: Decision tracing, requirement alignment, avoiding duplicate decisions
+- **Key topics**: Decision IDs (`PBB-0001+`), changelog, open vs closed decisions
+
 ---
 
 ## Architecture (Technical Design)
