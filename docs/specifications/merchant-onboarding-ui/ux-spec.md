@@ -1,4 +1,4 @@
-# Pay by Bank: Merchant Onboarding Specification
+# Pay by Bank: Merchant Onboarding UI/UX Spec
 
 **Version:** 0.2 (Draft)
 **Date:** 10 March 2026

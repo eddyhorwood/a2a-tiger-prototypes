@@ -30,6 +30,12 @@ This index helps LLMs quickly locate relevant documentation. Each entry specifie
 - **LLM use**: Payment flow implementation, error handling, status updates
 - **Key topics**: Payment initiation, polling, webhooks, reconciliation
 
+### specifications/merchant-onboarding-ui/ux-spec.md
+- **Purpose**: UI/UX specification for Pay by Bank merchant onboarding
+- **When to use**: Defining onboarding interaction design, entry-point behaviour, and UX edge-case handling
+- **LLM use**: UX requirement alignment, flow implementation guidance, copy and state behaviour checks
+- **Key topics**: Entry points, modal flow, permissions assumptions, post-enable behaviour, open questions
+
 ### specifications/pay-by-bank-decision-log.md
 - **Purpose**: Lightweight decision log for Pay by Bank / Safer A2A alignment
 - **When to use**: Checking current product decisions, open questions, and accepted outcomes
