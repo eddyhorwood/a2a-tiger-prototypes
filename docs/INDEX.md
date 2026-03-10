@@ -31,10 +31,10 @@ This index helps LLMs quickly locate relevant documentation. Each entry specifie
 - **Key topics**: Payment initiation, polling, webhooks, reconciliation
 
 ### specifications/merchant-onboarding-ui/ux-spec.md
-- **Purpose**: UI/UX specification for Pay by Bank merchant onboarding
-- **When to use**: Defining onboarding interaction design, entry-point behaviour, and UX edge-case handling
-- **LLM use**: UX requirement alignment, flow implementation guidance, copy and state behaviour checks
-- **Key topics**: Entry points, modal flow, permissions assumptions, post-enable behaviour, open questions
+- **Purpose**: Merchant onboarding specification for Pay by Bank (single-modal flow)
+- **When to use**: Defining onboarding interaction design, entry-point behaviour, UX edge-case handling, implementing modal copy, field behaviour, errors, post-enable states, and analytics events
+- **LLM use**: UX requirement alignment, flow implementation guidance, copy and state behaviour checks, acceptance criteria traceability
+- **Key topics**: Entry points, modal flow, permissions, post-enable behaviour, compliance copy constraints, analytics events, open questions
 
 ### specifications/pay-by-bank-decision-log.md
 - **Purpose**: Lightweight decision log for Pay by Bank / Safer A2A alignment

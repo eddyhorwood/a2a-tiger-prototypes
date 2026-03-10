@@ -1,12 +1,10 @@
-# Pay by Bank: Merchant Onboarding UI/UX Spec
+# Pay by Bank: Merchant Onboarding Specification
 
-**Version:** 0.2 (Draft)
-**Date:** 10 March 2026
-**Status:** Draft, updated with PM alignment on key UX/product questions; remaining unresolved items flagged with [TBC]
-**Audience:** Engineering teams implementing A2A merchant onboarding, AI coding agents supervised by engineers
-**Prototype reference:** `A2APaymentsApp/ClientApp/src/pages/OnboardingWizardAggressiveFast.tsx`
-
----
+Author: @Eddy Horwood
+Date: 10 March 2026
+Status: Draft, open questions flagged with [TBC]
+Audience: Engineering teams implementing A2A merchant onboarding, AI coding agents supervised by engineers
+Prototype references: https://github.com/eddyhorwood/a2a-tiger-prototypes
 
 ## 1. Problem and Opportunity
 
@@ -15,8 +13,6 @@ Xero merchants in New Zealand need a way to accept direct bank-to-bank payments 
 This onboarding flow eliminates that friction. It uses data Xero already holds (org details, chart of accounts, bank accounts) to compress onboarding into a single modal interaction, targeting sub-10-second completion.
 
 The business case: higher conversion from "sees the option" to "starts accepting bank payments," particularly for the invoice entry point where merchants are already thinking about getting paid.
-
----
 
 ## 2. Scope
 
@@ -29,17 +25,16 @@ The business case: higher conversion from "sees the option" to "starts accepting
 - Success state and return-to-origin behaviour
 - Error and edge case handling
 
-### Out of scope
+### Out of scope (for this version)
 
-- Backend API design, data model, and Akahu integration (covered in separate **Akahu A2A Merchant Onboarding API Spec**)
+- Backend API design, data model, and Akahu integration (covered in separate [DRAFT Merchant Onboarding Flow API Spec](https://xero.atlassian.net/wiki/spaces/XFS/pages/271926003257/DRAFT+Merchant+Onboarding+Flow+API+Spec))
 - Balanced (multi-step) and conservative (full KYC) flow variants
-- Payer-side payment experience (covered in `payment-execution-pattern.md`)
+- Payer-side payment experience (covered in payment-execution-pattern.md)
 - Webhook processing and invoice status updates
 - Pricing, billing, and App Store subscription
 - Mobile (XAA) entry points
 - Markets outside New Zealand
-
----
+- Confirmation of Payee
 
 ## 3. Actors
 
@@ -49,8 +44,6 @@ The business case: higher conversion from "sees the option" to "starts accepting
 | Xero | Software provider. Collects payment instructions, updates the ledger | Never holds, pools, or manages customer funds |
 | Akahu | Accredited requestor under CDPA 2025. Initiates payments via NZ bank APIs | Initiates payments only. Does not hold funds |
 | Banks | Executing financial institutions. Authenticate payers, execute transfers | Hold funds, execute transfers, maintain records |
-
----
 
 ## 4. Prerequisites
 
@@ -63,8 +56,6 @@ Before a merchant can enter the onboarding flow:
 | At least one eligible bank account | Xero Accounts API | At least one account where `Type === BANK` and `EnablePaymentsToAccount === true` |
 | User has bank-feed authorisation permissions | Xero identity / permissions + bank feed authorisation model | Direction agreed: users who can view bank-feed authorised account context should be eligible; preferred gate is users who can edit bank feed/payment settings. Final Xero role-name mapping remains an implementation follow-up |
 | Pay by bank not already enabled | Internal state (see backend API spec) | `A2AOnboardingStatus !== 'complete_enabled'` |
-
----
 
 ## 5. User Flow
 
@@ -213,11 +204,9 @@ CTA: "Go back" (closes modal, returns to origin).
 
 Decision: no deep link in v1 beta. The rollout targets orgs that already have bank-feed-authorised accounts that look like valid NZ account numbers. Keep the settlement account editable before save in the main flow.
 
----
-
 ## 6. Backend Integration
 
-Backend API design (endpoints, data model, Akahu registration, branding theme attachment) is covered in the separate **Akahu A2A Merchant Onboarding API Spec**. This section describes only the UI-side behaviour during enablement.
+Backend API design (endpoints, data model, Akahu registration, branding theme attachment) is covered in the separate [DRAFT Merchant Onboarding Flow API Spec](https://xero.atlassian.net/wiki/spaces/XFS/pages/271926003257/DRAFT+Merchant+Onboarding+Flow+API+Spec). This section describes only the UI-side behaviour during enablement.
 
 ### 6.1 UI sequence on "Enable" click
 
@@ -226,8 +215,6 @@ Backend API design (endpoints, data model, Akahu registration, branding theme at
 3. On **success**: modal transitions to an in-product confirmation state with a context-aware end-of-task CTA (for example, "View invoice" from invoice entry, or "Back to Online Payments" from settings entry). After CTA, user returns to the originating surface
 4. On **error**: modal stays open, error message displayed (see Section 8), retry button shown
 5. On **user closes modal mid-processing**: in-flight request is cancelled, no partial state persisted. Merchant can restart from the same entry point
-
----
 
 ## 7. Flow Context Requirements
 
@@ -241,8 +228,6 @@ The onboarding flow must receive the following context from its caller, regardle
 | Invoice ID | No | The invoice being viewed, if the flow was launched from an invoice |
 | Campaign ID | No | Attribution identifier if the flow was launched from a marketing campaign or deep link |
 
----
-
 ## 8. Error States
 
 | Scenario | User experience | Recovery |
@@ -254,8 +239,6 @@ The onboarding flow must receive the following context from its caller, regardle
 | Bank slot conflict | [TBC] Depends on backend slot conflict resolution (see backend API spec) | [TBC] |
 | Concurrent setup | [TBC] Last-write-wins? Optimistic locking? | [TBC] |
 | User closes modal mid-processing | Cancel the in-flight request. No partial state persisted. Merchant can restart | Re-enter the flow from the same entry point |
-
----
 
 ## 9. Post-Enablement Behaviour
 
@@ -278,16 +261,12 @@ The onboarding flow must receive the following context from its caller, regardle
 | Auto-reconciliation | Payments include invoice reference in bank statement, enabling one-to-one matching | Covered in payment-execution-pattern.md |
 | Notifications | Show an in-product confirmation screen after enablement, with configurable copy and a context-relevant end-of-task CTA. Email confirmation is not required for v1 | Aligned for v1 |
 
----
-
 ## 10. Manage / Edit Flow
 
 After initial enablement, the merchant may need to:
 
 - **Change settlement account:** Re-open the modal from Online Payments Settings (Pay by bank tile > "Change settlement account"). This entry point is required so merchants can update payout account details after setup. Same modal, pre-populated with current account. The flow mode should be "manage" (not first-time setup). Copy on the manage screen: "You can change the bank account where you receive Pay by bank transfers at any time. Changes only affect future payments." Helper text: "Pay by bank deposits will be sent directly to this bank account. Xero and Akahu do not hold or manage your customers' money."
 - **Disable Pay by bank:** Follow the existing Custom URL provider disable pattern in Online Payments settings. Merchant confirms disable action, and the payment service is removed/deactivated from branding themes per current provider behaviour.
-
----
 
 ## 11. Analytics Events
 
@@ -302,11 +281,9 @@ After initial enablement, the merchant may need to:
 | `onboarding.modal_dismissed` | Modal closed without enabling | `source`, `dismissMethod` (close button, cancel, escape) |
 | `onboarding.empty_state_shown` | No eligible accounts modal rendered | `source` |
 
----
-
 ## 12. Compliance Copy Validation Checklist
 
-All copy in this flow must comply with [AML_CFT_LLM_CONTEXT.md](../../compliance/AML_CFT_LLM_CONTEXT.md) and the approved legal phrase set.
+All copy in this flow must comply with [AML_CFT_LLM_CONTEXT.md](../../../compliance/AML_CFT_LLM_CONTEXT.md) and the approved legal phrase set.
 
 ### 12.1 Assertions (must hold for any copy change)
 
@@ -352,8 +329,6 @@ All copy in this flow must comply with [AML_CFT_LLM_CONTEXT.md](../../compliance
 
 **Legal review status:** Legal phrase set provided and incorporated. Copy in this spec uses approved phrases. Bell Gully review of final in-product copy is pending.
 
----
-
 ## 13. Design and Component Requirements
 
 ### 13.1 Components used
@@ -381,24 +356,20 @@ All copy in this flow must comply with [AML_CFT_LLM_CONTEXT.md](../../compliance
 
 Responsive/mobile variant should be supported for v1 using standard XUI responsive behaviour. This is a default expectation, but minor responsive polish should not block an initial controlled beta.
 
----
-
 ## 14. Open Questions Summary
 
 | # | Area | Question | Priority |
 |---|---|---|---|
 | C1 | Compliance | Bell Gully sign-off on final in-product copy (legal phrase set incorporated, pending final review) | P1 |
-| ~~C2~~ | ~~Compliance~~ | ~~Implied consent (button click) vs. explicit consent (checkbox)~~ | ~~Resolved: explicit checkbox adopted per legal phrase set~~ |
-| ~~C3~~ | ~~Compliance~~ | ~~AML disclaimer detail modal, final approved copy~~ | ~~Resolved: legal phrase set incorporated~~ |
-| ~~U1~~ | ~~UX~~ | ~~Empty state, deep link to add bank account~~ | ~~Resolved: no deep link in v1 beta; target cohort should already have eligible accounts~~ |
-| ~~U2~~ | ~~UX~~ | ~~Ineligible org (non-NZ) handling~~ | ~~Resolved: hide entry points for non-NZ orgs~~ |
-| ~~U3~~ | ~~UX~~ | ~~Responsive/mobile layout~~ | ~~Resolved: responsive modal expected for v1 (non-blocking polish)~~ |
-| ~~U4~~ | ~~UX~~ | ~~Confirmation notification after enablement~~ | ~~Resolved: in-product confirmation state with context-aware CTA~~ |
-| ~~P1~~ | ~~Permissions~~ | ~~Which Xero roles can enable Pay by bank~~ | ~~Resolved direction: use bank-feed-authorised permissions, preferably edit-capable roles; final role-name mapping remains follow-up~~ |
-| ~~P2~~ | ~~Product~~ | ~~Do existing draft invoices get Pay by bank after enablement~~ | ~~Resolved: branding-theme-driven behaviour applies to existing drafts; manual activation may be required where another provider is active~~ |
-| ~~P3~~ | ~~Product~~ | ~~Disable/revoke flow~~ | ~~Resolved: follow existing Custom URL provider disable behaviour, plus clear edit-account entry point~~ |
-
----
+| C2 | Compliance | Implied consent (button click) vs. explicit consent (checkbox) | Resolved: explicit checkbox adopted per legal phrase set |
+| C3 | Compliance | AML disclaimer detail modal, final approved copy | Resolved: legal phrase set incorporated |
+| U1 | UX | Empty state, deep link to add bank account | Resolved: no deep link in v1 beta; target cohort should already have eligible accounts |
+| U2 | UX | Ineligible org (non-NZ) handling | Resolved: hide entry points for non-NZ orgs |
+| U3 | UX | Responsive/mobile layout | Resolved: responsive modal expected for v1 (non-blocking polish) |
+| U4 | UX | Confirmation notification after enablement | Resolved: in-product confirmation state with context-aware CTA |
+| P1 | Permissions | Which Xero roles can enable Pay by bank | Resolved: use bank-feed-authorised permissions; final role-name mapping remains follow-up |
+| P2 | Product | Do existing draft invoices get Pay by bank after enablement | Resolved: branding-theme-driven behaviour applies to existing drafts; manual activation may be required where another provider is active |
+| P3 | Product | Disable/revoke flow | Resolved: follow existing Custom URL provider disable behaviour, plus clear edit-account entry point |
 
 ## 15. Appendix: Prototype Reference
 
@@ -418,3 +389,13 @@ The following files are from the stakeholder alignment prototype. They illustrat
 | `A2APaymentsApp/ClientApp/src/components/SetupBanner.tsx` | Entry point banner component |
 | `compliance/AML_CFT_LLM_CONTEXT.md` | Compliance guardrails (canonical) |
 | `docs/architecture/branding-themes-3-slot-problem.md` | Branding theme constraints |
+
+### 15.1 Appendix: Prototype Screenshots
+
+*Screenshots to be added from the deployed prototype.*
+
+## Sources
+
+- [Safer A2A Payments (NZ) PRD](https://xero.atlassian.net/wiki/spaces/XFS/pages/271926003257)
+- [DRAFT] High-level ERD: NZ A2A Safe Payments
+- Legal Phrase Set
