@@ -1,5 +1,5 @@
 ---
-purpose: "Lightweight decision log for Pay by Bank / Safer A2A"
+purpose: "Backbone decision log for Pay by Bank / Safer A2A implementation constraints"
 audience: "Product, Design, Engineering, Risk, CX, and AI/LLM agents"
 last_updated: "2026-03-11"
 status: "current"
@@ -7,117 +7,117 @@ status: "current"
 
 # Pay by Bank / Safer A2A Decision Log
 
-Lightweight decision log for Pay by Bank / Safer A2A NZ and global rollout.
+Canonical decision log for product, engineering, and UX/design decisions that materially constrain how Pay by Bank / Safer A2A is implemented.
 
 ## How to use this doc
 
-- Changelog gives the latest status for each decision ID.
-- Open decisions capture active alignment topics.
-- Closed decisions capture aligned outcomes, rationale, and implications.
-- Reference decisions from specs, tickets, and designs using the decision ID (for example `PBB-0005`).
+- This log is restricted to product, engineering, and UX/design decisions that materially constrain implementation.
+- Beta/rollout, cohort, GTM, and document-scope planning belongs in the PRD / Beta Plan, not in this log.
+- Changelog gives the latest status for each retained decision ID.
+- Open decisions capture unresolved implementation constraints.
+- Closed decisions capture accepted implementation constraints, rationale, and trade-offs.
+- Reference decisions from specs, tickets, and designs using the decision ID (for example `PBB-0007`).
 
 ## Changelog (summary)
 
 | Date | Decision ID | Title | Area | Status |
 |---|---|---|---|---|
 | 2026-03-10 | PBB-0001 | Merchant Settlement Account Prefill Strategy | Merchant onboarding | Accepted |
-| 2026-03-10 | PBB-0002 | Merchant Payout Bank Account Storage Pattern | Payouts / global data model | Open |
-| 2026-03-10 | PBB-0003 | Launch Surfaces & Cohorts | Launch surfaces & rollout | Open (updated with aligned UX defaults) |
-| 2026-03-10 | PBB-0004 | Merchant Permissions | Roles and permissions | Accepted (directional) |
-| 2026-03-10 | PBB-0005 | Existing Invoices | Invoicing behaviour | Accepted |
-| 2026-03-10 | PBB-0006 | Disable / Wind-back | Settings, risk, wind-back | Accepted |
-| 2026-03-11 | PBB-0003 | Launch Surfaces & Cohorts | Launch surfaces & rollout | Open (updated: beta eligibility criteria added) |
-| 2026-03-11 | PBB-0004 | Merchant Permissions | Roles and permissions | Accepted (directional, updated) |
-| 2026-03-11 | PBB-0007 | Bank Account Storage and CoA Liability Boundary | Bank account data | Accepted |
-| 2026-03-11 | PBB-0008 | Pay by Bank is Read-Only for CoA | Bank account data | Accepted |
-| 2026-03-11 | PBB-0009 | Bank Account Naming Source | Bank account UX | Accepted |
-| 2026-03-11 | PBB-0010 | Branding Theme Slot 1: Pay by Bank vs Stripe | Branding themes | Accepted |
-| 2026-03-11 | PBB-0011 | DB Schema for Settlement Account Configuration | Bank account data | Open |
-| 2026-03-11 | PBB-0012 | Evals and Observability Tooling Strategy | Observability | Open |
+| 2026-03-10 | PBB-0002 | Merchant Payout Bank Account Storage Pattern | Data model / account storage | Open |
+| 2026-03-11 | PBB-0003 | Organisation Prerequisites for Pay by Bank Availability | Eligibility / product availability | Open |
+| 2026-03-10 | PBB-0004 | Merchant Permissions | Permissions / access control | Accepted (directional) |
+| 2026-03-10 | PBB-0005 | Existing Invoices | Invoicing / branding theme behaviour | Accepted |
+| 2026-03-10 | PBB-0006 | Disable / Wind-back | Settings / provider lifecycle | Accepted |
+| 2026-03-11 | PBB-0004 | Merchant Permissions | Permissions / access control | Accepted (directional, updated) |
+| 2026-03-11 | PBB-0007 | Bank Account Storage and CoA Liability Boundary | Data storage / liability boundary | Accepted |
+| 2026-03-11 | PBB-0008 | Pay by Bank is Read-Only for CoA | CoA edit boundaries | Accepted |
+| 2026-03-11 | PBB-0009 | Bank Account Naming Source | Settlement account labelling | Accepted |
+| 2026-03-11 | PBB-0010 | Branding Theme Slot 1: Pay by Bank vs Stripe | Branding themes / payment method behaviour | Accepted |
+| 2026-03-11 | PBB-0011 | DB Schema for Settlement Account Configuration | Database schema / settlement configuration | Open |
 
 ## Open decisions
 
 ### PBB-0002 - Merchant Payout Bank Account Storage Pattern
 
 - Status: Open
-- Owner / DRI: Safer A2A Tiger Team (TBC)
+- Date: 2026-03-10
 - Theme: Merchant payout account storage and reference pattern (NZ + global)
+- Area: Data model / account storage
 
-Problem / what is open:
-- Finalise how Pay by Bank stores and references merchant payout account details across NZ and global contexts.
+Context:
+- Pay by Bank needs a durable pattern for storing and referencing merchant payout account details across NZ and any future global implementations.
+- The main architectural question is whether A2A should rely on a CoA reference, store full bank details itself, or use a hybrid snapshot model.
 
-Current leaning:
-- Reuse GoCardless / PayPal model.
-- Use Chart of Accounts (CoA) as source of truth for bank details.
-- Store reference and operational metadata in A2A (not raw bank details).
+Decision:
+- No final storage pattern is accepted yet.
+- Current preferred direction is CoA reference only, with optional A2A operational metadata rather than duplicated raw bank details.
+- Alternative options still under consideration are full A2A account storage and a hybrid CoA + A2A snapshot.
 
-Options:
-- Option A: CoA reference only (preferred), with optional A2A metadata.
-- Option B: A2A stores full account details.
-- Option C: Hybrid CoA + A2A snapshot.
+Rationale:
+- Reuses an existing provider pattern already seen in GoCardless / PayPal.
+- Avoids unnecessary duplication of bank details if CoA references are sufficient.
 
-Next steps:
-- Validate GoCardless / PayPal implementation details in code.
-- Lock A2A payout reference schema and required metadata.
-- Confirm as global pattern or document regional exceptions.
-
-### PBB-0003 - Launch Surfaces & Cohorts
-
-- Status: Open (partial alignment completed)
-- Owner / DRI: TBC
-- Theme: Launch surfaces, eligibility gating, and rollout strategy
-
-Aligned defaults from PM direction (consolidates U1-U4 without creating duplicate decision IDs):
-- Non-NZ handling: hide entry points for non-NZ orgs (regional feature pattern).
-- Empty-state deep link: no deep link in v1 beta from No eligible bank accounts.
-- Eligibility targeting: beta targets orgs with bank feed and accounts that look like valid accounts.
-- Responsive UX: responsive/mobile variant should be supported by default for v1 (not a hard blocker for minor polish).
-- Post-enable UX: show an in-product confirmation screen with configurable copy and end-of-task CTA (for example View invoice).
+Implications:
+- API contracts and DB design should remain flexible until this storage pattern is closed.
+- Regional exceptions may still be required if the NZ pattern does not hold globally.
 
 Still open:
-- Final v1 invoice surface matrix (old/new invoicing, repeating invoices, API-originated invoices, mobile).
-- Cohort phasing detail and feature-flag strategy.
-- GTM and support readiness gates by phase.
-- Definition of "valid" bank accounts for beta eligibility (for example Type="BANK", EnablePayments=true, NZD currency). Precise validation rules and the gating model (invite-only for orgs with a valid CoA bank account vs broader access with constrained feature usage) are not yet aligned.
+- Whether CoA reference only is sufficient in practice.
+- Whether the NZ pattern should become the global default or allow regional variation.
 
-Next steps:
-- Produce final surface matrix and phased rollout plan.
-- Review with Product, Design, CX, Risk, Payments.
-- Close decision once rollout plan and cohort definitions are signed off.
+### PBB-0003 - Organisation Prerequisites for Pay by Bank Availability
+
+- Status: Open
+- Date: 2026-03-11
+- Theme: Organisation prerequisites and product availability gating
+- Area: Eligibility / product availability
+
+Context:
+- Pay by Bank should only be surfaced to organisations that meet the baseline product prerequisites required for a viable setup experience.
+- This is distinct from beta cohort management or rollout phasing. The question here is what must be true about an organisation before Pay by Bank is shown as an available option at all.
+
+Decision:
+- Pay by Bank entry points should be hidden for non-NZ organisations.
+- Pay by Bank should only be surfaced when the organisation passes prerequisite checks rather than being shown universally.
+- Current direction is that prerequisite checks include a bank feed relationship and at least one bank account that passes valid-account checks.
+
+Rationale:
+- Treats availability as a product constraint, not just a rollout tactic.
+- Avoids presenting Pay by Bank to organisations that cannot complete setup or use the product meaningfully.
+
+Implications:
+- Entry-point visibility logic must evaluate organisation prerequisites before showing setup CTAs.
+- Product and engineering need a durable eligibility check that can be reused across invoice, settings, and other entry surfaces.
+
+Still open:
+- Exact definition of a valid bank account for prerequisite checks, for example whether it requires `Type="BANK"`, `EnablePayments=true`, NZD currency, or additional criteria.
 
 ### PBB-0011 - DB Schema for Settlement Account Configuration
 
 - Status: Open
-- Owner / DRI: Safer A2A Tiger Team (TBC)
+- Date: 2026-03-11
 - Theme: Bank account data storage and liability
+- Area: Database schema / settlement configuration
 
-Problem / what is open:
-- Define the exact DB schema required for Pay by Bank settlement account configuration (fields, constraints, and indexes).
-- Schema must store a reference to the CoA bank account (org ID, account identifier, account name/reference) and the merchant's settlement bank account details, without writing back to CoA.
+Context:
+- PBB-0007, PBB-0008, and PBB-0009 require Pay by Bank to store settlement configuration separately from CoA, keep CoA read-only, and reuse CoA naming in the UI.
+- The exact DB schema that implements those constraints is not yet finalised.
 
-Current leaning:
-- Likely includes org_id, CoA bank account identifier, CoA bank account name/reference, settlement bank details (BSB, account number), and audit fields. Final field list is not yet defined.
+Decision:
+- No final schema is accepted yet.
+- The schema must support an org reference, a CoA bank account reference, CoA name/reference data, settlement bank details, and auditability.
 
-Next steps:
-- Align on final schema with engineering.
-- Confirm constraints and indexing strategy.
+Rationale:
+- The accepted CoA liability boundary requires Pay by Bank to own settlement configuration in its own DB.
+- Schema design must support display, editing, and audit requirements without changing CoA records.
 
-### PBB-0012 - Evals and Observability Tooling Strategy
+Implications:
+- Backend API contracts, migrations, and admin tooling depend on this schema.
+- Field constraints, indexes, and audit fields must be finalised before implementation is locked.
 
-- Status: Open
-- Owner / DRI: TBC (Product, Engineering, Observability)
-- Theme: Experimentation, metrics, and AI-native dev lifecycle
-
-Problem / what is open:
-- No confirmed strategy for integrating evaluation, metrics, and observability tooling into the Pay by Bank development lifecycle.
-- Unclear whether and how AI-driven tooling is used to monitor data during development and operation.
-
-Current leaning:
-- No current leaning confirmed. Needs a concrete proposal.
-
-Next steps:
-- Develop a proposal covering metrics collection, evaluation frameworks, and observability ownership.
-- Align across product, engineering, and observability owners.
+Still open:
+- Exact fields, constraints, and indexes.
+- Audit model and any uniqueness or history requirements.
 
 ## Closed decisions
 
@@ -125,70 +125,110 @@ Next steps:
 
 - Status: Accepted
 - Date: 2026-03-10
-- Channel / Source: `#ai-pay-by-bank-tiger-team` Slack (summarised)
-- Owner / DRI: Safer A2A Tiger Team
+- Theme: Merchant onboarding and settlement account prefill
+- Area: Merchant onboarding UX / account data
+
+Context:
+- Onboarding should be fast and should reuse data Xero already holds where possible.
+- CoA NZD bank accounts are the closest available source for a settlement-account suggestion, but data quality is not perfect.
+- Invoice notes were considered as a possible signal but would add runtime complexity.
 
 Decision:
-- Use CoA NZD bank account as prefilled suggestion in onboarding when format checks pass.
-- Prefill is editable and must be explicitly reviewed by merchant before save.
-- Store settlement account at onboarding rather than relying on mutable free-text fields.
+- Use a CoA NZD bank account as the prefilled suggestion in onboarding when format checks pass.
+- Prefill remains editable and must be explicitly reviewed by the merchant before save.
+- Store the settlement account at onboarding rather than relying on mutable free-text fields.
 - Do not productise invoice-notes extraction for v1.
-- Launch beta with a controlled cohort and instrumentation.
 
 Rationale:
-- Balances lower onboarding friction with acceptable data quality.
-- Uses existing product/API surfaces and avoids adding a new runtime data pipeline.
+- Reduces onboarding friction while keeping merchants in control of the final stored account.
+- Reuses existing product and API surfaces instead of introducing a new runtime data pipeline.
+
+Implications:
+- Merchants can correct poor CoA data during onboarding before Pay by Bank is enabled.
+- Settlement-account persistence happens during onboarding, not at payment time.
 
 ### PBB-0004 - Merchant Permissions
 
 - Status: Accepted (directional)
 - Date: 2026-03-10 (updated 2026-03-11)
 - Theme: Roles that can enable/disable Pay by Bank
+- Area: Permissions / access control
 
 Context:
-- Pay by Bank setup and configuration (including enabling/disabling and editing settlement account details) requires a defined permission model.
-- An existing Xero bank feed authorisation capability provides a natural alignment point for who can manage bank-related configuration.
+- Pay by Bank setup and configuration, including enabling, disabling, and editing settlement account details, requires a defined permission model.
+- Existing Xero bank feed authorisation capability provides the closest alignment point for who can manage bank-related configuration.
 
 Decision:
-- The permission model for enabling and disabling Pay by Bank should align with the bank feed authorisation capability.
-- Minimum direction: users with relevant bank-feed-authorised visibility should be able to access Pay by Bank setup.
-- Preferred direction: users who can edit bank feed/payment settings can enable/disable Pay by Bank.
-- No new custom permission concept is introduced for Pay by Bank. It should be mapped onto existing Xero roles/permissions used for bank feeds and payment settings.
+- Align Pay by Bank permissions with the bank feed authorisation capability.
+- Minimum direction: users with relevant bank-feed-authorised visibility can access Pay by Bank setup.
+- Preferred direction: users who can edit bank feed/payment settings can enable and disable Pay by Bank.
+- Do not introduce a new standalone Pay by Bank permission concept.
 
 Rationale:
-- Reusing existing bank feed/payment settings permission models reduces complexity.
-- Ensures that users who manage bank-related configuration are the ones who manage Pay by Bank.
+- Reuses existing access-control concepts instead of creating a bespoke permissions model.
+- Keeps bank-related configuration with users who already manage bank and payment settings.
+
+Implications:
+- Implementation must map Pay by Bank actions onto existing Xero roles and permissions.
+- Permission checks must cover setup access, enable/disable actions, and settlement-account management.
 
 Still open:
-- Mapping the directional model to concrete Xero role names and specific permission checks (access setup, enable/disable, edit settlement configuration) is not yet defined. To be resolved as a sub-issue during implementation.
+- Exact role-name mapping and enforcement detail.
 
 ### PBB-0005 - Existing Invoices
 
 - Status: Accepted
 - Date: 2026-03-10
 - Theme: Behaviour of existing invoices after enablement
+- Area: Invoicing / branding theme behaviour
+
+Context:
+- Enabling Pay by Bank changes what payment option can appear on invoices tied to a branding theme.
+- Existing draft invoices may already reference themes that later gain the custom payment service.
 
 Decision:
-- Any invoice using a branding theme that now has the custom payment service attached can show Pay by Bank.
+- Any invoice using a branding theme that has the custom payment service attached can show Pay by Bank.
 - This applies to existing draft invoices and new invoices, subject to branding theme behaviour.
-- If another payment service is active on the branding theme (for example Stripe), merchant may need to manually activate/swap Pay by Bank on that theme.
+- If another payment service is already active on the branding theme, merchant may need to manually activate or swap Pay by Bank on that theme.
+
+Rationale:
+- Keeps invoice behaviour consistent with branding theme configuration rather than invoice creation time.
+- Avoids a separate special-case model for existing drafts versus new invoices.
+
+Implications:
+- Enabling Pay by Bank can change payment availability on already-created draft invoices.
+- Merchants with another active provider on the same theme may need manual theme changes before Pay by Bank appears.
 
 ### PBB-0006 - Disable / Wind-back
 
 - Status: Accepted
 - Date: 2026-03-10
 - Theme: Disable flow and technical wind-back
+- Area: Settings / provider lifecycle
+
+Context:
+- Merchants need a predictable way to disable Pay by Bank after enablement.
+- Disablement should align with existing Online Payments patterns rather than inventing a new provider lifecycle.
 
 Decision:
-- Disable behaviour follows existing Custom URL provider pattern in Online Payments settings.
-- Merchant confirms disable action, then payment service is removed/deactivated from branding themes per current provider behaviour.
-- Provide a clear settings entry point to edit settlement bank account.
+- Disable behaviour follows the existing Custom URL provider pattern in Online Payments settings.
+- Merchant confirms the disable action, then the payment service is removed or deactivated from branding themes per current provider behaviour.
+- Provide a clear settings entry point to edit the settlement bank account.
+
+Rationale:
+- Reuses an established settings flow that merchants and engineering already understand.
+- Minimises bespoke disable and wind-back behaviour.
+
+Implications:
+- Pay by Bank settings must surface both disable and settlement-account management entry points.
+- Theme detachment behaviour should match current provider conventions rather than a custom Pay by Bank rule.
 
 ### PBB-0007 - Bank Account Storage and CoA Liability Boundary
 
 - Status: Accepted
 - Date: 2026-03-11
 - Theme: Bank account data storage and liability
+- Area: Data storage / liability boundary
 
 Context:
 - Xero Chart of Accounts (CoA) bank account records are meaningful for accounting, but data quality is not reliable enough to use directly as the settlement account for Pay by Bank.
@@ -196,7 +236,7 @@ Context:
 
 Decision:
 - Pay by Bank will store settlement bank account details in its own application database and will not write those details back to the Xero Chart of Accounts.
-- The Pay by Bank DB will hold a reference to the selected CoA bank account (including its name/reference) plus the merchant's chosen settlement bank account details entered during onboarding.
+- The Pay by Bank DB will hold a reference to the selected CoA bank account, including its name/reference, plus the merchant's chosen settlement bank account details entered during onboarding.
 
 Rationale:
 - Avoids increasing Xero's liability by preventing Pay by Bank from editing CoA records directly.
@@ -212,6 +252,7 @@ Implications:
 - Status: Accepted
 - Date: 2026-03-11
 - Theme: Editing CoA vs Pay by Bank configuration
+- Area: CoA edit boundaries
 
 Context:
 - Pay by Bank onboarding and settings need to read CoA bank accounts to let merchants choose a settlement account.
@@ -219,7 +260,7 @@ Context:
 
 Decision:
 - The Pay by Bank UI must never directly edit Xero Chart of Accounts bank records.
-- Any changes to CoA accounts (including bank account details and labels) must go through existing Xero bank account / CoA flows outside Pay by Bank.
+- Any changes to CoA accounts, including bank account details and labels, must go through existing Xero bank account / CoA flows outside Pay by Bank.
 
 Rationale:
 - Keeps CoA change authority with existing Xero surfaces and controls, avoiding new liability and complexity in Pay by Bank.
@@ -235,6 +276,7 @@ Implications:
 - Status: Accepted
 - Date: 2026-03-11
 - Theme: Bank account naming in UI
+- Area: Settlement account labelling
 
 Context:
 - During onboarding, merchants choose a settlement account. There is both the CoA bank account name/reference and the settlement bank account details stored by Pay by Bank.
@@ -242,7 +284,7 @@ Context:
 
 Decision:
 - Pay by Bank will reuse the existing bank account name/reference from the Xero Chart of Accounts as the user-facing label for the settlement account.
-- The Pay by Bank DB will store a reference to that CoA bank account (including its name/reference) plus the underlying settlement details.
+- The Pay by Bank DB will store a reference to that CoA bank account, including its name/reference, plus the underlying settlement details.
 - Pay by Bank will not introduce a separate, independent display name for the settlement account.
 
 Rationale:
@@ -258,6 +300,7 @@ Implications:
 - Status: Accepted
 - Date: 2026-03-11
 - Theme: Branding themes and payment method slot behaviour
+- Area: Branding themes / payment method behaviour
 
 Context:
 - Existing branding themes provide three payment slots. Slot 1 is used for custom payment methods or Stripe.
@@ -271,9 +314,8 @@ Decision:
 
 Rationale:
 - Leveraging existing Slot 1 behaviour minimises changes to the branding themes system and keeps Stripe and Pay by Bank mutually exclusive in the same slot.
-- Requiring an explicit merchant choice per branding theme gives cleaner comparative data on how Pay by Bank performs relative to Stripe.
+- Requiring an explicit merchant choice per branding theme gives a cleaner behavioural model than automatic provider switching.
 
 Implications:
 - Merchants with both Stripe and Pay by Bank enabled will have some manual work: they must adjust branding themes or invoice branding choices to switch between Stripe and Pay by Bank in Slot 1.
-- Product analytics can use this to compare usage and conversion between the two payment methods.
 - UI copy and onboarding must clearly explain the Slot 1 trade-off and the manual steps for merchants who already use Stripe.
