@@ -1,7 +1,7 @@
 # Pay by Bank: Merchant Onboarding Specification
 
 Author: @Eddy Horwood
-Date: 10 March 2026
+Date: 11 March 2026
 Status: Draft, open questions flagged with [TBC]
 Audience: Engineering teams implementing A2A merchant onboarding, AI coding agents supervised by engineers
 Prototype references: https://github.com/eddyhorwood/a2a-tiger-prototypes
@@ -24,6 +24,8 @@ The business case: higher conversion from "sees the option" to "starts accepting
 - Entry from invoice view (banner and OPMM modal) and Online Payments settings
 - Success state and return-to-origin behaviour
 - Error and edge case handling
+
+> **Scoping note (open question B3):** Both the invoice entry point and the Online Payments Settings entry point are currently in scope. Whether the Settings first-time-setup entry should be deferred to Phase 2 (given branding theme complexity) is an open question — see section 14.
 
 ### Out of scope (for this version)
 
@@ -54,7 +56,7 @@ Before a merchant can enter the onboarding flow:
 | Authenticated Xero session | Xero identity / native auth | Active session; backend has token with `paymentservices` capability |
 | NZ-based organisation | Xero Organisation API (`CountryCode`) | `CountryCode === "NZ"` |
 | At least one eligible bank account | Xero Accounts API | At least one account where `Type === BANK` and `EnablePaymentsToAccount === true` |
-| User has bank-feed authorisation permissions | Xero identity / permissions + bank feed authorisation model | Direction agreed: users who can view bank-feed authorised account context should be eligible; preferred gate is users who can edit bank feed/payment settings. Final Xero role-name mapping remains an implementation follow-up |
+| User has bank-feed authorisation permissions | Xero identity / permissions + bank feed authorisation model | Direction agreed (PBB-0004): users who can view bank-feed authorised account context should be eligible; preferred gate is users who can edit bank feed/payment settings. Mapping to concrete Xero role names and permission checks is a sub-issue to be resolved during implementation. |
 | Pay by bank not already enabled | Internal state (see backend API spec) | `A2AOnboardingStatus !== 'complete_enabled'` |
 
 ## 5. User Flow
@@ -64,6 +66,21 @@ Before a merchant can enter the onboarding flow:
 ```
 Entry point → Onboarding modal (single screen) → Enable → [Backend setup] → Success → Return to origin
 ```
+
+```mermaid
+flowchart LR
+	A[Entry point] --> B[Onboarding modal]
+	B --> C[Select settlement\naccount and consent]
+	C --> D[Click Enable]
+	D --> E[Backend setup]
+	E -->|Success| F[Confirmation state]
+	E -->|Error| G[Error — retry]
+	G --> D
+	F --> H[Return to origin]
+	B -->|Cancel or dismiss| H
+```
+
+*📸 Screenshot placeholder: end-to-end flow overview. Reference prototype: `InvoiceView.tsx` → `OnboardingWizardAggressiveFast.tsx`.*
 
 The entire merchant-facing interaction is a single XUI modal. No page navigation, no multi-step wizard, no redirect to a third-party site.
 
@@ -90,6 +107,8 @@ Two entry points are in scope for v1. Both open the same modal.
 
 **Behaviour:** The onboarding modal opens as an overlay on the invoice page. On completion or dismissal, the merchant returns to the invoice.
 
+*📸 Screenshot placeholder: invoice view showing SetupBanner and OPMM modal integration. Reference prototype: `InvoiceView.tsx`.*
+
 #### 5.2.2 Online Payments Settings entry
 
 **Trigger:** Merchant navigates to Settings > Online Payments. Pay by bank tile shows status "Not configured."
@@ -106,9 +125,25 @@ Two entry points are in scope for v1. Both open the same modal.
 
 **Behaviour:** Same modal. On completion, the settings page refreshes to show Pay by bank as enabled.
 
+#### 5.2.3 Entry point visibility for orgs with an existing payment service
+
+**Decision reference:** PBB-0010
+
+Pay by Bank shares branding theme Slot 1 with Stripe. The table below defines entry point display rules.
+
+| Scenario | Entry point behaviour |
+|---|---|
+| No payment service enabled | Show all entry points: SetupBanner, OPMM button, and Settings tile |
+| Stripe (or other PS) enabled, Pay by Bank not yet enabled | [TBC — open question B1] Whether to show Pay by Bank entry points is not yet decided. Showing them risks cannibalising Stripe attach rate on the same surfaces |
+| Pay by Bank enabled | Hide first-time-setup entry points. Show manage and edit entry points only |
+
+After onboarding, if Stripe already occupies Slot 1, the merchant must manually choose which method appears on each invoice by editing their branding themes. Pay by Bank will not auto-migrate or auto-switch Stripe configurations. See section 9.3.
+
 ### 5.3 Onboarding modal (primary screen)
 
 **Container:** XUI Modal, size `large`, dismissible via close button or Cancel.
+
+*📸 Screenshot placeholder: main onboarding modal (desktop and mobile). Reference prototype: `OnboardingWizardAggressiveFast.tsx`.*
 
 **Layout (top to bottom):**
 
@@ -140,6 +175,8 @@ Four items, each with a checkmark icon (green, `var(--xero-green-success)`):
 | Display format | `{Account Name} - {Full Bank Account Number}` (e.g. "ANZ Business Account - 06-0123-0456789-00") |
 | Default selection | None. The dropdown shows "Select an account..." until the merchant explicitly chooses |
 | Single account edge case | If only one eligible account exists, pre-select it |
+
+> **Decisions PBB-0007, PBB-0008, PBB-0009:** The account name shown in the selector comes from the CoA bank account name/reference (PBB-0009). Pay by Bank reads CoA but never writes to it (PBB-0008). Settlement bank account details entered here are stored in the Pay by Bank application database, not written back to CoA (PBB-0007). If a merchant needs to correct or rename a CoA bank account, they must do so via standard Xero bank account flows.
 
 #### AML/CFT disclosure
 
@@ -249,19 +286,37 @@ The onboarding flow must receive the following context from its caller, regardle
 | Modal closes | On successful enablement, transition to confirmation state first, then close after user action |
 | Navigation | Context-aware confirmation CTA returns the merchant to the originating surface (invoice view or settings page) |
 | Settings page | If entry was from settings: Pay by bank tile updates to show `SETUP_COMPLETE` status with settlement account display |
-| Invoice page | If entry was from invoice: Pay by bank availability reflects branding theme attachment after setup. If another payment service already occupies the relevant slot, merchant may need manual activation on the branding theme |
+| Invoice page | If entry was from invoice: Pay by bank availability reflects branding theme attachment after setup. If Stripe or another payment service already occupies Slot 1 on the branding theme, the merchant must manually activate Pay by Bank on that theme (PBB-0010). See section 9.3 for full branding theme strategy |
 
 ### 9.2 Downstream effects
 
 | Effect | Detail | Status |
 |---|---|---|
-| New invoices | Invoices created after enablement include Pay by bank as a payment option (assuming branding theme attachment) | Depends on backend branding theme behaviour (see backend API spec) |
-| Existing draft invoices | Any invoice (including existing drafts) that uses a branding theme with the custom payment service attached now has Pay by bank available. If another payment service is already active on that branding theme (for example Stripe), merchant must manually activate/swap as required | Aligned (10 Mar 2026), subject to branding theme slot logic |
+| New invoices | Invoices created after enablement include Pay by bank as a payment option, subject to branding theme attachment (PBB-0010). If Slot 1 is already occupied by Stripe, Pay by Bank will not appear until the merchant manually adjusts their branding theme | PBB-0010, PBB-0005 |
+| Existing draft invoices | Any invoice (including existing drafts) that uses a branding theme with the custom payment service attached now has Pay by bank available. If Stripe or another payment service is already in Slot 1 on that branding theme, the merchant must manually activate/swap. No auto-migration (PBB-0010) | PBB-0005, PBB-0010 |
 | Payer experience | Online invoices display a "Pay by bank" button. Clicking initiates the Akahu payment flow | Covered in separate spec (payment-execution-pattern.md) |
 | Auto-reconciliation | Payments include invoice reference in bank statement, enabling one-to-one matching | Covered in payment-execution-pattern.md |
 | Notifications | Show an in-product confirmation screen after enablement, with configurable copy and a context-relevant end-of-task CTA. Email confirmation is not required for v1 | Aligned for v1 |
 
+### 9.3 Branding theme attachment strategy
+
+**Decision reference:** PBB-0010, PBB-0005
+
+Pay by Bank operates as a custom payment method in branding theme Slot 1, which it shares with Stripe.
+
+| Scenario | Behaviour |
+|---|---|
+| No payment service in Slot 1 | Pay by Bank is attached to the branding theme as a custom payment method during enablement |
+| Stripe already in Slot 1 | Pay by Bank is added as a custom payment method, but Stripe remains active in Slot 1. The merchant must manually edit each branding theme to switch between Stripe and Pay by Bank. No auto-migration |
+| Multiple branding themes | [TBC — open question B2] Whether Pay by Bank attaches to the merchant's default theme only, all existing themes, or requires manual per-theme activation is not yet defined |
+
+**Rationale (PBB-0010):** Slot 1 sharing minimises changes to the branding themes system. Requiring an explicit merchant choice per branding theme gives cleaner comparative data between Stripe and Pay by Bank.
+
+**Merchant action required where Stripe is active:** UI copy in onboarding and settings must clearly explain that merchants with Stripe will have manual steps to switch payment methods per theme and per invoice. This is not handled automatically.
+
 ## 10. Manage / Edit Flow
+
+*📸 Screenshot placeholder: Online Payments Settings showing the Pay by Bank tile with "Change settlement account" and "Disable" options. Reference prototype: `OnlinePaymentsSettings.tsx`.*
 
 After initial enablement, the merchant may need to:
 
@@ -367,9 +422,12 @@ Responsive/mobile variant should be supported for v1 using standard XUI responsi
 | U2 | UX | Ineligible org (non-NZ) handling | Resolved: hide entry points for non-NZ orgs |
 | U3 | UX | Responsive/mobile layout | Resolved: responsive modal expected for v1 (non-blocking polish) |
 | U4 | UX | Confirmation notification after enablement | Resolved: in-product confirmation state with context-aware CTA |
-| P1 | Permissions | Which Xero roles can enable Pay by bank | Resolved: use bank-feed-authorised permissions; final role-name mapping remains follow-up |
+| P1 | Permissions | Which Xero roles can enable Pay by bank | Resolved: use bank-feed-authorised permissions (PBB-0004). Mapping to specific Xero role names is a sub-issue for implementation. |
 | P2 | Product | Do existing draft invoices get Pay by bank after enablement | Resolved: branding-theme-driven behaviour applies to existing drafts; manual activation may be required where another provider is active |
 | P3 | Product | Disable/revoke flow | Resolved: follow existing Custom URL provider disable behaviour, plus clear edit-account entry point |
+| B1 | Branding themes | Entry point visibility for orgs with an existing PS: should Pay by Bank entry points (SetupBanner, OPMM, Settings tile) be shown to orgs that already have Stripe or another PS active? Risk of cannibalising Stripe attach rate if surfaced on the same invoicing surfaces | P1 |
+| B2 | Branding themes | Branding theme attachment approach: does Pay by Bank attach to the merchant's default theme only, to all existing themes, or require manual per-theme activation? Slot 1 sharing is decided (PBB-0010); the attachment mechanics are not | P1 |
+| B3 | Scope | Phase 1 vs Phase 2 for Settings entry point: should the Online Payments Settings first-time-setup entry point (and associated branding theme complexity) be deferred to Phase 2 scope, with Phase 1 scoped to the invoice entry point only? | P2 |
 
 ## 15. Appendix: Prototype Reference
 
